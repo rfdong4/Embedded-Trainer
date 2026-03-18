@@ -1,0 +1,29 @@
+id: reg_read_modify_write
+topic_id: registers
+title: "Read-Modify-Write"
+difficulty: intermediate
+description: |
+  Implement a read-modify-write operation on a register value.
+
+  Given a 32-bit register value, first clear all bits specified by clear_mask,
+  then set all bits specified by set_mask.
+
+  This is the fundamental pattern used to modify specific fields in a
+  hardware register without disturbing other bits.
+
+  Formula: result = (reg_val & ~clear_mask) | set_mask
+function_signature: "uint32_t reg_rmw(uint32_t reg_val, uint32_t clear_mask, uint32_t set_mask)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t reg_rmw(uint32_t reg_val, uint32_t clear_mask, uint32_t set_mask) {
+      // TODO: implement
+      return 0;
+  }
+test_harness: "reg_read_modify_write_tests/test_main.c"
+expected_output: "reg_read_modify_write_tests/expected_output.txt"
+hints:
+  - "First clear: reg_val &= ~clear_mask; then set: reg_val |= set_mask."
+  - "The clear_mask specifies which bits to zero out; set_mask specifies which bits to turn on."
+xp: 30
+time_limit: 5

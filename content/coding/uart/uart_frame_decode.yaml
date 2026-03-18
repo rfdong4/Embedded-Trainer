@@ -1,0 +1,33 @@
+id: uart_uart_frame_decode
+topic_id: uart
+title: "Decode a UART Frame"
+difficulty: intermediate
+description: |
+  Implement a function that decodes a UART frame (uint16_t) and extracts the
+  data byte. The frame format (LSB first) is:
+
+    Bit 0:    Start bit (must be 0)
+    Bits 1-8: Data bits (LSB of data at bit 1)
+    Bit 9:    Even parity bit
+    Bit 10:   Stop bit (must be 1)
+
+  Validate the frame by checking:
+  1. Start bit (bit 0) is 0
+  2. Stop bit (bit 10) is 1
+  3. Even parity: the number of 1-bits in data + parity bit is even
+
+  Return the extracted 8-bit data byte if valid, or 0xFF if any check fails.
+function_signature: "uint8_t uart_decode_frame(uint16_t frame)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t uart_decode_frame(uint16_t frame) {
+      // TODO: implement
+  }
+test_harness: "uart_frame_decode_tests/test_main.c"
+expected_output: "uart_frame_decode_tests/expected_output.txt"
+hints:
+  - "Extract start bit with (frame & 1), data with (frame >> 1) & 0xFF, parity with (frame >> 9) & 1, stop with (frame >> 10) & 1."
+  - "Count 1-bits in the data byte. The parity bit should make the total count even."
+xp: 30
+time_limit: 5

@@ -1,0 +1,22 @@
+QuizScreen {
+    layout: vertical;
+}
+
+#quiz-header {
+    height: 3;
+    padding: 0 2;
+    background: $primary-background;
+}
+
+#quiz-content {
+    height: 1fr;
+    overflow-y: auto;
+    padding: 1 2;
+}
+
+#quiz-nav {
+    dock: bottom;
+    height: 3;
+    layout: horizontal;
+    padding: 0 2;
+}

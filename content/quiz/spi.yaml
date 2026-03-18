@@ -1,0 +1,110 @@
+topic_id: spi
+topic_name: "SPI Communication"
+questions:
+  - id: spi_q01
+    type: mcq
+    difficulty: beginner
+    text: "How many signal lines does a basic SPI bus use?"
+    options:
+      - "A) 2 (SDA, SCL)"
+      - "B) 3 (MOSI, MISO, SCLK)"
+      - "C) 4 (MOSI, MISO, SCLK, CS/SS)"
+      - "D) 1 (DATA)"
+    correct: "C"
+    explanation: "A standard SPI bus uses 4 lines: MOSI (Master Out Slave In), MISO (Master In Slave Out), SCLK (Serial Clock), and CS/SS (Chip Select / Slave Select). CS is active low and selects which slave communicates."
+    tags: [spi, signal_lines, basics]
+    xp: 10
+
+  - id: spi_q02
+    type: true_false
+    difficulty: beginner
+    text: "SPI is a full-duplex communication protocol, meaning data can be sent and received simultaneously."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "SPI uses separate MOSI and MISO lines, allowing the master and slave to exchange data simultaneously on each clock cycle. Each clock pulse shifts one bit out on MOSI and one bit in on MISO."
+    tags: [full_duplex, mosi, miso]
+    xp: 10
+
+  - id: spi_q03
+    type: mcq
+    difficulty: beginner
+    text: "In SPI communication, which device generates the clock signal?"
+    options:
+      - "A) The slave device"
+      - "B) The master device"
+      - "C) Both devices generate their own clocks"
+      - "D) An external oscillator shared by both"
+    correct: "B"
+    explanation: "The SPI master always generates the SCLK signal. The slave uses this clock to synchronize data transfer. This makes SPI a synchronous protocol and eliminates baud rate mismatch issues."
+    tags: [master, clock, synchronous]
+    xp: 10
+
+  - id: spi_q04
+    type: mcq
+    difficulty: intermediate
+    text: "What do CPOL and CPHA define in SPI communication?"
+    options:
+      - "A) The data word length and bit order"
+      - "B) The clock polarity at idle and the clock phase for data sampling"
+      - "C) The chip select polarity and the data hold time"
+      - "D) The clock frequency and prescaler division"
+    correct: "B"
+    explanation: "CPOL (Clock Polarity) defines the idle state of the clock (0=low, 1=high). CPHA (Clock Phase) defines which edge data is sampled on (0=first edge, 1=second edge). Together they create 4 SPI modes (0-3)."
+    tags: [cpol, cpha, spi_modes]
+    xp: 15
+
+  - id: spi_q05
+    type: mcq
+    difficulty: intermediate
+    text: "In SPI Mode 0 (CPOL=0, CPHA=0), when is data sampled?"
+    options:
+      - "A) On the rising edge of SCLK"
+      - "B) On the falling edge of SCLK"
+      - "C) On both edges of SCLK"
+      - "D) Between clock pulses"
+    correct: "A"
+    explanation: "In Mode 0, CPOL=0 means clock idles low. CPHA=0 means data is sampled on the first clock edge. Since the clock starts low, the first edge is a rising edge. Data is set up on the falling edge and sampled on the rising edge."
+    tags: [mode_0, sampling_edge, clock_polarity]
+    xp: 15
+
+  - id: spi_q06
+    type: mcq
+    difficulty: intermediate
+    text: "When multiple slave devices share an SPI bus, how does the master select which slave to communicate with?"
+    options:
+      - "A) By changing the clock frequency"
+      - "B) By sending the slave's address in the first byte"
+      - "C) By asserting (driving low) only that slave's dedicated chip select (CS) line"
+      - "D) By using different MOSI lines for each slave"
+    correct: "C"
+    explanation: "Each slave has its own CS line connected to the master. The master drives the desired slave's CS low to select it while keeping all other CS lines high. Only the selected slave responds on the MISO line."
+    tags: [chip_select, multi_slave, bus_topology]
+    xp: 15
+
+  - id: spi_q07
+    type: mcq
+    difficulty: advanced
+    text: "What is a potential problem when the SPI master reads data from a slave and the master transmits dummy bytes to generate clock cycles?"
+    options:
+      - "A) The slave will interpret dummy bytes as commands"
+      - "B) There is no problem; this is standard SPI practice"
+      - "C) The clock frequency becomes unstable"
+      - "D) The MISO line will float"
+    correct: "B"
+    explanation: "This is normal SPI operation. Since SPI is full-duplex, the master must transmit something to generate clock pulses for receiving. Sending 0x00 or 0xFF as dummy data is standard practice. Well-designed slaves ignore MOSI data when they are in a data-output phase."
+    tags: [dummy_bytes, read_operation, full_duplex]
+    xp: 25
+
+  - id: spi_q08
+    type: mcq
+    difficulty: advanced
+    text: "Compared to I2C, which of the following is NOT an advantage of SPI?"
+    options:
+      - "A) Higher maximum clock speed"
+      - "B) Full-duplex communication"
+      - "C) Fewer signal lines needed for multiple slaves"
+      - "D) No addressing overhead in each transaction"
+    correct: "C"
+    explanation: "SPI requires a separate CS line for each slave, so pin count grows with the number of slaves: 3 + N lines for N slaves. I2C uses only 2 lines (SDA, SCL) regardless of slave count, using addressing instead. SPI advantages include higher speed, full-duplex, and no addressing overhead."
+    tags: [spi_vs_i2c, pin_count, tradeoffs]
+    xp: 25

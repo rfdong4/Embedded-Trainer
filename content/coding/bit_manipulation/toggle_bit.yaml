@@ -1,0 +1,23 @@
+id: bit_toggle_bit
+topic_id: bit_manipulation
+title: "Toggle a Bit in a Register"
+difficulty: beginner
+description: |
+  Implement a function that toggles (flips) a specific bit in an 8-bit register
+  value. If the bit is 0, it becomes 1; if it is 1, it becomes 0.
+
+  For example, toggle_bit(0x0F, 3) should return 0x07 (bit 3 flipped from 1 to 0).
+function_signature: "uint8_t toggle_bit(uint8_t reg, uint8_t bit_pos)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t toggle_bit(uint8_t reg, uint8_t bit_pos) {
+      // TODO: implement
+  }
+test_harness: "toggle_bit_tests/test_main.c"
+expected_output: "toggle_bit_tests/expected_output.txt"
+hints:
+  - "The XOR operator (^) flips a bit: 0^1=1 and 1^1=0."
+  - "Use reg ^ (1 << bit_pos) to toggle just the target bit."
+xp: 25
+time_limit: 5

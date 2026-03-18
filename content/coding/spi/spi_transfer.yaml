@@ -1,0 +1,27 @@
+id: spi_spi_transfer
+topic_id: spi
+title: "Bit-Banged SPI Byte Transfer"
+difficulty: beginner
+description: |
+  Simulate a bit-banged SPI byte transfer. For this exercise, implement a
+  function that reverses the bits of a byte (simulating MSB-first SPI
+  transmission where the "received" data is the bit-reversed transmit data).
+
+  Bit 7 of the input becomes bit 0 of the output, bit 6 becomes bit 1, etc.
+
+  For example, spi_transfer(0xA5) = 0xA5 reversed = 0xA5 (10100101 -> 10100101).
+  spi_transfer(0x80) = 0x01 (10000000 -> 00000001).
+function_signature: "uint8_t spi_transfer(uint8_t tx_byte)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t spi_transfer(uint8_t tx_byte) {
+      // TODO: implement - reverse the bits of tx_byte
+  }
+test_harness: "spi_transfer_tests/test_main.c"
+expected_output: "spi_transfer_tests/expected_output.txt"
+hints:
+  - "Loop 8 times, shifting the result left and adding the LSB of the input each time."
+  - "Extract LSB with (tx_byte & 1), then shift tx_byte right."
+xp: 35
+time_limit: 5

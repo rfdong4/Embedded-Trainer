@@ -1,0 +1,134 @@
+topic_id: gpio
+topic_name: "GPIO (General Purpose Input/Output)"
+questions:
+  - id: gpio_q01
+    type: mcq
+    difficulty: beginner
+    text: "What does GPIO stand for?"
+    options:
+      - "A) General Programmable Input/Output"
+      - "B) General Purpose Input/Output"
+      - "C) Global Peripheral Interface Operation"
+      - "D) General Pin I/O"
+    correct: "B"
+    explanation: "GPIO stands for General Purpose Input/Output. These are digital pins on a microcontroller that can be configured as either inputs or outputs under software control."
+    tags: [gpio, basics]
+    xp: 10
+
+  - id: gpio_q02
+    type: mcq
+    difficulty: beginner
+    text: "In push-pull output mode, what happens when the GPIO output is set to logic high?"
+    options:
+      - "A) The pin is left floating"
+      - "B) The upper PMOS transistor turns on, connecting the pin to VDD"
+      - "C) An external pull-up resistor drives the pin high"
+      - "D) The lower NMOS transistor turns on, connecting the pin to GND"
+    correct: "B"
+    explanation: "In push-pull mode, the output stage has two transistors: a PMOS (high-side) and an NMOS (low-side). For logic high, the PMOS turns on and actively drives the pin to VDD. For logic low, the NMOS turns on and drives the pin to GND."
+    tags: [push_pull, output_mode]
+    xp: 10
+
+  - id: gpio_q03
+    type: true_false
+    difficulty: beginner
+    text: "A pull-up resistor connected to a GPIO input pin ensures the pin reads logic high when no external signal is applied."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "A pull-up resistor connects the pin to VDD through a resistor, ensuring a defined high logic level when the pin is not actively driven by an external source. This prevents the pin from floating."
+    tags: [pull_up, input_mode]
+    xp: 10
+
+  - id: gpio_q04
+    type: mcq
+    difficulty: beginner
+    text: "Which GPIO configuration is required to read the state of an external push button?"
+    options:
+      - "A) Output push-pull"
+      - "B) Output open-drain"
+      - "C) Input with pull-up or pull-down"
+      - "D) Analog mode"
+    correct: "C"
+    explanation: "To read a button, the pin must be configured as an input. A pull-up or pull-down resistor provides a defined logic level when the button is not pressed, preventing a floating input."
+    tags: [input_mode, button, pull_resistor]
+    xp: 10
+
+  - id: gpio_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is the key advantage of open-drain output mode over push-pull?"
+    options:
+      - "A) Faster switching speed"
+      - "B) Lower power consumption in all cases"
+      - "C) Allows wired-AND/OR logic and level shifting with an external pull-up"
+      - "D) Does not require any external components"
+    correct: "C"
+    explanation: "Open-drain can only actively pull the line low; the high state is achieved via an external pull-up. This allows multiple devices to share a line (wired-AND), and the pull-up can be connected to a different voltage for level shifting."
+    tags: [open_drain, wired_and, level_shifting]
+    xp: 15
+
+  - id: gpio_q06
+    type: mcq
+    difficulty: intermediate
+    text: "On an STM32 microcontroller, which register is used to atomically set or reset individual GPIO pins without a read-modify-write operation?"
+    options:
+      - "A) GPIOx_IDR (Input Data Register)"
+      - "B) GPIOx_ODR (Output Data Register)"
+      - "C) GPIOx_BSRR (Bit Set/Reset Register)"
+      - "D) GPIOx_MODER (Mode Register)"
+    correct: "C"
+    explanation: "The BSRR register allows atomic set and reset of individual pins. Writing to the lower 16 bits sets pins, writing to the upper 16 bits resets pins. This is a single write operation with no read-modify-write race condition."
+    tags: [bsrr, atomic, stm32]
+    xp: 15
+
+  - id: gpio_q07
+    type: true_false
+    difficulty: intermediate
+    text: "Configuring a GPIO pin in analog mode disables the digital input buffer, reducing power consumption."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "When a pin is set to analog mode (e.g., for ADC use), the digital input Schmitt trigger is disabled. This prevents unnecessary switching of the digital input buffer and reduces power consumption, especially important for pins connected to slowly varying analog signals."
+    tags: [analog_mode, power, schmitt_trigger]
+    xp: 15
+
+  - id: gpio_q08
+    type: mcq
+    difficulty: intermediate
+    text: "What is the purpose of the GPIO alternate function selection on Cortex-M microcontrollers?"
+    options:
+      - "A) To allow a pin to output both high and low simultaneously"
+      - "B) To connect the pin to an internal peripheral like UART, SPI, or Timer"
+      - "C) To enable both input and output at the same time"
+      - "D) To increase the output current drive strength"
+    correct: "B"
+    explanation: "Alternate function mode routes the pin to an internal peripheral (UART TX/RX, SPI MOSI/MISO, Timer PWM output, etc.) instead of being controlled by the GPIO output data register. Each pin typically has multiple alternate function mappings."
+    tags: [alternate_function, peripheral_mapping]
+    xp: 15
+
+  - id: gpio_q09
+    type: mcq
+    difficulty: advanced
+    text: "An LED is connected between a GPIO pin and GND with a 330 ohm resistor. The MCU operates at 3.3V and the GPIO output high voltage is 3.0V. The LED forward voltage is 2.0V. What is the approximate current through the LED?"
+    options:
+      - "A) 1.0 mA"
+      - "B) 3.0 mA"
+      - "C) 6.1 mA"
+      - "D) 10.0 mA"
+    correct: "B"
+    explanation: "Using Ohm's law: I = (Vout - Vled) / R = (3.0V - 2.0V) / 330 ohm = 1.0V / 330 ohm = approximately 3.0 mA."
+    tags: [led_calculation, ohms_law, current]
+    xp: 25
+
+  - id: gpio_q10
+    type: mcq
+    difficulty: advanced
+    text: "On an STM32, the GPIOx_OSPEEDR register controls the output speed setting. What does increasing the speed setting primarily affect?"
+    options:
+      - "A) The maximum frequency of the GPIO clock"
+      - "B) The output slew rate and maximum toggle frequency of the pin"
+      - "C) The input sampling rate"
+      - "D) The pull-up/pull-down resistor value"
+    correct: "B"
+    explanation: "The speed setting controls the output driver's slew rate. Higher speed settings allow faster edge transitions and higher toggle frequencies, but increase EMI emissions and power consumption. For low-frequency signals, a lower speed setting is preferred to reduce noise."
+    tags: [slew_rate, ospeedr, emi, signal_integrity]
+    xp: 25

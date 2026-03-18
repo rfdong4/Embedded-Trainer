@@ -1,0 +1,42 @@
+id: mem_checksum
+topic_id: memory_management
+title: "CRC-8 Memory Checksum"
+difficulty: intermediate
+description: |
+  Implement a CRC-8 checksum calculation over a memory region, commonly used
+  in embedded systems for data integrity verification over flash, EEPROM, or
+  communication buffers.
+
+  Use the standard CRC-8 polynomial 0x07 (x^8 + x^2 + x + 1) with an
+  initial value of 0x00. Process each byte MSB-first.
+
+  Algorithm for each byte:
+  1. XOR the byte into the CRC register.
+  2. For each of the 8 bits: if the MSB of the CRC is set, left-shift and
+     XOR with the polynomial; otherwise, just left-shift.
+  3. After all bytes, the CRC register holds the result.
+
+  Implement:
+  - crc8_calc: Compute CRC-8 over the given data buffer of length len.
+  - crc8_verify: Compute CRC-8 over data and compare to expected checksum.
+    Return 1 if they match, 0 otherwise.
+function_signature: "uint8_t crc8_calc(const uint8_t *data, uint32_t len) / int crc8_verify(const uint8_t *data, uint32_t len, uint8_t expected)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define CRC8_POLY 0x07
+
+  uint8_t crc8_calc(const uint8_t *data, uint32_t len) {
+      // TODO: compute CRC-8 with polynomial 0x07
+  }
+
+  int crc8_verify(const uint8_t *data, uint32_t len, uint8_t expected) {
+      // TODO: return 1 if crc8_calc matches expected, 0 otherwise
+  }
+test_harness: "mem_checksum_tests/test_main.c"
+expected_output: "mem_checksum_tests/expected_output.txt"
+hints:
+  - "Initialize crc = 0. For each byte: crc ^= byte. Then loop 8 times: if (crc & 0x80) crc = (crc << 1) ^ POLY; else crc <<= 1."
+  - "Remember to mask the CRC to 8 bits: use uint8_t or mask with 0xFF after shifts."
+xp: 30
+time_limit: 5

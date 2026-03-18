@@ -1,0 +1,29 @@
+id: gpio_configure_pin
+topic_id: gpio
+title: "Configure a GPIO Pin Direction"
+difficulty: beginner
+description: |
+  Implement a function that configures a GPIO pin as either input or output by
+  modifying a 32-bit direction register. Each bit in the register corresponds
+  to one pin: 1 = output, 0 = input.
+
+  Parameters:
+  - dir_reg: current value of the direction register
+  - pin: pin number (0-31)
+  - mode: 0 for input, 1 for output
+
+  Return the updated direction register value.
+function_signature: "uint32_t configure_pin(uint32_t dir_reg, uint8_t pin, uint8_t mode)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t configure_pin(uint32_t dir_reg, uint8_t pin, uint8_t mode) {
+      // TODO: implement
+  }
+test_harness: "configure_pin_tests/test_main.c"
+expected_output: "configure_pin_tests/expected_output.txt"
+hints:
+  - "To set a pin as output, OR the register with (1 << pin)."
+  - "To set a pin as input, AND the register with ~(1 << pin)."
+xp: 30
+time_limit: 5

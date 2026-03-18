@@ -1,0 +1,40 @@
+id: memory_management_stack_watermark
+topic_id: memory_management
+title: "Stack Watermark Detection"
+difficulty: advanced
+description: |
+  Implement stack watermark detection, a technique used in embedded systems to
+  measure peak stack usage at runtime.
+
+  Implement two functions:
+  - stack_paint: Fill a uint32_t buffer of the given size (number of uint32_t
+    elements) with the pattern 0xDEADBEEF. This "paints" the stack region before
+    use.
+  - stack_check_usage: Scan the buffer from the START (index 0) and count how
+    many consecutive uint32_t elements still contain 0xDEADBEEF (untouched).
+    Return (size - untouched_count), which represents the number of uint32_t
+    elements that were overwritten (peak usage measured from the END of the
+    buffer, simulating a stack that grows downward).
+
+  This technique works because a stack growing downward overwrites entries from
+  the end of the buffer toward the beginning.
+function_signature: "void stack_paint(uint32_t* buf, uint32_t size) / uint32_t stack_check_usage(const uint32_t* buf, uint32_t size)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define STACK_PAINT_PATTERN 0xDEADBEEF
+
+  void stack_paint(uint32_t* buf, uint32_t size) {
+      // TODO: fill buf with STACK_PAINT_PATTERN
+  }
+
+  uint32_t stack_check_usage(const uint32_t* buf, uint32_t size) {
+      // TODO: count untouched words from start, return size - untouched
+  }
+test_harness: "stack_watermark_tests/test_main.c"
+expected_output: "stack_watermark_tests/expected_output.txt"
+hints:
+  - "stack_paint just loops through the buffer setting each element to 0xDEADBEEF."
+  - "In stack_check_usage, count from index 0 while buf[i] == 0xDEADBEEF, then return size minus that count."
+xp: 50
+time_limit: 5

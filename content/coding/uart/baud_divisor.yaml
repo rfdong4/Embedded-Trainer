@@ -1,0 +1,26 @@
+id: uart_baud_divisor
+topic_id: uart
+title: "Calculate UART Baud Rate Divisor"
+difficulty: beginner
+description: |
+  Implement a function that calculates the baud rate divisor for a UART
+  peripheral. The divisor is calculated as:
+
+    divisor = clock_freq / (16 * baud_rate)
+
+  This is how most UART hardware determines the correct timing for serial
+  communication. Integer division is sufficient (truncate, don't round).
+function_signature: "uint16_t baud_divisor(uint32_t clock_freq, uint32_t baud_rate)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint16_t baud_divisor(uint32_t clock_freq, uint32_t baud_rate) {
+      // TODO: implement
+  }
+test_harness: "baud_divisor_tests/test_main.c"
+expected_output: "baud_divisor_tests/expected_output.txt"
+hints:
+  - "Simply divide clock_freq by (16 * baud_rate)."
+  - "Be careful with integer overflow: 16 * baud_rate could overflow if baud_rate is large, but typical UART baud rates are small enough."
+xp: 25
+time_limit: 5

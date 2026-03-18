@@ -1,0 +1,134 @@
+topic_id: timers
+topic_name: "Timers and PWM"
+questions:
+  - id: timers_q01
+    type: mcq
+    difficulty: beginner
+    text: "What is the purpose of a prescaler in a timer peripheral?"
+    options:
+      - "A) To multiply the timer clock frequency"
+      - "B) To divide the input clock frequency before it reaches the timer counter"
+      - "C) To set the duty cycle of a PWM signal"
+      - "D) To store the previous counter value"
+    correct: "B"
+    explanation: "A prescaler divides the timer's input clock frequency by a configurable factor. For example, a 72 MHz clock with prescaler = 71 produces a 1 MHz timer tick (72 MHz / (71+1) = 1 MHz). This extends the timer's counting range."
+    tags: [prescaler, clock_division]
+    xp: 10
+
+  - id: timers_q02
+    type: mcq
+    difficulty: beginner
+    text: "What happens when a timer counter reaches its auto-reload (ARR) value in up-counting mode?"
+    options:
+      - "A) The counter stops permanently"
+      - "B) The counter overflows to the maximum 32-bit value"
+      - "C) The counter resets to zero and an update event is generated"
+      - "D) The prescaler value is doubled"
+    correct: "C"
+    explanation: "In up-counting mode, the counter increments from 0 to the ARR value. When it matches ARR, an update event (UEV) is generated, the counter resets to 0, and optionally an interrupt flag is set."
+    tags: [auto_reload, up_counting, update_event]
+    xp: 10
+
+  - id: timers_q03
+    type: true_false
+    difficulty: beginner
+    text: "PWM (Pulse Width Modulation) varies the duty cycle of a square wave to control the average power delivered to a load."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "PWM controls average power by varying the ratio of on-time to total period. A 50% duty cycle delivers half the average power of a 100% duty cycle. This is used for LED dimming, motor speed control, and many other applications."
+    tags: [pwm, duty_cycle, average_power]
+    xp: 10
+
+  - id: timers_q04
+    type: mcq
+    difficulty: intermediate
+    text: "A timer runs at 1 MHz (after prescaler) with an ARR value of 999. What is the timer overflow frequency?"
+    options:
+      - "A) 100 Hz"
+      - "B) 1 kHz"
+      - "C) 10 kHz"
+      - "D) 999 Hz"
+    correct: "B"
+    explanation: "The timer counts from 0 to 999 (1000 ticks). Overflow frequency = timer clock / (ARR + 1) = 1,000,000 / 1000 = 1000 Hz = 1 kHz."
+    tags: [overflow_frequency, calculation, arr]
+    xp: 15
+
+  - id: timers_q05
+    type: mcq
+    difficulty: intermediate
+    text: "To generate a 25% duty cycle PWM signal, what should the Capture/Compare Register (CCR) value be if the ARR is set to 999?"
+    options:
+      - "A) 25"
+      - "B) 249"
+      - "C) 250"
+      - "D) 750"
+    correct: "B"
+    explanation: "Duty cycle = CCR / (ARR + 1). For 25%: CCR = 0.25 * (999 + 1) = 250. Since the counter counts from 0, and the output is high while counter < CCR, CCR = 250 gives exactly 250/1000 = 25%. With 0-indexed match at 249 (values 0-249 = 250 ticks high), CCR = 249 on some implementations. Typically CCR = 250 for PWM mode 1 where output is active while CNT < CCR."
+    tags: [pwm_duty_cycle, ccr, calculation]
+    xp: 15
+
+  - id: timers_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What is the input capture mode of a timer used for?"
+    options:
+      - "A) To capture keyboard input from a user"
+      - "B) To measure the time between external signal edges by recording the counter value on each edge"
+      - "C) To capture the prescaler value at a specific time"
+      - "D) To store the auto-reload value into a buffer"
+    correct: "B"
+    explanation: "Input capture records the timer counter value into the CCR register when a defined edge (rising, falling, or both) is detected on the input pin. By comparing two consecutive captures, you can measure pulse width, period, or frequency of an external signal."
+    tags: [input_capture, frequency_measurement, edge_detection]
+    xp: 15
+
+  - id: timers_q07
+    type: true_false
+    difficulty: intermediate
+    text: "A dead-time insertion feature in a timer is used to prevent shoot-through in complementary PWM outputs driving an H-bridge."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "In an H-bridge or half-bridge, complementary outputs must never be on simultaneously to avoid a short circuit (shoot-through). Dead-time insertion adds a brief delay during switching transitions where both outputs are off, allowing the transistors to fully turn off before the opposite one turns on."
+    tags: [dead_time, h_bridge, complementary_pwm]
+    xp: 15
+
+  - id: timers_q08
+    type: mcq
+    difficulty: advanced
+    text: "A system clock is 72 MHz. You need a timer interrupt exactly every 500 microseconds. The timer is 16-bit (max count 65535). Which prescaler (PSC) and auto-reload (ARR) combination works?"
+    options:
+      - "A) PSC = 71, ARR = 499"
+      - "B) PSC = 0, ARR = 35999"
+      - "C) PSC = 35, ARR = 999"
+      - "D) All of the above"
+    correct: "D"
+    explanation: "Period = (PSC+1) * (ARR+1) / Fclk. For 500us at 72 MHz we need 36000 ticks. A) (72)(500) = 36000. B) (1)(36000) = 36000. C) (36)(1000) = 36000. All produce exactly 36000 cycles = 500us at 72 MHz, and all values fit in 16 bits."
+    tags: [timer_calculation, prescaler, arr, system_clock]
+    xp: 25
+
+  - id: timers_q09
+    type: mcq
+    difficulty: advanced
+    text: "Using input capture with a 1 MHz timer clock, two consecutive rising edge captures yield values 15000 and 45000. What is the frequency of the measured signal?"
+    options:
+      - "A) 33.3 Hz"
+      - "B) 66.7 Hz"
+      - "C) 30.0 Hz"
+      - "D) 22.2 Hz"
+    correct: "A"
+    explanation: "Period in ticks = 45000 - 15000 = 30000 ticks. At 1 MHz, period = 30000 / 1,000,000 = 0.03 seconds = 30 ms. Frequency = 1 / 0.03 = 33.33 Hz."
+    tags: [input_capture, frequency_calculation, period]
+    xp: 25
+
+  - id: timers_q10
+    type: mcq
+    difficulty: advanced
+    text: "In center-aligned (up/down counting) PWM mode with ARR = 999, the effective PWM frequency compared to edge-aligned mode with the same ARR and clock is:"
+    options:
+      - "A) The same frequency"
+      - "B) Half the frequency"
+      - "C) Double the frequency"
+      - "D) Four times the frequency"
+    correct: "B"
+    explanation: "In center-aligned mode, the counter counts up to ARR then back down to 0, making the period = 2 * (ARR+1) ticks instead of (ARR+1) ticks. This halves the PWM frequency compared to edge-aligned mode but produces symmetrical PWM pulses, which reduces harmonics."
+    tags: [center_aligned, pwm_frequency, up_down_counting]
+    xp: 25

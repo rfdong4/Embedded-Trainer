@@ -1,0 +1,36 @@
+id: i2c_reg_read
+topic_id: i2c
+title: "I2C Register Read Simulation"
+difficulty: intermediate
+description: |
+  Simulate reading registers from an I2C device. Many I2C peripherals
+  (sensors, EEPROMs, RTCs) expose a register map -- an array of byte-sized
+  registers accessed by address.
+
+  Implement a function that reads 'len' consecutive bytes starting at
+  register address 'reg_addr' from a device register map, copying them
+  into the output buffer.
+
+  The function must validate that the entire read stays within bounds of
+  the register map (size given by 'map_size'). Specifically:
+  - If reg_addr >= map_size, return -1 (invalid start address).
+  - If reg_addr + len > map_size, return -1 (read would exceed map).
+  - If len is 0, return 0 (nothing to read, but not an error).
+  - On success, copy the bytes and return the number of bytes read (len).
+
+  Example: reg_map = {0x10, 0x20, 0x30, 0x40}, map_size=4,
+  reg_addr=1, len=2 -> output = {0x20, 0x30}, return 2
+function_signature: "int8_t i2c_reg_read(const uint8_t *reg_map, uint8_t map_size, uint8_t reg_addr, uint8_t *out_buf, uint8_t len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int8_t i2c_reg_read(const uint8_t *reg_map, uint8_t map_size, uint8_t reg_addr, uint8_t *out_buf, uint8_t len) {
+      // TODO: implement
+  }
+test_harness: "i2c_reg_read_tests/test_main.c"
+expected_output: "i2c_reg_read_tests/expected_output.txt"
+hints:
+  - "Check bounds first: reg_addr must be < map_size, and reg_addr + len must be <= map_size."
+  - "Use a simple loop to copy: for (i = 0; i < len; i++) out_buf[i] = reg_map[reg_addr + i];"
+xp: 30
+time_limit: 5

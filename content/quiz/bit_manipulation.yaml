@@ -1,0 +1,134 @@
+topic_id: bit_manipulation
+topic_name: "Bit Manipulation"
+questions:
+  - id: bit_manipulation_q01
+    type: mcq
+    difficulty: beginner
+    text: "What is the result of 0xF0 & 0x3C in hexadecimal?"
+    options:
+      - "A) 0x30"
+      - "B) 0xFC"
+      - "C) 0xCC"
+      - "D) 0x0F"
+    correct: "A"
+    explanation: "0xF0 = 1111_0000, 0x3C = 0011_1100. AND yields 0011_0000 = 0x30."
+    tags: [bitwise_and, masking]
+    xp: 10
+
+  - id: bit_manipulation_q02
+    type: mcq
+    difficulty: beginner
+    text: "Which bitwise operation is used to set bit 3 of an 8-bit register without affecting other bits?"
+    options:
+      - "A) reg = reg & (1 << 3)"
+      - "B) reg = reg | (1 << 3)"
+      - "C) reg = reg ^ (1 << 3)"
+      - "D) reg = reg ~ (1 << 3)"
+    correct: "B"
+    explanation: "OR with a mask that has only bit 3 set will set bit 3 and leave all other bits unchanged."
+    tags: [bitwise_or, set_bit]
+    xp: 10
+
+  - id: bit_manipulation_q03
+    type: mcq
+    difficulty: beginner
+    text: "Which operation clears bit 5 of a register?"
+    options:
+      - "A) reg |= (1 << 5)"
+      - "B) reg ^= (1 << 5)"
+      - "C) reg &= ~(1 << 5)"
+      - "D) reg >>= 5"
+    correct: "C"
+    explanation: "AND with the complement of the bit mask clears the target bit. ~(1 << 5) = 0b1101_1111, so AND preserves all bits except bit 5."
+    tags: [clear_bit, bitwise_and, complement]
+    xp: 10
+
+  - id: bit_manipulation_q04
+    type: true_false
+    difficulty: beginner
+    text: "The XOR operation can be used to toggle a specific bit in a register."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "XOR with 1 flips a bit (0 becomes 1, 1 becomes 0), while XOR with 0 leaves the bit unchanged. So reg ^= (1 << n) toggles bit n."
+    tags: [bitwise_xor, toggle_bit]
+    xp: 10
+
+  - id: bit_manipulation_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What does the expression (value >> 4) & 0x0F extract from an 8-bit value?"
+    options:
+      - "A) The lower nibble (bits 3:0)"
+      - "B) The upper nibble (bits 7:4)"
+      - "C) Bits 4 through 7 shifted left"
+      - "D) The parity of the upper nibble"
+    correct: "B"
+    explanation: "Right-shifting by 4 moves bits 7:4 into the lower nibble position, then AND with 0x0F masks off any upper bits, extracting the original upper nibble."
+    tags: [shift, masking, nibble]
+    xp: 15
+
+  - id: bit_manipulation_q06
+    type: mcq
+    difficulty: intermediate
+    text: "To write a 3-bit value 'val' into bits [6:4] of a register without affecting other bits, which sequence is correct?"
+    options:
+      - "A) reg = (reg & ~(0x7 << 4)) | ((val & 0x7) << 4)"
+      - "B) reg = (reg | (0x7 << 4)) & ((val & 0x7) << 4)"
+      - "C) reg = reg ^ ((val & 0x7) << 4)"
+      - "D) reg = (reg & (0x7 << 4)) | (val << 4)"
+    correct: "A"
+    explanation: "First clear bits [6:4] using AND with the complement of the mask, then OR in the new value shifted to the correct position. Masking val with 0x7 ensures only 3 bits are used."
+    tags: [bit_field, read_modify_write]
+    xp: 15
+
+  - id: bit_manipulation_q07
+    type: true_false
+    difficulty: intermediate
+    text: "Left-shifting an unsigned 8-bit value by 8 positions always yields zero."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Shifting an 8-bit value left by 8 or more positions shifts all bits out, resulting in zero (assuming the operation is performed within the 8-bit type or the result is stored back in an 8-bit variable)."
+    tags: [shift, overflow]
+    xp: 15
+
+  - id: bit_manipulation_q08
+    type: mcq
+    difficulty: advanced
+    text: "What does the expression n & (n - 1) do?"
+    options:
+      - "A) Sets the lowest set bit of n"
+      - "B) Clears the lowest set bit of n"
+      - "C) Returns 1 if n is a power of 2"
+      - "D) Counts the number of set bits in n"
+    correct: "B"
+    explanation: "Subtracting 1 from n flips all bits from the lowest set bit downward. ANDing with the original value clears that lowest set bit. This is a classic bit manipulation trick used in Brian Kernighan's bit counting algorithm."
+    tags: [bit_trick, optimization]
+    xp: 25
+
+  - id: bit_manipulation_q09
+    type: mcq
+    difficulty: advanced
+    text: "In a 32-bit ARM register, you need to atomically set bits [11:8] to 0b1010 without a read-modify-write sequence. Which Cortex-M feature supports this?"
+    options:
+      - "A) Bit-band aliasing region"
+      - "B) LDREX/STREX exclusive access instructions"
+      - "C) GPIO BSRR register"
+      - "D) Both A and B can achieve this"
+    correct: "D"
+    explanation: "Bit-banding allows atomic single-bit access via aliased memory addresses. LDREX/STREX provides exclusive access for atomic read-modify-write on multi-bit fields. Both avoid race conditions without disabling interrupts."
+    tags: [atomic, bit_band, exclusive_access]
+    xp: 25
+
+  - id: bit_manipulation_q10
+    type: mcq
+    difficulty: advanced
+    text: "What is the result of applying the expression ((x >> 31) ^ x) - (x >> 31) to a signed 32-bit integer x?"
+    options:
+      - "A) It returns -x"
+      - "B) It returns the absolute value of x"
+      - "C) It returns 0 if x is negative"
+      - "D) It returns the sign of x"
+    correct: "B"
+    explanation: "When x is negative, x >> 31 is -1 (all ones due to arithmetic shift). XOR with -1 inverts all bits (one's complement), and subtracting -1 adds 1, yielding the two's complement negation. When x is non-negative, x >> 31 is 0 and the expression returns x unchanged. This computes abs(x) without branching."
+    tags: [bit_trick, twos_complement, branchless]
+    xp: 25

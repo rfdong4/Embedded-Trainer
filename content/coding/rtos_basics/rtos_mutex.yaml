@@ -1,0 +1,58 @@
+id: rtos_mutex
+topic_id: rtos_basics
+title: "Mutex with Owner Tracking"
+difficulty: intermediate
+description: |
+  Implement a mutex that tracks which task currently owns it.
+
+  - mutex_init: Initialize the mutex to unlocked state (owner = 0).
+  - mutex_lock: Attempt to acquire the mutex for a given task_id.
+    Returns 1 if acquired successfully, 0 if already locked by another task.
+    If the same task tries to lock again, return 0 (non-recursive mutex).
+  - mutex_unlock: Release the mutex for a given task_id. Returns 1 if
+    successfully unlocked, 0 if the caller is not the owner or mutex is
+    already unlocked.
+  - mutex_try_lock: Same as lock but intended for polling usage. Returns 1
+    if acquired, 0 otherwise.
+  - mutex_get_owner: Returns the task_id of the current owner, or 0 if unlocked.
+
+  Use a struct with: uint8_t locked, uint8_t owner.
+function_signature: "void mutex_init(Mutex *m) / int mutex_lock(Mutex *m, uint8_t task_id) / int mutex_unlock(Mutex *m, uint8_t task_id) / int mutex_try_lock(Mutex *m, uint8_t task_id) / uint8_t mutex_get_owner(Mutex *m)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t locked;
+      uint8_t owner;
+  } Mutex;
+
+  void mutex_init(Mutex *m) {
+      // TODO: implement
+  }
+
+  int mutex_lock(Mutex *m, uint8_t task_id) {
+      // TODO: return 1 if acquired, 0 if already locked
+      return 0;
+  }
+
+  int mutex_unlock(Mutex *m, uint8_t task_id) {
+      // TODO: return 1 if released, 0 if not owner or already unlocked
+      return 0;
+  }
+
+  int mutex_try_lock(Mutex *m, uint8_t task_id) {
+      // TODO: same as lock, return 1 if acquired, 0 otherwise
+      return 0;
+  }
+
+  uint8_t mutex_get_owner(Mutex *m) {
+      // TODO: return owner task_id, or 0 if unlocked
+      return 0;
+  }
+test_harness: "rtos_mutex_tests/test_main.c"
+expected_output: "rtos_mutex_tests/expected_output.txt"
+hints:
+  - "In mutex_lock, check if locked is 0 before acquiring. Set locked=1 and owner=task_id on success."
+  - "In mutex_unlock, verify that the caller's task_id matches the owner before releasing."
+xp: 30
+time_limit: 5

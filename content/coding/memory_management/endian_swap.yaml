@@ -1,0 +1,23 @@
+id: mem_endian_swap
+topic_id: memory_management
+title: "Swap Endianness of 32-bit Value"
+difficulty: beginner
+description: |
+  Implement a function that swaps the byte order (endianness) of a 32-bit value.
+  This converts between big-endian and little-endian representations.
+
+  For example, swap_endian(0x12345678) should return 0x78563412.
+function_signature: "uint32_t swap_endian(uint32_t value)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t swap_endian(uint32_t value) {
+      // TODO: implement
+  }
+test_harness: "endian_swap_tests/test_main.c"
+expected_output: "endian_swap_tests/expected_output.txt"
+hints:
+  - "Extract each byte with shifts and masks, then reassemble in reversed order."
+  - "Byte 0 goes to position 3, byte 1 to position 2, etc."
+xp: 30
+time_limit: 5

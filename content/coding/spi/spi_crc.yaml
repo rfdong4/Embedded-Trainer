@@ -1,0 +1,34 @@
+id: spi_crc
+topic_id: spi
+title: "SPI CRC-8 with Polynomial 0x31"
+difficulty: intermediate
+description: |
+  Calculate a CRC-8 checksum over a byte array using the polynomial 0x31
+  (x^8 + x^5 + x^4 + 1), which is commonly used by SPI-connected sensors
+  such as the SHT3x temperature/humidity sensor family.
+
+  Algorithm (bit-by-bit, MSB first, initial CRC = 0xFF):
+  1. Initialize CRC to 0xFF.
+  2. For each byte in the data array:
+     a. XOR the byte into the current CRC value.
+     b. For each of the 8 bits (MSB to LSB):
+        - If the MSB of CRC is set (CRC & 0x80), shift CRC left by 1
+          and XOR with 0x31.
+        - Otherwise, just shift CRC left by 1.
+  3. Return the final 8-bit CRC value.
+
+  Example: data = {0xBE, 0xEF} -> CRC-8/0x31 = 0x92
+function_signature: "uint8_t spi_crc8(const uint8_t *data, uint8_t len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t spi_crc8(const uint8_t *data, uint8_t len) {
+      // TODO: implement
+  }
+test_harness: "spi_crc_tests/test_main.c"
+expected_output: "spi_crc_tests/expected_output.txt"
+hints:
+  - "Initialize CRC to 0xFF, not 0x00. XOR each data byte into CRC, then process 8 bits."
+  - "Inner loop: if (crc & 0x80) crc = (crc << 1) ^ 0x31; else crc <<= 1; Remember to mask to 8 bits."
+xp: 30
+time_limit: 5

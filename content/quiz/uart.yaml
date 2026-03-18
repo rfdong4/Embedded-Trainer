@@ -1,0 +1,134 @@
+topic_id: uart
+topic_name: "UART Communication"
+questions:
+  - id: uart_q01
+    type: mcq
+    difficulty: beginner
+    text: "What does UART stand for?"
+    options:
+      - "A) Universal Asynchronous Receiver/Transmitter"
+      - "B) Unified Analog Receive/Transmit"
+      - "C) Universal Address Resolution Technology"
+      - "D) Unified Asynchronous Register Transfer"
+    correct: "A"
+    explanation: "UART stands for Universal Asynchronous Receiver/Transmitter. It is a hardware peripheral for serial communication that does not use a shared clock signal (asynchronous). Both sides must agree on the baud rate."
+    tags: [uart, serial, basics]
+    xp: 10
+
+  - id: uart_q02
+    type: mcq
+    difficulty: beginner
+    text: "In a standard UART frame with 8 data bits, no parity, and 1 stop bit (8N1), how many total bits are transmitted per character?"
+    options:
+      - "A) 8 bits"
+      - "B) 9 bits"
+      - "C) 10 bits"
+      - "D) 11 bits"
+    correct: "C"
+    explanation: "An 8N1 frame consists of: 1 start bit + 8 data bits + 0 parity bits + 1 stop bit = 10 bits total per character. The start bit signals the beginning of the frame."
+    tags: [framing, start_bit, stop_bit, 8n1]
+    xp: 10
+
+  - id: uart_q03
+    type: true_false
+    difficulty: beginner
+    text: "UART communication requires a shared clock line between the transmitter and receiver."
+    options: ["True", "False"]
+    correct: "False"
+    explanation: "UART is asynchronous, meaning no shared clock line is needed. Instead, both devices must be configured to the same baud rate. The receiver uses the start bit edge to synchronize and sample the data bits at the correct timing."
+    tags: [asynchronous, clock, synchronization]
+    xp: 10
+
+  - id: uart_q04
+    type: mcq
+    difficulty: beginner
+    text: "What is the purpose of the start bit in a UART frame?"
+    options:
+      - "A) To indicate the data is valid"
+      - "B) To synchronize the receiver's clock to the beginning of the data frame"
+      - "C) To set the baud rate automatically"
+      - "D) To enable parity checking"
+    correct: "B"
+    explanation: "The start bit is always a logic low (0) transition from the idle high state. The receiver detects this falling edge and uses it to synchronize its sampling clock, then samples each subsequent data bit at the center of each bit period."
+    tags: [start_bit, synchronization, idle_state]
+    xp: 10
+
+  - id: uart_q05
+    type: mcq
+    difficulty: intermediate
+    text: "An MCU has a peripheral clock of 36 MHz. To achieve 115200 baud, what should the USART baud rate divisor (USARTDIV) be?"
+    options:
+      - "A) 156.25"
+      - "B) 312.5"
+      - "C) 19.53125"
+      - "D) 625"
+    correct: "C"
+    explanation: "For standard UART with 16x oversampling: USARTDIV = Fclk / (16 * BaudRate) = 36,000,000 / (16 * 115200) = 36,000,000 / 1,843,200 = 19.53125. The fractional part is programmed via a fractional divider register."
+    tags: [baud_rate, divisor, calculation, oversampling]
+    xp: 15
+
+  - id: uart_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What is the purpose of parity in UART communication?"
+    options:
+      - "A) To double the data throughput"
+      - "B) To provide a basic single-bit error detection mechanism"
+      - "C) To encrypt the transmitted data"
+      - "D) To control the flow of data between devices"
+    correct: "B"
+    explanation: "Parity adds one bit to the frame that makes the total number of 1-bits either even (even parity) or odd (odd parity). The receiver checks this to detect single-bit errors. It cannot correct errors or detect an even number of bit errors."
+    tags: [parity, error_detection, even_parity, odd_parity]
+    xp: 15
+
+  - id: uart_q07
+    type: mcq
+    difficulty: intermediate
+    text: "What is the difference between hardware flow control (RTS/CTS) and software flow control (XON/XOFF)?"
+    options:
+      - "A) Hardware flow control uses dedicated signal lines; software flow control uses special characters in the data stream"
+      - "B) Hardware flow control is slower than software flow control"
+      - "C) Software flow control requires additional pins"
+      - "D) There is no practical difference"
+    correct: "A"
+    explanation: "Hardware flow control uses dedicated RTS (Request to Send) and CTS (Clear to Send) signal lines to signal readiness. Software flow control sends XON (0x11) and XOFF (0x13) characters in-band. Hardware flow control is more reliable and doesn't consume data bandwidth."
+    tags: [flow_control, rts_cts, xon_xoff]
+    xp: 15
+
+  - id: uart_q08
+    type: true_false
+    difficulty: intermediate
+    text: "A UART FIFO (First-In-First-Out) buffer reduces the number of interrupts needed by allowing multiple bytes to be stored before requiring CPU attention."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Without a FIFO, an interrupt is generated for each received byte. With a FIFO (commonly 16 or 64 bytes deep), the interrupt is triggered when the buffer reaches a configurable threshold, allowing the CPU to process multiple bytes per interrupt and reducing interrupt overhead."
+    tags: [fifo, interrupt_reduction, buffer]
+    xp: 15
+
+  - id: uart_q09
+    type: mcq
+    difficulty: advanced
+    text: "At 9600 baud with 8N1 framing, what is the maximum data throughput in bytes per second?"
+    options:
+      - "A) 9600 bytes/sec"
+      - "B) 960 bytes/sec"
+      - "C) 1200 bytes/sec"
+      - "D) 800 bytes/sec"
+    correct: "B"
+    explanation: "At 9600 baud, 9600 bits are transmitted per second. Each 8N1 frame is 10 bits (1 start + 8 data + 1 stop). Maximum throughput = 9600 / 10 = 960 bytes per second."
+    tags: [throughput, calculation, baud_rate]
+    xp: 25
+
+  - id: uart_q10
+    type: mcq
+    difficulty: advanced
+    text: "Two UART devices are configured for the same nominal baud rate but have clock sources with different accuracies. What is the maximum allowable baud rate error for reliable communication?"
+    options:
+      - "A) +/- 10%"
+      - "B) +/- 5%"
+      - "C) Approximately +/- 3-4% combined error between both devices"
+      - "D) +/- 0.1%"
+    correct: "C"
+    explanation: "The UART receiver samples at the center of each bit. With 10 bits per frame and sampling at 16x oversampling, the cumulative timing error must be less than half a bit period by the last bit. This gives roughly +/- 4.5% tolerance for the entire frame, or about +/- 2-3% per device. In practice, keeping combined error under 3-4% ensures reliable operation."
+    tags: [clock_accuracy, baud_rate_error, tolerance]
+    xp: 25

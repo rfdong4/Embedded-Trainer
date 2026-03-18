@@ -1,0 +1,53 @@
+id: uart_fifo
+topic_id: uart
+title: "UART TX FIFO Buffer"
+difficulty: intermediate
+description: |
+  Implement a simple UART TX FIFO (First-In, First-Out) circular buffer
+  with a fixed capacity of 8 bytes. You must implement four functions:
+
+  - uart_fifo_init(): Reset the FIFO to an empty state.
+  - uart_fifo_push(data): Add a byte to the FIFO. Return 0 on success,
+    or -1 if the FIFO is full.
+  - uart_fifo_pop(): Remove and return the oldest byte from the FIFO.
+    Return -1 if the FIFO is empty.
+  - uart_fifo_count(): Return the number of bytes currently stored.
+
+  Use the provided static global variables for the buffer and state.
+  The buffer must behave as a circular (ring) buffer: when the head or
+  tail index reaches FIFO_SIZE, it wraps around to 0.
+function_signature: "void uart_fifo_init(void) / int uart_fifo_push(uint8_t data) / int uart_fifo_pop(void) / int uart_fifo_count(void)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define FIFO_SIZE 8
+
+  static uint8_t fifo_buf[FIFO_SIZE];
+  static int fifo_head;
+  static int fifo_tail;
+  static int fifo_cnt;
+
+  void uart_fifo_init(void) {
+      // TODO: implement
+  }
+
+  int uart_fifo_push(uint8_t data) {
+      // TODO: implement
+  }
+
+  int uart_fifo_pop(void) {
+      // TODO: implement
+  }
+
+  int uart_fifo_count(void) {
+      // TODO: implement
+  }
+test_harness: "uart_fifo_tests/test_main.c"
+expected_output: "uart_fifo_tests/expected_output.txt"
+hints:
+  - "Use head as the write index and tail as the read index, with cnt tracking the count."
+  - "Push writes at fifo_buf[head], then advances head = (head + 1) % FIFO_SIZE."
+  - "Pop reads from fifo_buf[tail], then advances tail = (tail + 1) % FIFO_SIZE."
+  - "Check cnt before push (full if cnt == FIFO_SIZE) and pop (empty if cnt == 0)."
+xp: 30
+time_limit: 5

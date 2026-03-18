@@ -1,0 +1,24 @@
+id: gpio_toggle_pattern
+topic_id: gpio
+title: "Toggle a Bit Pattern on GPIO Port"
+difficulty: beginner
+description: |
+  Implement a function that toggles a pattern of bits in a 32-bit GPIO port
+  register. Every bit that is set in the pattern should be toggled in the
+  port register.
+
+  For example, toggle_pattern(0x0F, 0x03) toggles bits 0 and 1, returning 0x0C.
+function_signature: "uint32_t toggle_pattern(uint32_t port_reg, uint32_t pattern)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t toggle_pattern(uint32_t port_reg, uint32_t pattern) {
+      // TODO: implement
+  }
+test_harness: "toggle_pattern_tests/test_main.c"
+expected_output: "toggle_pattern_tests/expected_output.txt"
+hints:
+  - "XOR toggles bits: a ^ b flips every bit where b is 1."
+  - "This is a one-line solution using the XOR operator."
+xp: 25
+time_limit: 5

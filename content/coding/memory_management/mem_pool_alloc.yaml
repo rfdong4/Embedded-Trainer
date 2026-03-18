@@ -1,0 +1,52 @@
+id: mem_pool_alloc
+topic_id: memory_management
+title: "Bitmap Memory Pool Allocator"
+difficulty: intermediate
+description: |
+  Implement a fixed-size memory pool allocator that uses a bitmap to track
+  which blocks are free or allocated. This is a common pattern in embedded
+  systems where dynamic allocation (malloc) is avoided.
+
+  The pool has 16 blocks, each 64 bytes. A single uint16_t bitmap tracks
+  allocation status: bit N = 1 means block N is in use.
+
+  Implement these functions:
+  - pool_init: Initialize the pool, clearing the bitmap (all blocks free).
+  - pool_alloc: Find the lowest-numbered free block, mark it used in the
+    bitmap, and return a pointer to it. Return NULL if all blocks are used.
+  - pool_free: Given a pointer, determine which block it belongs to, and
+    clear the corresponding bit. Ignore pointers outside the pool.
+  - pool_count_free: Return the number of free blocks remaining.
+function_signature: "void pool_init(void) / void* pool_alloc(void) / void pool_free(void* ptr) / int pool_count_free(void)"
+skeleton_code: |
+  #include <stdint.h>
+  #include <stddef.h>
+
+  #define POOL_BLOCK_SIZE 64
+  #define POOL_NUM_BLOCKS 16
+
+  static uint8_t pool_memory[POOL_NUM_BLOCKS][POOL_BLOCK_SIZE];
+  static uint16_t pool_bitmap;  /* bit N = 1 means block N is in use */
+
+  void pool_init(void) {
+      // TODO: clear bitmap
+  }
+
+  void* pool_alloc(void) {
+      // TODO: find lowest free bit, set it, return pointer to that block
+  }
+
+  void pool_free(void* ptr) {
+      // TODO: calculate block index from pointer, clear bit
+  }
+
+  int pool_count_free(void) {
+      // TODO: count zero bits in bitmap
+  }
+test_harness: "mem_pool_alloc_tests/test_main.c"
+expected_output: "mem_pool_alloc_tests/expected_output.txt"
+hints:
+  - "To find the lowest free bit, iterate from 0 to 15 and check !(bitmap & (1U << i))."
+  - "To get the block index from a pointer, cast to uint8_t* and compute (ptr - &pool_memory[0][0]) / POOL_BLOCK_SIZE."
+xp: 30
+time_limit: 5

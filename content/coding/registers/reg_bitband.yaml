@@ -1,0 +1,31 @@
+id: reg_bitband
+topic_id: registers
+title: "Bit-Band Address Calculator"
+difficulty: intermediate
+description: |
+  Simulate Cortex-M bit-banding for the peripheral region.
+
+  Given a peripheral register address and a bit number (0-31), calculate
+  the corresponding bit-band alias address.
+
+  The peripheral region starts at 0x40000000 and the bit-band alias
+  region starts at 0x42000000.
+
+  Formula:
+    byte_offset = periph_addr - 0x40000000
+    alias = 0x42000000 + (byte_offset * 32) + (bit_num * 4)
+function_signature: "uint32_t calc_bitband_addr(uint32_t periph_addr, uint8_t bit_num)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t calc_bitband_addr(uint32_t periph_addr, uint8_t bit_num) {
+      // TODO: implement
+      return 0;
+  }
+test_harness: "reg_bitband_tests/test_main.c"
+expected_output: "reg_bitband_tests/expected_output.txt"
+hints:
+  - "First compute byte_offset = periph_addr - 0x40000000."
+  - "Then alias = 0x42000000 + (byte_offset * 32) + (bit_num * 4)."
+xp: 30
+time_limit: 5

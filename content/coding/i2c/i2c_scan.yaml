@@ -1,0 +1,37 @@
+id: i2c_scan
+topic_id: i2c
+title: "I2C Bus Scan"
+difficulty: intermediate
+description: |
+  Implement two functions for I2C bus scanning:
+
+  1. i2c_check_addr: Given an array of "present" 7-bit device addresses and
+     a target address, return 1 if the target is found (ACK) or 0 if not
+     found (NACK). This simulates probing a single address on the I2C bus.
+
+  2. i2c_scan_count: Given the same array of present addresses, return the
+     total count of responding devices (i.e., the length of valid entries).
+     The array is terminated by the value 0x00 (address 0 is reserved in
+     I2C and never used for devices).
+
+  In real embedded systems, an I2C scan sends a start condition followed by
+  each possible 7-bit address (0x08-0x77) and checks for ACK. This is how
+  tools like Linux i2cdetect discover devices on the bus.
+function_signature: "uint8_t i2c_check_addr(const uint8_t *present, uint8_t target); uint8_t i2c_scan_count(const uint8_t *present)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t i2c_check_addr(const uint8_t *present, uint8_t target) {
+      // TODO: return 1 if target is in present list, 0 otherwise
+  }
+
+  uint8_t i2c_scan_count(const uint8_t *present) {
+      // TODO: count devices in 0x00-terminated list
+  }
+test_harness: "i2c_scan_tests/test_main.c"
+expected_output: "i2c_scan_tests/expected_output.txt"
+hints:
+  - "For i2c_check_addr, iterate until you hit 0x00 (the sentinel) and compare each entry to the target."
+  - "For i2c_scan_count, simply count elements until the 0x00 terminator."
+xp: 30
+time_limit: 5

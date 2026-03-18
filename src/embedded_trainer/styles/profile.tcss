@@ -1,0 +1,29 @@
+ProfileScreen {
+    layout: vertical;
+    padding: 1 2;
+}
+
+#profile-header {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#achievements-grid {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+.achievement-locked {
+    color: $text-muted;
+}
+
+.achievement-unlocked {
+    color: $success;
+    text-style: bold;
+}
+
+#topic-progress {
+    height: 1fr;
+    overflow-y: auto;
+    margin-top: 1;
+}

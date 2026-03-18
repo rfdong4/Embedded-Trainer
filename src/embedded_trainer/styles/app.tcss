@@ -1,0 +1,35 @@
+Screen {
+    background: $surface;
+}
+
+#title-bar {
+    dock: top;
+    height: 3;
+    background: $primary;
+    color: $text;
+    text-style: bold;
+    content-align: center middle;
+    padding: 1;
+}
+
+.section-title {
+    text-style: bold;
+    color: $accent;
+    margin: 1 0;
+}
+
+.card {
+    border: tall $primary;
+    padding: 1 2;
+    margin: 1 0;
+}
+
+Button {
+    margin: 0 1;
+}
+
+.mode-button {
+    width: 1fr;
+    height: 5;
+    margin: 1;
+}

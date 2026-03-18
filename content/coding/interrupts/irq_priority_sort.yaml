@@ -1,0 +1,29 @@
+id: interrupts_irq_priority_sort
+topic_id: interrupts
+title: "Next IRQ to Service by Priority"
+difficulty: intermediate
+description: |
+  Given an array of pending interrupt numbers and a priority lookup table,
+  determine which interrupt should be serviced next.
+
+  The priority table maps IRQ number to its priority value (lower value = higher
+  priority). If two pending interrupts have the same priority value, the one with
+  the lower IRQ number should be serviced first (tie-breaking rule).
+
+  Return the IRQ number that should be serviced first. If count is 0, return 255
+  to indicate no pending interrupts.
+function_signature: "uint8_t next_irq_to_service(const uint8_t* pending, uint8_t count, const uint8_t* priorities)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t next_irq_to_service(const uint8_t* pending, uint8_t count, const uint8_t* priorities) {
+      // TODO: find the pending IRQ with the lowest priority value
+      // (lowest IRQ number breaks ties)
+  }
+test_harness: "irq_priority_sort_tests/test_main.c"
+expected_output: "irq_priority_sort_tests/expected_output.txt"
+hints:
+  - "Loop through the pending array, look up each IRQ's priority, and track the best candidate."
+  - "When comparing, replace the best candidate if the new priority is strictly lower, or if equal priority but lower IRQ number."
+xp: 30
+time_limit: 5

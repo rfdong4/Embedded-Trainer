@@ -1,0 +1,23 @@
+id: bit_set_bit
+topic_id: bit_manipulation
+title: "Set a Bit in a Register"
+difficulty: beginner
+description: |
+  Implement a function that sets (makes 1) a specific bit in an 8-bit register
+  value. The bit position ranges from 0 (LSB) to 7 (MSB).
+
+  For example, set_bit(0x00, 3) should return 0x08 (bit 3 set).
+function_signature: "uint8_t set_bit(uint8_t reg, uint8_t bit_pos)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t set_bit(uint8_t reg, uint8_t bit_pos) {
+      // TODO: implement
+  }
+test_harness: "set_bit_tests/test_main.c"
+expected_output: "set_bit_tests/expected_output.txt"
+hints:
+  - "Use the bitwise OR operator (|) to set a bit without changing others."
+  - "Create a mask with (1 << bit_pos) to target the specific bit."
+xp: 25
+time_limit: 5

@@ -1,0 +1,25 @@
+id: rtos_round_robin
+topic_id: rtos_basics
+title: "Round-Robin Task Scheduler"
+difficulty: beginner
+description: |
+  Implement a simple round-robin scheduler. Given the current task ID,
+  an array of active flags (1=active, 0=inactive), and the number of tasks,
+  return the next active task ID.
+
+  Search forward from (current + 1), wrapping around to 0 after reaching
+  num_tasks - 1. If no tasks are active, return the current task ID.
+function_signature: "uint8_t next_task(uint8_t current, uint8_t *active, uint8_t num_tasks)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t next_task(uint8_t current, uint8_t *active, uint8_t num_tasks) {
+      // TODO: implement
+  }
+test_harness: "round_robin_tests/test_main.c"
+expected_output: "round_robin_tests/expected_output.txt"
+hints:
+  - "Use modulo to wrap: next = (current + 1 + i) % num_tasks."
+  - "Loop num_tasks times to check all tasks, starting from (current + 1)."
+xp: 35
+time_limit: 5

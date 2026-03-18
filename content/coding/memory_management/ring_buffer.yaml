@@ -1,0 +1,45 @@
+id: mem_ring_buffer
+topic_id: memory_management
+title: "Ring Buffer Push and Pop"
+difficulty: beginner
+description: |
+  Implement a simple ring buffer (circular buffer) with push and pop operations.
+  The ring buffer has a fixed capacity of 8 bytes.
+
+  Implement these functions:
+  - rb_init: Initialize the ring buffer (set head, tail, count to 0)
+  - rb_push: Add a byte to the buffer. Returns 1 on success, 0 if full.
+  - rb_pop: Remove and return a byte. Returns the byte, or -1 if empty.
+
+  Use a struct with: uint8_t buf[8], uint8_t head, uint8_t tail, uint8_t count.
+function_signature: "void rb_init(RingBuffer *rb); uint8_t rb_push(RingBuffer *rb, uint8_t val); int16_t rb_pop(RingBuffer *rb)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define RB_SIZE 8
+
+  typedef struct {
+      uint8_t buf[RB_SIZE];
+      uint8_t head;
+      uint8_t tail;
+      uint8_t count;
+  } RingBuffer;
+
+  void rb_init(RingBuffer *rb) {
+      // TODO: implement
+  }
+
+  uint8_t rb_push(RingBuffer *rb, uint8_t val) {
+      // TODO: implement - return 1 on success, 0 if full
+  }
+
+  int16_t rb_pop(RingBuffer *rb) {
+      // TODO: implement - return byte or -1 if empty
+  }
+test_harness: "ring_buffer_tests/test_main.c"
+expected_output: "ring_buffer_tests/expected_output.txt"
+hints:
+  - "Use head for writing, tail for reading. Advance with modulo: head = (head + 1) % RB_SIZE."
+  - "Track count to easily check full/empty conditions."
+xp: 40
+time_limit: 10

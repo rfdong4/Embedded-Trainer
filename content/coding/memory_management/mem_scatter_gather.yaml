@@ -1,0 +1,46 @@
+id: mem_scatter_gather
+topic_id: memory_management
+title: "Scatter-Gather Memory Copy"
+difficulty: advanced
+description: |
+  Implement a scatter-gather copy operation used in DMA and network packet
+  processing. Given a source buffer and an array of descriptors, each
+  specifying a (src_offset, length) pair, copy the non-contiguous source
+  regions into a contiguous destination buffer in order.
+
+  Implement:
+  - sg_copy: Copy data from src to dst according to the descriptor array.
+    Each descriptor specifies a starting offset into src and a length.
+    Copy each region sequentially into dst. Return the total number of
+    bytes copied.
+  - sg_total_length: Calculate the total bytes that will be copied across
+    all descriptors. Useful for pre-validating destination buffer size.
+
+  Descriptors are processed in order. If a descriptor has length 0, skip it.
+  You may assume src and dst do not overlap.
+function_signature: "uint32_t sg_copy(const uint8_t *src, uint8_t *dst, const SG_Descriptor *desc, uint32_t num_desc) / uint32_t sg_total_length(const SG_Descriptor *desc, uint32_t num_desc)"
+skeleton_code: |
+  #include <stdint.h>
+  #include <string.h>
+
+  typedef struct {
+      uint32_t src_offset;
+      uint32_t length;
+  } SG_Descriptor;
+
+  uint32_t sg_copy(const uint8_t *src, uint8_t *dst,
+                   const SG_Descriptor *desc, uint32_t num_desc) {
+      // TODO: for each descriptor, copy desc[i].length bytes from
+      // src + desc[i].src_offset into dst sequentially
+  }
+
+  uint32_t sg_total_length(const SG_Descriptor *desc, uint32_t num_desc) {
+      // TODO: sum all descriptor lengths
+  }
+test_harness: "mem_scatter_gather_tests/test_main.c"
+expected_output: "mem_scatter_gather_tests/expected_output.txt"
+hints:
+  - "Maintain a dst_offset that starts at 0 and advances by desc[i].length after each copy."
+  - "Use memcpy(dst + dst_offset, src + desc[i].src_offset, desc[i].length) for each descriptor."
+xp: 50
+time_limit: 5

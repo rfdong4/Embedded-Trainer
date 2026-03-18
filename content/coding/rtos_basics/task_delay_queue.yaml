@@ -1,0 +1,40 @@
+id: rtos_basics_task_delay_queue
+topic_id: rtos_basics
+title: "Task Delay Queue"
+difficulty: advanced
+description: |
+  Implement a task delay queue that tracks tick-based delays for up to 8 tasks (0-7).
+
+  - delay_queue_init: Initialize the delay queue (all delays to 0, no tasks active).
+  - delay_task: Add a task with a given tick delay. If ticks is 0, ignore the request.
+  - delay_tick_update: Decrement all active delays by 1. Return a bitmask of tasks
+    whose delays just expired (reached 0 on this tick). Once expired, a task is no
+    longer active.
+
+  Use static arrays to track delay counts and active status for each task.
+function_signature: "void delay_queue_init(void) / void delay_task(uint8_t task_id, uint16_t ticks) / uint8_t delay_tick_update(void)"
+skeleton_code: |
+  #include <stdint.h>
+
+  static uint16_t delay_ticks[8];
+  static uint8_t  delay_active[8];
+
+  void delay_queue_init(void) {
+      // TODO: implement
+  }
+
+  void delay_task(uint8_t task_id, uint16_t ticks) {
+      // TODO: implement
+  }
+
+  uint8_t delay_tick_update(void) {
+      // TODO: implement - return bitmask of expired tasks
+      return 0;
+  }
+test_harness: "task_delay_queue_tests/test_main.c"
+expected_output: "task_delay_queue_tests/expected_output.txt"
+hints:
+  - "In delay_task, set delay_ticks[task_id] = ticks and delay_active[task_id] = 1."
+  - "In tick_update, loop over all 8 tasks: if active, decrement; if it reaches 0, set the bit in the result mask and mark inactive."
+xp: 50
+time_limit: 5

@@ -1,0 +1,65 @@
+id: reg_watchdog
+topic_id: registers
+title: "Watchdog Timer Simulation"
+difficulty: advanced
+description: |
+  Simulate a watchdog timer register interface. The watchdog counts down
+  from a configured timeout value each time check_expired is called.
+
+  - wdt_init: Initialize the watchdog to disabled state with counter = 0.
+  - wdt_configure: Set the timeout reload value and enable the watchdog.
+    The counter is loaded with the timeout value. Returns 1 on success,
+    0 if timeout is 0.
+  - wdt_kick: Feed/reset the watchdog counter back to the configured timeout
+    value. Returns 1 if watchdog is enabled, 0 if disabled.
+  - wdt_check_expired: Decrement the counter by 1. If the counter reaches 0,
+    the watchdog has expired: return 1. If counter is still > 0, return 0.
+    If the watchdog is disabled, return 0 without decrementing.
+  - wdt_get_counter: Return the current counter value.
+  - wdt_disable: Disable the watchdog and reset counter to 0.
+
+  Use a struct with: uint32_t counter, uint32_t timeout, uint8_t enabled.
+function_signature: "void wdt_init(Watchdog *w) / int wdt_configure(Watchdog *w, uint32_t timeout) / int wdt_kick(Watchdog *w) / int wdt_check_expired(Watchdog *w) / uint32_t wdt_get_counter(Watchdog *w) / void wdt_disable(Watchdog *w)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t counter;
+      uint32_t timeout;
+      uint8_t enabled;
+  } Watchdog;
+
+  void wdt_init(Watchdog *w) {
+      // TODO: implement
+  }
+
+  int wdt_configure(Watchdog *w, uint32_t timeout) {
+      // TODO: return 1 on success, 0 if timeout is 0
+      return 0;
+  }
+
+  int wdt_kick(Watchdog *w) {
+      // TODO: reload counter, return 1 if enabled, 0 if disabled
+      return 0;
+  }
+
+  int wdt_check_expired(Watchdog *w) {
+      // TODO: decrement counter, return 1 if expired (reaches 0), 0 otherwise
+      return 0;
+  }
+
+  uint32_t wdt_get_counter(Watchdog *w) {
+      // TODO: return current counter value
+      return 0;
+  }
+
+  void wdt_disable(Watchdog *w) {
+      // TODO: disable watchdog and reset counter
+  }
+test_harness: "reg_watchdog_tests/test_main.c"
+expected_output: "reg_watchdog_tests/expected_output.txt"
+hints:
+  - "wdt_check_expired should first check if enabled, then decrement. If counter reaches 0, the watchdog expired."
+  - "wdt_kick reloads counter from the stored timeout value. Only works when enabled."
+xp: 50
+time_limit: 5

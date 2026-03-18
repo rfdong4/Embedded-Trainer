@@ -1,0 +1,56 @@
+id: interrupts_nested_irq_tracker
+topic_id: interrupts
+title: "Nested Interrupt Tracker"
+difficulty: advanced
+description: |
+  Implement a nested interrupt tracker using a stack data structure. In systems
+  that support nested interrupts, a higher-priority interrupt can preempt a
+  lower-priority one. Tracking the nesting depth and currently active IRQ is
+  essential for correct system behavior.
+
+  Implement these functions:
+  - irq_tracker_init: Initialize the tracker (reset depth to 0).
+  - irq_enter: Push the given IRQ number onto the tracker stack. If the stack
+    is full (max depth 8), do nothing.
+  - irq_exit: Pop the top IRQ from the tracker stack. If the stack is empty,
+    do nothing.
+  - irq_get_depth: Return the current nesting depth (0 if no IRQs active).
+  - irq_get_active: Return the IRQ number of the currently active (top of
+    stack) interrupt, or -1 if no IRQs are active.
+
+  Use static storage for the stack and depth counter.
+function_signature: "void irq_tracker_init(void) / void irq_enter(uint8_t irq) / void irq_exit(void) / int irq_get_depth(void) / int irq_get_active(void)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define IRQ_MAX_DEPTH 8
+
+  static uint8_t irq_stack[IRQ_MAX_DEPTH];
+  static int irq_depth;
+
+  void irq_tracker_init(void) {
+      // TODO: reset depth to 0
+  }
+
+  void irq_enter(uint8_t irq) {
+      // TODO: push irq onto stack if not full
+  }
+
+  void irq_exit(void) {
+      // TODO: pop from stack if not empty
+  }
+
+  int irq_get_depth(void) {
+      // TODO: return current depth
+  }
+
+  int irq_get_active(void) {
+      // TODO: return top of stack or -1 if empty
+  }
+test_harness: "nested_irq_tracker_tests/test_main.c"
+expected_output: "nested_irq_tracker_tests/expected_output.txt"
+hints:
+  - "Use irq_depth as both the count and the index for the next push position."
+  - "The active IRQ is at irq_stack[irq_depth - 1] when depth > 0."
+xp: 50
+time_limit: 5

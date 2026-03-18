@@ -1,0 +1,66 @@
+id: rtos_message_queue
+topic_id: rtos_basics
+title: "Fixed-Size Message Queue"
+difficulty: intermediate
+description: |
+  Implement a fixed-size message queue using a circular buffer of uint32_t
+  messages. The queue has a maximum capacity defined by MAX_QUEUE_SIZE (8).
+
+  - mq_init: Initialize the queue to empty state.
+  - mq_send: Add a message to the back of the queue. Returns 1 on success,
+    0 if the queue is full.
+  - mq_receive: Remove and return the message at the front of the queue via
+    an output pointer. Returns 1 on success, 0 if the queue is empty.
+  - mq_is_full: Returns 1 if the queue is full, 0 otherwise.
+  - mq_is_empty: Returns 1 if the queue is empty, 0 otherwise.
+  - mq_count: Returns the number of messages currently in the queue.
+
+  Use a struct with a fixed-size buffer, head index, tail index, and count.
+function_signature: "void mq_init(MsgQueue *q) / int mq_send(MsgQueue *q, uint32_t msg) / int mq_receive(MsgQueue *q, uint32_t *msg) / int mq_is_full(MsgQueue *q) / int mq_is_empty(MsgQueue *q) / uint8_t mq_count(MsgQueue *q)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define MAX_QUEUE_SIZE 8
+
+  typedef struct {
+      uint32_t buffer[MAX_QUEUE_SIZE];
+      uint8_t head;
+      uint8_t tail;
+      uint8_t count;
+  } MsgQueue;
+
+  void mq_init(MsgQueue *q) {
+      // TODO: implement
+  }
+
+  int mq_send(MsgQueue *q, uint32_t msg) {
+      // TODO: return 1 on success, 0 if full
+      return 0;
+  }
+
+  int mq_receive(MsgQueue *q, uint32_t *msg) {
+      // TODO: return 1 on success, 0 if empty
+      return 0;
+  }
+
+  int mq_is_full(MsgQueue *q) {
+      // TODO: return 1 if full, 0 otherwise
+      return 0;
+  }
+
+  int mq_is_empty(MsgQueue *q) {
+      // TODO: return 1 if empty, 0 otherwise
+      return 0;
+  }
+
+  uint8_t mq_count(MsgQueue *q) {
+      // TODO: return number of messages in queue
+      return 0;
+  }
+test_harness: "rtos_message_queue_tests/test_main.c"
+expected_output: "rtos_message_queue_tests/expected_output.txt"
+hints:
+  - "Use head for the read position and tail for the write position. Wrap both with modulo MAX_QUEUE_SIZE."
+  - "Track count separately so you can distinguish full from empty without wasting a slot."
+xp: 30
+time_limit: 5

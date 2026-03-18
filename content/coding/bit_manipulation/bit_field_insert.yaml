@@ -1,0 +1,31 @@
+id: bit_manipulation_bit_field_insert
+topic_id: bit_manipulation
+title: "Insert a Value into a Bit Field"
+difficulty: advanced
+description: |
+  Implement a function that inserts a value into a specific bit field of a
+  32-bit register, preserving all other bits. The function takes:
+  - reg: the current register value
+  - value: the value to insert (only the lowest 'width' bits are used)
+  - start_bit: the bit position where the field begins (0 = LSB)
+  - width: the number of bits in the field
+
+  For example, bit_field_insert(0xFF00FF00, 0x5A, 8, 8) should replace bits
+  15..8 with 0x5A, resulting in 0xFF005A00.
+
+  This is a common operation when configuring peripheral control registers
+  in embedded systems.
+function_signature: "uint32_t bit_field_insert(uint32_t reg, uint32_t value, uint8_t start_bit, uint8_t width)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t bit_field_insert(uint32_t reg, uint32_t value, uint8_t start_bit, uint8_t width) {
+      // TODO: implement
+  }
+test_harness: "bit_field_insert_tests/test_main.c"
+expected_output: "bit_field_insert_tests/expected_output.txt"
+hints:
+  - "First, create a mask of 'width' ones: ((1UL << width) - 1). Shift it to start_bit to get the field mask."
+  - "Clear the field in reg with reg &= ~(mask << start_bit), then insert with reg |= ((value & mask) << start_bit)."
+xp: 50
+time_limit: 5

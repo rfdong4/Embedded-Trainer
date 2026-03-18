@@ -1,0 +1,24 @@
+id: int_debounce
+topic_id: interrupts
+title: "Software Debounce Filter"
+difficulty: beginner
+description: |
+  Implement a simple software debounce function. Given an array of recent
+  samples (0 or 1), return 1 only if the last 'required' samples are all
+  the same value (all 1s). Return 0 otherwise.
+
+  This is used to filter out noisy button presses in embedded systems.
+function_signature: "uint8_t debounce(uint8_t *samples, uint8_t count, uint8_t required)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t debounce(uint8_t *samples, uint8_t count, uint8_t required) {
+      // TODO: implement
+  }
+test_harness: "debounce_tests/test_main.c"
+expected_output: "debounce_tests/expected_output.txt"
+hints:
+  - "Check the last 'required' elements of the samples array (starting from count - required)."
+  - "If required > count, there aren't enough samples, so return 0."
+xp: 30
+time_limit: 5

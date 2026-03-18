@@ -1,0 +1,26 @@
+id: bit_manipulation_count_set_bits
+topic_id: bit_manipulation
+title: "Count Set Bits (Popcount)"
+difficulty: intermediate
+description: |
+  Implement a function that counts the number of set (1) bits in a 32-bit
+  unsigned integer. This operation is commonly known as "popcount" or
+  "population count" and is frequently used in embedded systems for tasks
+  like counting active flags or peripherals.
+
+  For example, count_set_bits(0x0F) returns 4 because 0b00001111 has four 1-bits.
+  count_set_bits(0xFFFFFFFF) returns 32.
+function_signature: "uint8_t count_set_bits(uint32_t val)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t count_set_bits(uint32_t val) {
+      // TODO: implement
+  }
+test_harness: "count_set_bits_tests/test_main.c"
+expected_output: "count_set_bits_tests/expected_output.txt"
+hints:
+  - "A simple approach: loop while val is non-zero, count the LSB with (val & 1), then shift right."
+  - "Brian Kernighan's trick: val &= (val - 1) clears the lowest set bit each iteration."
+xp: 30
+time_limit: 5

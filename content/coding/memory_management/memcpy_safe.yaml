@@ -1,0 +1,28 @@
+id: memory_management_memcpy_safe
+topic_id: memory_management
+title: "Safe Memory Copy with Overlap Handling"
+difficulty: intermediate
+description: |
+  Implement a safe memory copy function that correctly handles overlapping
+  memory regions, similar to the standard memmove function.
+
+  Copy n bytes from src to dst. When src and dst overlap, a naive front-to-back
+  copy can corrupt data. Detect the overlap direction and copy accordingly:
+  - If dst < src (or no overlap): copy front to back.
+  - If dst > src (overlap risk): copy back to front.
+
+  Return dst.
+function_signature: "void* safe_memcpy(void* dst, const void* src, uint32_t n)"
+skeleton_code: |
+  #include <stdint.h>
+
+  void* safe_memcpy(void* dst, const void* src, uint32_t n) {
+      // TODO: implement - handle overlapping regions
+  }
+test_harness: "memcpy_safe_tests/test_main.c"
+expected_output: "memcpy_safe_tests/expected_output.txt"
+hints:
+  - "Cast pointers to uint8_t* to copy byte-by-byte."
+  - "If dst > src and the regions overlap, start copying from the end (index n-1) down to 0."
+xp: 30
+time_limit: 5

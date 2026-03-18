@@ -1,0 +1,40 @@
+id: timer_deadtime_insert
+topic_id: timers
+title: "Complementary PWM Dead Time Insertion"
+difficulty: advanced
+description: |
+  Insert dead time into complementary PWM signals to prevent
+  shoot-through (both high-side and low-side transistors on
+  simultaneously).
+
+  Given:
+  - period: timer period in ticks per PWM cycle
+  - duty_permille: duty cycle in permille (0-1000, where 500 = 50.0%)
+  - dead_ticks: number of timer ticks for the dead time gap
+
+  Calculate compare values for two complementary channels:
+  1. Compute on_ticks = (period * duty_permille) / 1000
+  2. ch1_compare = on_ticks - dead_ticks  (CH1 turns off early)
+  3. ch2_compare = on_ticks + dead_ticks  (CH2 turns on late)
+
+  This ensures a gap of 2 * dead_ticks between CH1 going low and
+  CH2 going high, preventing overlap.
+
+  Return the result packed into a uint32_t:
+    bits[31:16] = ch1_compare
+    bits[15:0]  = ch2_compare
+function_signature: "uint32_t calc_dead_time_pwm(uint16_t period, uint16_t duty_permille, uint16_t dead_ticks)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t calc_dead_time_pwm(uint16_t period, uint16_t duty_permille, uint16_t dead_ticks) {
+      // TODO: implement
+  }
+test_harness: "timer_deadtime_insert_tests/test_main.c"
+expected_output: "timer_deadtime_insert_tests/expected_output.txt"
+hints:
+  - "Cast to uint32_t before multiplying: on_ticks = ((uint32_t)period * duty_permille) / 1000."
+  - "ch1 turns off dead_ticks before the nominal edge. ch2 turns on dead_ticks after it."
+  - "Pack the result: ((uint32_t)ch1_compare << 16) | ch2_compare."
+xp: 50
+time_limit: 5

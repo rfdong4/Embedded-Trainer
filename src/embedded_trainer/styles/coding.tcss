@@ -1,0 +1,51 @@
+CodingScreen {
+    layout: horizontal;
+}
+
+#code-panel {
+    width: 1fr;
+    layout: vertical;
+}
+
+#info-panel {
+    width: 1fr;
+    layout: vertical;
+}
+
+#challenge-description {
+    height: 2fr;
+    overflow-y: auto;
+    padding: 1;
+    border: tall $primary;
+}
+
+#hints-panel {
+    height: auto;
+    max-height: 8;
+    overflow-y: auto;
+    border: tall $warning;
+    padding: 0 1;
+}
+
+#hints-header {
+    text-style: bold;
+    color: $warning;
+}
+
+.hint-text {
+    color: $text;
+    margin-left: 1;
+}
+
+#results-panel {
+    height: 1fr;
+    overflow-y: auto;
+    border: tall $primary;
+}
+
+#code-actions {
+    dock: bottom;
+    height: 3;
+    layout: horizontal;
+    padding: 0 1;
+}

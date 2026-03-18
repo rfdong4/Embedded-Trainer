@@ -1,0 +1,39 @@
+id: interrupts_irq_mask_register
+topic_id: interrupts
+title: "Interrupt Mask Register Operations"
+difficulty: intermediate
+description: |
+  Implement functions to manipulate a 32-bit interrupt mask register. Each bit
+  corresponds to one interrupt source (IRQ 0 through IRQ 31).
+
+  Implement these functions:
+  - enable_irq: Set bit irq_num in mask_reg to enable that interrupt. Return
+    the updated register value.
+  - disable_irq: Clear bit irq_num in mask_reg to disable that interrupt.
+    Return the updated register value.
+  - is_irq_enabled: Return 1 if bit irq_num is set in mask_reg, 0 otherwise.
+
+  If irq_num >= 32, return the register unchanged (for enable/disable) or 0
+  (for is_irq_enabled).
+function_signature: "uint32_t enable_irq(uint32_t mask_reg, uint8_t irq_num) / uint32_t disable_irq(uint32_t mask_reg, uint8_t irq_num) / uint8_t is_irq_enabled(uint32_t mask_reg, uint8_t irq_num)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t enable_irq(uint32_t mask_reg, uint8_t irq_num) {
+      // TODO: set bit irq_num
+  }
+
+  uint32_t disable_irq(uint32_t mask_reg, uint8_t irq_num) {
+      // TODO: clear bit irq_num
+  }
+
+  uint8_t is_irq_enabled(uint32_t mask_reg, uint8_t irq_num) {
+      // TODO: return 1 if bit irq_num is set, else 0
+  }
+test_harness: "irq_mask_register_tests/test_main.c"
+expected_output: "irq_mask_register_tests/expected_output.txt"
+hints:
+  - "Use (1U << irq_num) to create a mask for the target bit."
+  - "Enable: OR with the mask. Disable: AND with the inverted mask. Check: AND and compare to non-zero."
+xp: 30
+time_limit: 5

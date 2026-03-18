@@ -1,0 +1,51 @@
+id: rtos_deadline_check
+topic_id: rtos_basics
+title: "RMS Schedulability Test"
+difficulty: advanced
+description: |
+  Implement a Rate Monotonic Scheduling (RMS) utilization bound test to
+  determine if a set of periodic tasks is guaranteed schedulable.
+
+  Given an array of tasks, each with a period and worst-case execution time
+  (WCET), compute the total CPU utilization: U = sum(WCET_i / Period_i).
+
+  Then compare against the Liu & Layland utilization bound:
+    bound = n * (2^(1/n) - 1)
+  where n is the number of tasks.
+
+  - compute_utilization: Return the total utilization as a float.
+  - compute_rm_bound: Return the RM bound for n tasks as a float.
+  - is_schedulable: Return 1 if utilization <= bound, 0 otherwise.
+
+  Use the provided Task struct with uint32_t period and uint32_t wcet fields.
+function_signature: "float compute_utilization(Task *tasks, int n) / float compute_rm_bound(int n) / int is_schedulable(Task *tasks, int n)"
+skeleton_code: |
+  #include <stdint.h>
+  #include <math.h>
+
+  typedef struct {
+      uint32_t period;
+      uint32_t wcet;
+  } Task;
+
+  float compute_utilization(Task *tasks, int n) {
+      // TODO: return sum of (wcet[i] / period[i])
+      return 0.0f;
+  }
+
+  float compute_rm_bound(int n) {
+      // TODO: return n * (2^(1/n) - 1)
+      return 0.0f;
+  }
+
+  int is_schedulable(Task *tasks, int n) {
+      // TODO: return 1 if utilization <= bound, 0 otherwise
+      return 0;
+  }
+test_harness: "rtos_deadline_check_tests/test_main.c"
+expected_output: "rtos_deadline_check_tests/expected_output.txt"
+hints:
+  - "Use powf(2.0f, 1.0f/n) to compute 2^(1/n). Cast integers to float before dividing."
+  - "For n=1, the bound is 1.0. For n=2, approximately 0.828. For n=3, approximately 0.780."
+xp: 50
+time_limit: 5

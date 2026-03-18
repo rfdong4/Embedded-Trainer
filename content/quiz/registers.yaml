@@ -1,0 +1,134 @@
+topic_id: registers
+topic_name: "ARM Cortex-M Registers"
+questions:
+  - id: registers_q01
+    type: mcq
+    difficulty: beginner
+    text: "Which ARM Cortex-M register holds the return address when a function is called using the BL instruction?"
+    options:
+      - "A) R0"
+      - "B) SP (R13)"
+      - "C) LR (R14)"
+      - "D) PC (R15)"
+    correct: "C"
+    explanation: "The Link Register (LR / R14) stores the return address when a BL (Branch with Link) instruction is executed. The BX LR instruction is then used to return from the function."
+    tags: [link_register, function_call]
+    xp: 10
+
+  - id: registers_q02
+    type: mcq
+    difficulty: beginner
+    text: "What is the purpose of the Program Counter (PC / R15) in ARM Cortex-M?"
+    options:
+      - "A) It stores the result of the last arithmetic operation"
+      - "B) It holds the address of the next instruction to be fetched"
+      - "C) It stores the current stack pointer value"
+      - "D) It holds the interrupt priority level"
+    correct: "B"
+    explanation: "The Program Counter contains the address of the next instruction to be fetched from memory. On Cortex-M, reading PC returns the current instruction address + 4 due to the pipeline."
+    tags: [program_counter, pipeline]
+    xp: 10
+
+  - id: registers_q03
+    type: true_false
+    difficulty: beginner
+    text: "ARM Cortex-M processors have two stack pointers: the Main Stack Pointer (MSP) and the Process Stack Pointer (PSP)."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Cortex-M has both MSP and PSP. The MSP is used by default and in handler mode. The PSP can be used in thread mode, which is useful in RTOS environments where each task has its own stack."
+    tags: [stack_pointer, msp, psp]
+    xp: 10
+
+  - id: registers_q04
+    type: mcq
+    difficulty: beginner
+    text: "Registers R0-R3 in the ARM Cortex-M calling convention (AAPCS) are used for:"
+    options:
+      - "A) Storing global variables only"
+      - "B) Passing the first four function arguments and returning results"
+      - "C) Holding interrupt vector addresses"
+      - "D) Storing callee-saved values"
+    correct: "B"
+    explanation: "Per the ARM Architecture Procedure Call Standard (AAPCS), R0-R3 are used to pass the first four arguments to a function and R0 (and R1 for 64-bit) holds the return value. They are caller-saved registers."
+    tags: [calling_convention, aapcs, function_arguments]
+    xp: 10
+
+  - id: registers_q05
+    type: mcq
+    difficulty: intermediate
+    text: "Which bits in the Program Status Register (xPSR) indicate the result of a comparison or arithmetic operation?"
+    options:
+      - "A) The ISR number field (bits 8:0)"
+      - "B) The condition code flags N, Z, C, V (bits 31:28)"
+      - "C) The Thumb state bit T (bit 24)"
+      - "D) The exception number field (bits 5:0)"
+    correct: "B"
+    explanation: "The APSR (Application Program Status Register) portion of xPSR contains the condition flags: N (Negative), Z (Zero), C (Carry), and V (Overflow) in bits 31 through 28. These are set by arithmetic and logical instructions."
+    tags: [psr, condition_flags, apsr]
+    xp: 15
+
+  - id: registers_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What happens when you set the PRIMASK register to 1 on a Cortex-M processor?"
+    options:
+      - "A) All interrupts are enabled"
+      - "B) All configurable interrupts are disabled (only NMI and HardFault remain active)"
+      - "C) The processor enters sleep mode"
+      - "D) The priority of the current interrupt is elevated"
+    correct: "B"
+    explanation: "Setting PRIMASK to 1 raises the execution priority to 0, effectively masking all interrupts with configurable priority. Only NMI (priority -2) and HardFault (priority -1) can still preempt."
+    tags: [primask, interrupt_masking, critical_section]
+    xp: 15
+
+  - id: registers_q07
+    type: true_false
+    difficulty: intermediate
+    text: "On Cortex-M, the CONTROL register's SPSEL bit selects whether the processor uses MSP or PSP in thread mode."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "When CONTROL.SPSEL = 0, thread mode uses MSP. When CONTROL.SPSEL = 1, thread mode uses PSP. Handler mode always uses MSP regardless of the SPSEL bit."
+    tags: [control_register, spsel, stack_pointer]
+    xp: 15
+
+  - id: registers_q08
+    type: mcq
+    difficulty: intermediate
+    text: "Which registers are automatically pushed onto the stack by hardware during an exception entry on Cortex-M?"
+    options:
+      - "A) R0-R3, R12, LR, PC, xPSR"
+      - "B) R0-R12, LR, PC"
+      - "C) Only PC and LR"
+      - "D) R4-R11, SP"
+    correct: "A"
+    explanation: "The Cortex-M hardware automatically stacks 8 registers during exception entry: R0, R1, R2, R3, R12, LR, PC (return address), and xPSR. This is the exception stack frame. R4-R11 must be saved by software if used in the ISR."
+    tags: [exception_frame, context_saving, stack]
+    xp: 15
+
+  - id: registers_q09
+    type: mcq
+    difficulty: advanced
+    text: "The EXC_RETURN value 0xFFFFFFFD loaded into LR during exception entry indicates:"
+    options:
+      - "A) Return to handler mode using MSP"
+      - "B) Return to thread mode using MSP"
+      - "C) Return to thread mode using PSP"
+      - "D) Return to thread mode using floating-point state"
+    correct: "C"
+    explanation: "EXC_RETURN value 0xFFFFFFFD means: return to thread mode, use PSP for stack operations, and no floating-point context. This is common in RTOS environments where tasks use PSP."
+    tags: [exc_return, exception_handling, thread_mode]
+    xp: 25
+
+  - id: registers_q10
+    type: mcq
+    difficulty: advanced
+    text: "What is the purpose of the BASEPRI register on Cortex-M3/M4?"
+    options:
+      - "A) It sets the base address for the vector table"
+      - "B) It masks interrupts with priority equal to or lower than the specified value"
+      - "C) It stores the priority of the currently executing exception"
+      - "D) It defines the number of priority bits implemented"
+    correct: "B"
+    explanation: "BASEPRI allows selective interrupt masking by priority level. When set to a non-zero value, it prevents activation of exceptions with the same or lower priority (higher numerical value). This is more flexible than PRIMASK, which blocks all configurable interrupts."
+    tags: [basepri, priority_masking, interrupt_control]
+    xp: 25

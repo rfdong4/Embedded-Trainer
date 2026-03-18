@@ -1,0 +1,43 @@
+id: i2c_multi_master
+topic_id: i2c
+title: "I2C Multi-Master Bus Arbitration"
+difficulty: advanced
+description: |
+  Simulate I2C bus arbitration between two masters transmitting
+  simultaneously. I2C uses an open-drain bus with wired-AND logic, meaning
+  any device pulling the line low (0) overrides a high (1).
+
+  When two masters start transmitting at the same time, arbitration occurs
+  bit by bit (MSB first). At each bit position, both masters drive their
+  bit onto the bus. If master A sends 0 while master B sends 1, the bus
+  reads 0 (wired-AND). Master B detects that the bus value differs from
+  what it sent and loses arbitration. It must release the bus immediately.
+
+  Implement a function that takes two 8-bit address bytes (one per master)
+  and returns:
+  - 1 if master 1 wins arbitration
+  - 2 if master 2 wins arbitration
+  - 0 if both addresses are identical (tie -- both could proceed)
+
+  The arbitration winner is determined at the first bit position (MSB
+  first, bit 7 down to bit 0) where the two addresses differ. The master
+  sending 0 at that bit wins because its signal dominates on the
+  open-drain bus.
+
+  Example: master1=0x48 (01001000), master2=0x50 (01010000)
+  Bits match at bit 7 (0=0), bit 6 (1=1), bit 5 (0=0).
+  At bit 4: master1=0, master2=1 -> master1 wins -> return 1.
+function_signature: "uint8_t i2c_arbitrate(uint8_t addr1, uint8_t addr2)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t i2c_arbitrate(uint8_t addr1, uint8_t addr2) {
+      // TODO: implement
+  }
+test_harness: "i2c_multi_master_tests/test_main.c"
+expected_output: "i2c_multi_master_tests/expected_output.txt"
+hints:
+  - "Compare addresses bit by bit from MSB (bit 7) to LSB (bit 0). At the first differing bit, the master sending 0 wins."
+  - "XOR the addresses to find differing bits. The highest set bit in the XOR result is where they first differ. The master with 0 at that position wins."
+xp: 50
+time_limit: 5

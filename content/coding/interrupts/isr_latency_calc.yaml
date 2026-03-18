@@ -1,0 +1,50 @@
+id: isr_latency_calc
+topic_id: interrupts
+title: "ISR Latency Calculator"
+difficulty: intermediate
+description: |
+  Calculate interrupt service routine (ISR) latency in clock cycles, a key
+  metric for real-time embedded systems. The total latency from interrupt
+  assertion to ISR completion depends on several factors.
+
+  For a simple (non-nested) interrupt:
+    total = entry_overhead + isr_body_cycles + exit_overhead
+
+  For a nested interrupt (one that preempts another ISR):
+    total = entry_overhead + preemption_check + isr_body_cycles + exit_overhead
+  The preemption_check adds extra cycles to save/compare priority context.
+
+  Implement:
+  - calc_isr_latency: Calculate total latency for a single ISR given the
+    component cycle counts and whether it is nested (preempts another ISR).
+  - calc_worst_case_latency: Given an array of ISR timing descriptors
+    (each with body_cycles and is_nested flag), plus shared entry/exit
+    overhead and preemption cost, find the maximum total latency across
+    all ISRs.
+function_signature: "uint32_t calc_isr_latency(uint32_t entry, uint32_t body, uint32_t exit_oh, uint32_t preempt_cost, int is_nested) / uint32_t calc_worst_case_latency(const ISR_Timing *isrs, uint32_t count, uint32_t entry, uint32_t exit_oh, uint32_t preempt_cost)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t body_cycles;
+      int is_nested;  /* 1 if this ISR preempts another, 0 otherwise */
+  } ISR_Timing;
+
+  uint32_t calc_isr_latency(uint32_t entry, uint32_t body,
+                             uint32_t exit_oh, uint32_t preempt_cost,
+                             int is_nested) {
+      // TODO: calculate total latency in cycles
+  }
+
+  uint32_t calc_worst_case_latency(const ISR_Timing *isrs, uint32_t count,
+                                    uint32_t entry, uint32_t exit_oh,
+                                    uint32_t preempt_cost) {
+      // TODO: find the maximum latency across all ISRs
+  }
+test_harness: "isr_latency_calc_tests/test_main.c"
+expected_output: "isr_latency_calc_tests/expected_output.txt"
+hints:
+  - "For a nested ISR, add preempt_cost to the total: entry + preempt_cost + body + exit."
+  - "For worst-case, iterate all ISRs and track the maximum using calc_isr_latency for each."
+xp: 30
+time_limit: 5

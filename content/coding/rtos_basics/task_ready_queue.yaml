@@ -1,0 +1,38 @@
+id: rtos_basics_task_ready_queue
+topic_id: rtos_basics
+title: "Task Ready Queue Bitmask"
+difficulty: intermediate
+description: |
+  Implement a task ready queue using a bitmask. Each bit in a uint8_t
+  represents a task (0-7), where bit 0 = task 0, bit 1 = task 1, etc.
+
+  - set_task_ready: Set the bit for the given task_id (0-7) in ready_mask and return the updated mask.
+  - clear_task_ready: Clear the bit for the given task_id (0-7) in ready_mask and return the updated mask.
+  - get_highest_ready: Return the highest-priority (lowest-numbered) ready task, or -1 if no tasks are ready.
+
+  If task_id is out of range (>7), return the mask unchanged for set/clear.
+function_signature: "uint8_t set_task_ready(uint8_t ready_mask, uint8_t task_id) / uint8_t clear_task_ready(uint8_t ready_mask, uint8_t task_id) / int8_t get_highest_ready(uint8_t ready_mask)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t set_task_ready(uint8_t ready_mask, uint8_t task_id) {
+      // TODO: implement
+      return ready_mask;
+  }
+
+  uint8_t clear_task_ready(uint8_t ready_mask, uint8_t task_id) {
+      // TODO: implement
+      return ready_mask;
+  }
+
+  int8_t get_highest_ready(uint8_t ready_mask) {
+      // TODO: implement - return lowest bit number set, or -1
+      return -1;
+  }
+test_harness: "task_ready_queue_tests/test_main.c"
+expected_output: "task_ready_queue_tests/expected_output.txt"
+hints:
+  - "Use (1 << task_id) to create a bitmask for a specific task."
+  - "To find the lowest set bit, iterate from bit 0 to 7 and check each with (mask & (1 << i))."
+xp: 30
+time_limit: 5

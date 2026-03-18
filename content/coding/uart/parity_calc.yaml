@@ -1,0 +1,25 @@
+id: uart_parity_calc
+topic_id: uart
+title: "Calculate Even Parity Bit"
+difficulty: beginner
+description: |
+  Implement a function that calculates the even parity bit for a byte of data.
+  Even parity means the total number of 1-bits (including the parity bit)
+  should be even.
+
+  Return 1 if the data byte has an odd number of 1-bits (parity bit needed to
+  make even), or 0 if the data already has an even number of 1-bits.
+function_signature: "uint8_t even_parity(uint8_t data)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t even_parity(uint8_t data) {
+      // TODO: implement
+  }
+test_harness: "parity_calc_tests/test_main.c"
+expected_output: "parity_calc_tests/expected_output.txt"
+hints:
+  - "Count the number of set bits, or XOR all bits together."
+  - "You can XOR the byte with itself shifted: data ^= (data >> 4); data ^= (data >> 2); data ^= (data >> 1); return data & 1;"
+xp: 30
+time_limit: 5

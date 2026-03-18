@@ -1,0 +1,25 @@
+id: bit_extract_field
+topic_id: bit_manipulation
+title: "Extract a Bit Field"
+difficulty: beginner
+description: |
+  Implement a function that extracts a bit field from an 8-bit register.
+  Given a start bit position and a width, extract that many bits starting
+  from the start position and return them right-aligned.
+
+  For example, extract_field(0xAB, 4, 4) extracts bits 7..4 from 0xAB (0b10101011),
+  returning 0x0A (0b00001010).
+function_signature: "uint8_t extract_field(uint8_t reg, uint8_t start_bit, uint8_t width)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t extract_field(uint8_t reg, uint8_t start_bit, uint8_t width) {
+      // TODO: implement
+  }
+test_harness: "extract_field_tests/test_main.c"
+expected_output: "extract_field_tests/expected_output.txt"
+hints:
+  - "First shift right by start_bit to move the field to bit 0."
+  - "Create a mask of 'width' ones using ((1 << width) - 1) and AND it with the shifted value."
+xp: 25
+time_limit: 5

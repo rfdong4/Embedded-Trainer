@@ -1,0 +1,33 @@
+HomeScreen {
+    layout: vertical;
+}
+
+#welcome {
+    text-align: center;
+    text-style: bold;
+    color: $accent;
+    margin: 1 0;
+    height: auto;
+}
+
+#stats-bar {
+    height: auto;
+    padding: 1 2;
+    layout: horizontal;
+}
+
+#stats-bar Label {
+    width: 1fr;
+    text-align: center;
+}
+
+#mode-buttons {
+    layout: horizontal;
+    height: 7;
+    margin: 1 2;
+}
+
+#recent-activity {
+    height: 1fr;
+    padding: 1 2;
+}

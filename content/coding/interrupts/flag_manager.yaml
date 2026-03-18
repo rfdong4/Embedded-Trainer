@@ -1,0 +1,34 @@
+id: int_flag_manager
+topic_id: interrupts
+title: "Interrupt Flag Manager"
+difficulty: beginner
+description: |
+  Implement three functions to manage interrupt flags in a 32-bit register:
+
+  - set_flag: Set a specific flag bit, return updated flags
+  - clear_flag: Clear a specific flag bit, return updated flags
+  - check_flag: Return 1 if the flag is set, 0 otherwise
+
+  Flag numbers range from 0 to 31.
+function_signature: "uint32_t set_flag(uint32_t flags, uint8_t flag_num); uint32_t clear_flag(uint32_t flags, uint8_t flag_num); uint8_t check_flag(uint32_t flags, uint8_t flag_num)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t set_flag(uint32_t flags, uint8_t flag_num) {
+      // TODO: implement
+  }
+
+  uint32_t clear_flag(uint32_t flags, uint8_t flag_num) {
+      // TODO: implement
+  }
+
+  uint8_t check_flag(uint32_t flags, uint8_t flag_num) {
+      // TODO: implement
+  }
+test_harness: "flag_manager_tests/test_main.c"
+expected_output: "flag_manager_tests/expected_output.txt"
+hints:
+  - "set_flag uses OR, clear_flag uses AND with inverted mask, check_flag uses AND and shift."
+  - "These are the same bit manipulation patterns from earlier, applied to 32-bit values."
+xp: 30
+time_limit: 5

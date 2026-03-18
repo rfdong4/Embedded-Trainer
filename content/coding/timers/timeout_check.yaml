@@ -1,0 +1,25 @@
+id: timers_timeout_check
+topic_id: timers
+title: "Check Timeout with Wraparound"
+difficulty: beginner
+description: |
+  Implement a function that checks whether a timeout has elapsed, correctly
+  handling counter wraparound. In embedded systems, tick counters eventually
+  overflow back to 0.
+
+  The function should return 1 if (now - start) >= timeout, or 0 otherwise.
+  Unsigned subtraction naturally handles wraparound.
+function_signature: "uint8_t timeout_elapsed(uint32_t start, uint32_t now, uint32_t timeout)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t timeout_elapsed(uint32_t start, uint32_t now, uint32_t timeout) {
+      // TODO: implement
+  }
+test_harness: "timeout_check_tests/test_main.c"
+expected_output: "timeout_check_tests/expected_output.txt"
+hints:
+  - "Unsigned subtraction (now - start) handles wraparound automatically in C."
+  - "Simply compare (now - start) >= timeout and return 1 or 0."
+xp: 30
+time_limit: 5

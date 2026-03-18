@@ -1,0 +1,24 @@
+id: int_priority_encode
+topic_id: interrupts
+title: "Find Highest Priority Interrupt"
+difficulty: beginner
+description: |
+  Implement a function that finds the highest priority (lowest numbered) active
+  interrupt from a pending interrupt mask. Each bit in the 32-bit mask represents
+  one interrupt source. Bit 0 is highest priority.
+
+  Return the bit position of the lowest set bit, or -1 if no interrupts are pending.
+function_signature: "int8_t highest_priority(uint32_t pending_mask)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int8_t highest_priority(uint32_t pending_mask) {
+      // TODO: implement
+  }
+test_harness: "priority_encode_tests/test_main.c"
+expected_output: "priority_encode_tests/expected_output.txt"
+hints:
+  - "Loop from bit 0 to 31 and return the first set bit position."
+  - "Check each bit with (pending_mask & (1U << i))."
+xp: 30
+time_limit: 5

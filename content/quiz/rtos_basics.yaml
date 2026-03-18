@@ -1,0 +1,134 @@
+topic_id: rtos_basics
+topic_name: "RTOS Basics"
+questions:
+  - id: rtos_basics_q01
+    type: mcq
+    difficulty: beginner
+    text: "What does RTOS stand for?"
+    options:
+      - "A) Real-Time Output System"
+      - "B) Real-Time Operating System"
+      - "C) Rapid Task Ordering Service"
+      - "D) Runtime Thread Optimization System"
+    correct: "B"
+    explanation: "RTOS stands for Real-Time Operating System. It provides task scheduling, synchronization primitives, and timing guarantees that are essential for embedded systems requiring deterministic behavior."
+    tags: [rtos, basics, definition]
+    xp: 10
+
+  - id: rtos_basics_q02
+    type: mcq
+    difficulty: beginner
+    text: "In an RTOS, which of the following is NOT a typical task state?"
+    options:
+      - "A) Running"
+      - "B) Ready"
+      - "C) Blocked (Waiting)"
+      - "D) Compiled"
+    correct: "D"
+    explanation: "Typical RTOS task states are: Running (currently executing on the CPU), Ready (eligible to run but waiting for the scheduler), Blocked/Waiting (waiting for an event, semaphore, or delay), and sometimes Suspended (explicitly paused). 'Compiled' is not a runtime task state."
+    tags: [task_states, scheduler]
+    xp: 10
+
+  - id: rtos_basics_q03
+    type: true_false
+    difficulty: beginner
+    text: "In a preemptive RTOS, a higher-priority task that becomes ready will immediately preempt a lower-priority task that is currently running."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "In a preemptive scheduling model, when a higher-priority task transitions from blocked to ready, the scheduler immediately preempts the currently running lower-priority task and gives the CPU to the higher-priority task. This ensures that the most urgent task always runs first."
+    tags: [preemptive, scheduling, priority]
+    xp: 10
+
+  - id: rtos_basics_q04
+    type: mcq
+    difficulty: beginner
+    text: "What is the difference between a binary semaphore and a mutex?"
+    options:
+      - "A) There is no difference; they are the same thing"
+      - "B) A mutex has ownership and supports priority inheritance; a binary semaphore does not"
+      - "C) A binary semaphore can only be used by one task; a mutex can be shared"
+      - "D) A mutex is faster than a binary semaphore"
+    correct: "B"
+    explanation: "A mutex has the concept of ownership: only the task that locked (took) the mutex can unlock (give) it. Mutexes also support priority inheritance to prevent priority inversion. A binary semaphore has no ownership and can be given by any task or ISR, making it suitable for signaling."
+    tags: [mutex, binary_semaphore, ownership, priority_inheritance]
+    xp: 10
+
+  - id: rtos_basics_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is priority inversion?"
+    options:
+      - "A) When a high-priority task runs before a low-priority task"
+      - "B) When a low-priority task indirectly blocks a high-priority task by holding a shared resource, while a medium-priority task runs instead"
+      - "C) When task priorities are automatically reversed by the scheduler"
+      - "D) When an ISR runs at a lower priority than a task"
+    correct: "B"
+    explanation: "Priority inversion occurs when a high-priority task (H) is blocked waiting for a resource held by a low-priority task (L), while a medium-priority task (M) preempts L and runs. H is effectively running at L's priority. Priority inheritance mitigates this by temporarily raising L's priority to H's level."
+    tags: [priority_inversion, priority_inheritance, resource_sharing]
+    xp: 15
+
+  - id: rtos_basics_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What is the difference between round-robin and preemptive priority scheduling?"
+    options:
+      - "A) Round-robin uses priorities; preemptive does not"
+      - "B) Round-robin gives equal time slices to same-priority tasks; preemptive always runs the highest-priority ready task"
+      - "C) Round-robin is only used in Linux; preemptive is only for embedded systems"
+      - "D) Preemptive scheduling cannot handle multiple tasks"
+    correct: "B"
+    explanation: "Preemptive priority scheduling always runs the highest-priority ready task. Round-robin scheduling shares CPU time equally among tasks of the same priority using time slices. Many RTOSes combine both: preemptive between different priorities and round-robin among equal-priority tasks."
+    tags: [round_robin, preemptive, time_slice, scheduling]
+    xp: 15
+
+  - id: rtos_basics_q07
+    type: mcq
+    difficulty: intermediate
+    text: "What is a message queue used for in an RTOS?"
+    options:
+      - "A) To store log messages for debugging"
+      - "B) To pass data between tasks (or from ISRs to tasks) in a thread-safe FIFO manner"
+      - "C) To queue interrupt requests in the NVIC"
+      - "D) To buffer UART transmit data"
+    correct: "B"
+    explanation: "A message queue is an inter-task communication mechanism that allows tasks (and ISRs) to send and receive messages in a FIFO order. The RTOS ensures thread safety. Tasks can block on an empty queue (receiver) or a full queue (sender), enabling producer-consumer patterns."
+    tags: [message_queue, inter_task_communication, fifo]
+    xp: 15
+
+  - id: rtos_basics_q08
+    type: true_false
+    difficulty: intermediate
+    text: "A counting semaphore can be used to manage access to a pool of identical resources, where the semaphore count represents the number of available resources."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "A counting semaphore tracks a count that represents available resources. Each 'take' decrements the count (a task acquires a resource), and each 'give' increments it (a resource is released). When the count reaches zero, tasks attempting to take will block until a resource becomes available."
+    tags: [counting_semaphore, resource_pool]
+    xp: 15
+
+  - id: rtos_basics_q09
+    type: mcq
+    difficulty: advanced
+    text: "What is a deadlock, and which of the following conditions is NOT required for deadlock to occur?"
+    options:
+      - "A) Mutual exclusion"
+      - "B) Hold and wait"
+      - "C) Preemptive scheduling"
+      - "D) Circular wait"
+    correct: "C"
+    explanation: "Deadlock requires four simultaneous conditions (Coffman conditions): mutual exclusion, hold and wait, no preemption of resources, and circular wait. Preemptive scheduling is a CPU scheduling policy, not a deadlock condition. In fact, the no-preemption condition means resources cannot be forcibly taken away."
+    tags: [deadlock, coffman_conditions, mutual_exclusion]
+    xp: 25
+
+  - id: rtos_basics_q10
+    type: mcq
+    difficulty: advanced
+    text: "In FreeRTOS, what happens when a task calls vTaskDelay(100) with a tick rate of 1 kHz?"
+    options:
+      - "A) The task busy-waits for 100 milliseconds"
+      - "B) The task is placed in the blocked state for 100 tick periods (100 ms) and the scheduler runs other tasks"
+      - "C) The task is deleted after 100 milliseconds"
+      - "D) The system clock is paused for 100 ticks"
+    correct: "B"
+    explanation: "vTaskDelay(100) moves the calling task to the blocked state for 100 tick periods. At 1 kHz tick rate, each tick is 1 ms, so the delay is 100 ms. During this time, the scheduler runs other ready tasks. After 100 ticks, the task moves back to the ready state."
+    tags: [freertos, vtaskdelay, blocked_state, tick_rate]
+    xp: 25

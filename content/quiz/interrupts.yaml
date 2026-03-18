@@ -1,0 +1,134 @@
+topic_id: interrupts
+topic_name: "Interrupts and NVIC"
+questions:
+  - id: interrupts_q01
+    type: mcq
+    difficulty: beginner
+    text: "What is an Interrupt Service Routine (ISR)?"
+    options:
+      - "A) A function that runs periodically on a timer"
+      - "B) A special function that executes in response to a hardware or software interrupt"
+      - "C) A subroutine that initializes peripherals at startup"
+      - "D) A background task managed by the OS scheduler"
+    correct: "B"
+    explanation: "An ISR is a function that the processor executes when a specific interrupt event occurs. It interrupts the normal program flow, handles the event, and then returns to the previously executing code."
+    tags: [isr, interrupt_basics]
+    xp: 10
+
+  - id: interrupts_q02
+    type: mcq
+    difficulty: beginner
+    text: "What does NVIC stand for in ARM Cortex-M?"
+    options:
+      - "A) Non-Volatile Integrated Controller"
+      - "B) Nested Vectored Interrupt Controller"
+      - "C) Network Vector Interface Circuit"
+      - "D) Nested Variable Instruction Cache"
+    correct: "B"
+    explanation: "The NVIC (Nested Vectored Interrupt Controller) manages all external interrupts on Cortex-M. It supports nested interrupts via priority levels and provides a vectored mechanism for fast ISR entry."
+    tags: [nvic, cortex_m]
+    xp: 10
+
+  - id: interrupts_q03
+    type: true_false
+    difficulty: beginner
+    text: "On Cortex-M, a lower numerical priority value represents a higher interrupt urgency."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "In the NVIC, priority 0 is the highest urgency and higher numbers mean lower urgency. An interrupt with priority 1 can preempt an interrupt with priority 3, but not one with priority 0."
+    tags: [priority, nvic]
+    xp: 10
+
+  - id: interrupts_q04
+    type: mcq
+    difficulty: beginner
+    text: "Why should ISRs be kept as short as possible?"
+    options:
+      - "A) Because ISRs cannot access global variables"
+      - "B) To minimize the time other interrupts are delayed and to maintain system responsiveness"
+      - "C) Because the processor runs slower during ISR execution"
+      - "D) Because ISRs cannot call any functions"
+    correct: "B"
+    explanation: "Long ISRs block other interrupts of equal or lower priority, increasing interrupt latency and potentially causing missed events. Best practice is to do minimal work in the ISR (e.g., set a flag, copy data) and defer processing to the main loop or a task."
+    tags: [isr_design, latency, responsiveness]
+    xp: 10
+
+  - id: interrupts_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is tail-chaining in the Cortex-M NVIC?"
+    options:
+      - "A) Linking multiple ISRs into a chain that executes sequentially"
+      - "B) An optimization where the processor skips the unstacking/restacking of registers when transitioning directly from one ISR to another"
+      - "C) A mechanism to chain DMA transfers to interrupt events"
+      - "D) A technique for prioritizing the last interrupt in a queue"
+    correct: "B"
+    explanation: "Tail-chaining occurs when a pending interrupt exists as the current ISR completes. Instead of restoring the context and then immediately saving it again, the processor transitions directly to the next ISR, saving up to 12 clock cycles."
+    tags: [tail_chaining, optimization, nvic]
+    xp: 15
+
+  - id: interrupts_q06
+    type: mcq
+    difficulty: intermediate
+    text: "Which keyword must be used for a variable shared between an ISR and the main loop to prevent compiler optimization issues?"
+    options:
+      - "A) static"
+      - "B) extern"
+      - "C) volatile"
+      - "D) const"
+    correct: "C"
+    explanation: "A variable modified in an ISR and read in the main loop (or vice versa) must be declared volatile. Without it, the compiler may cache the value in a register and never re-read it from memory, causing the main loop to miss updates from the ISR."
+    tags: [volatile, isr, shared_variable]
+    xp: 15
+
+  - id: interrupts_q07
+    type: mcq
+    difficulty: intermediate
+    text: "What is a critical section in the context of embedded programming?"
+    options:
+      - "A) The section of code that handles fatal errors"
+      - "B) A region of code where interrupts are temporarily disabled to protect shared resources from concurrent access"
+      - "C) The startup code that initializes the system"
+      - "D) A code section that must be stored in Flash"
+    correct: "B"
+    explanation: "A critical section protects shared data by disabling interrupts (or using other synchronization mechanisms) around the access. This ensures atomicity and prevents race conditions between the main code and ISRs."
+    tags: [critical_section, race_condition, atomicity]
+    xp: 15
+
+  - id: interrupts_q08
+    type: true_false
+    difficulty: intermediate
+    text: "On Cortex-M, the HardFault exception has a fixed priority of -1 and cannot be disabled by PRIMASK."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "HardFault has a fixed priority of -1, which is higher than any configurable priority (0 and above). Since PRIMASK only blocks priorities 0 and above, HardFault cannot be masked. Only NMI (priority -2) has higher priority than HardFault."
+    tags: [hardfault, fixed_priority, primask]
+    xp: 15
+
+  - id: interrupts_q09
+    type: mcq
+    difficulty: advanced
+    text: "A Cortex-M4 implements 4 bits of interrupt priority. How many preemption priority levels are available if 2 bits are assigned to preemption priority and 2 bits to sub-priority?"
+    options:
+      - "A) 2"
+      - "B) 4"
+      - "C) 8"
+      - "D) 16"
+    correct: "B"
+    explanation: "With 2 bits for preemption (group) priority, there are 2^2 = 4 preemption levels (0-3). The remaining 2 sub-priority bits determine execution order among interrupts with the same preemption priority but do not enable preemption."
+    tags: [priority_grouping, preemption, sub_priority]
+    xp: 25
+
+  - id: interrupts_q10
+    type: mcq
+    difficulty: advanced
+    text: "A read-modify-write operation on a shared variable in the main loop is interrupted midway by an ISR that modifies the same variable. What is this problem called, and what is the correct mitigation?"
+    options:
+      - "A) Deadlock; use a timeout"
+      - "B) Race condition; disable interrupts around the read-modify-write or use an atomic operation"
+      - "C) Priority inversion; raise the priority of the main loop"
+      - "D) Stack overflow; increase the stack size"
+    correct: "B"
+    explanation: "This is a classic race condition. The ISR can preempt the main loop between the read and write, causing a lost update. The solution is to make the operation atomic using a critical section (__disable_irq / __enable_irq) or hardware atomic instructions (LDREX/STREX)."
+    tags: [race_condition, atomic, critical_section, ldrex_strex]
+    xp: 25

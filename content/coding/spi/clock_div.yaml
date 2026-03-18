@@ -1,0 +1,27 @@
+id: spi_clock_div
+topic_id: spi
+title: "Calculate SPI Clock Divider"
+difficulty: beginner
+description: |
+  Implement a function that calculates the minimum clock divider needed to
+  keep the SPI clock at or below the maximum allowed frequency.
+
+  The SPI clock frequency is: spi_clk = sys_clock / divider
+
+  Find the smallest power-of-2 divider (1, 2, 4, 8, 16, 32, 64, 128) such
+  that sys_clock / divider <= max_spi_clock. Return the divider value.
+  If no divider is small enough, return 128.
+function_signature: "uint8_t spi_clock_div(uint32_t sys_clock, uint32_t max_spi_clock)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t spi_clock_div(uint32_t sys_clock, uint32_t max_spi_clock) {
+      // TODO: implement
+  }
+test_harness: "clock_div_tests/test_main.c"
+expected_output: "clock_div_tests/expected_output.txt"
+hints:
+  - "Start with divider=1 and double it until sys_clock/divider <= max_spi_clock."
+  - "Powers of 2: 1, 2, 4, 8, 16, 32, 64, 128. Stop at 128 maximum."
+xp: 30
+time_limit: 5

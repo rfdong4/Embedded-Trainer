@@ -1,0 +1,31 @@
+id: registers_reg_field_encode
+topic_id: registers
+title: "Register Field Encoder"
+difficulty: advanced
+description: |
+  Encode multiple fields into a single 32-bit configuration register.
+
+  Given an array of field descriptors and the number of fields, combine them
+  into a single register value. Each field is described by 3 consecutive bytes
+  in the array:
+    - fields[i*3 + 0] = start_bit (0-31)
+    - fields[i*3 + 1] = width (1-8 bits)
+    - fields[i*3 + 2] = value
+
+  Before placing each value, mask it to the specified width (discard excess bits).
+  Then shift it left by start_bit and OR it into the result.
+function_signature: "uint32_t encode_register(const uint8_t* fields, uint8_t num_fields)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t encode_register(const uint8_t* fields, uint8_t num_fields) {
+      // TODO: implement
+      return 0;
+  }
+test_harness: "reg_field_encode_tests/test_main.c"
+expected_output: "reg_field_encode_tests/expected_output.txt"
+hints:
+  - "To mask a value to width bits: val & ((1 << width) - 1)."
+  - "For each field: result |= (masked_value << start_bit)."
+xp: 50
+time_limit: 5

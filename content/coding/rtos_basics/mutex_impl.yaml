@@ -1,0 +1,42 @@
+id: rtos_basics_mutex_impl
+topic_id: rtos_basics
+title: "Simple Mutex Implementation"
+difficulty: intermediate
+description: |
+  Implement a simple non-recursive mutex using a static variable.
+
+  - mutex_init: Set the mutex state to unlocked (0).
+  - mutex_lock: If unlocked, lock the mutex and return 0. If already locked, return -1.
+  - mutex_unlock: If locked, unlock the mutex and return 0. If already unlocked, return -1.
+  - mutex_is_locked: Return 1 if the mutex is locked, 0 if unlocked.
+function_signature: "void mutex_init(void) / int mutex_lock(void) / int mutex_unlock(void) / int mutex_is_locked(void)"
+skeleton_code: |
+  #include <stdint.h>
+
+  static int mutex_state;
+
+  void mutex_init(void) {
+      // TODO: implement
+  }
+
+  int mutex_lock(void) {
+      // TODO: implement - return 0 on success, -1 if already locked
+      return -1;
+  }
+
+  int mutex_unlock(void) {
+      // TODO: implement - return 0 on success, -1 if already unlocked
+      return -1;
+  }
+
+  int mutex_is_locked(void) {
+      // TODO: implement - return 1 if locked, 0 if unlocked
+      return 0;
+  }
+test_harness: "mutex_impl_tests/test_main.c"
+expected_output: "mutex_impl_tests/expected_output.txt"
+hints:
+  - "Use a static variable (0 = unlocked, 1 = locked) to track the mutex state."
+  - "mutex_lock should check if state is 0, set it to 1, and return 0; otherwise return -1."
+xp: 30
+time_limit: 5

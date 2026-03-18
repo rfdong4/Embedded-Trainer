@@ -1,0 +1,23 @@
+id: bit_check_bit
+topic_id: bit_manipulation
+title: "Check if a Bit is Set"
+difficulty: beginner
+description: |
+  Implement a function that checks whether a specific bit is set in an 8-bit
+  register value. Return 1 if the bit is set, or 0 if it is clear.
+
+  For example, check_bit(0x0F, 2) should return 1 (bit 2 is set in 0x0F).
+function_signature: "uint8_t check_bit(uint8_t reg, uint8_t bit_pos)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t check_bit(uint8_t reg, uint8_t bit_pos) {
+      // TODO: implement
+  }
+test_harness: "check_bit_tests/test_main.c"
+expected_output: "check_bit_tests/expected_output.txt"
+hints:
+  - "Use bitwise AND (&) with a mask to isolate the bit, then check if it is non-zero."
+  - "Return (reg >> bit_pos) & 1 to get a clean 0 or 1 result."
+xp: 25
+time_limit: 5

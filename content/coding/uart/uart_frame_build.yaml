@@ -1,0 +1,29 @@
+id: uart_uart_frame_build
+topic_id: uart
+title: "Build a UART Frame"
+difficulty: intermediate
+description: |
+  Implement a function that builds a complete UART frame from a data byte.
+  The frame format (LSB first) is:
+
+    Bit 0:    Start bit (always 0)
+    Bits 1-8: Data bits (LSB of data at bit 1)
+    Bit 9:    Even parity bit (set so total number of 1s in data + parity is even)
+    Bit 10:   Stop bit (always 1)
+
+  Return the 11-bit frame packed into a uint16_t, with the start bit at bit 0.
+function_signature: "uint16_t uart_build_frame(uint8_t data)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint16_t uart_build_frame(uint8_t data) {
+      // TODO: implement
+  }
+test_harness: "uart_frame_build_tests/test_main.c"
+expected_output: "uart_frame_build_tests/expected_output.txt"
+hints:
+  - "The start bit is 0, so bit 0 of the frame is always 0."
+  - "Place the 8 data bits at bits[8:1] by shifting data left by 1."
+  - "Count the number of 1-bits in data. If odd, set the parity bit (bit 9) to 1."
+xp: 30
+time_limit: 5

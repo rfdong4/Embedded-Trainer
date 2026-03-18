@@ -1,0 +1,27 @@
+id: i2c_i2c_address
+topic_id: i2c
+title: "Build I2C Address Byte"
+difficulty: beginner
+description: |
+  Implement a function that constructs an I2C address byte from a 7-bit
+  device address and a read/write bit.
+
+  In I2C protocol, the address byte is: [A6 A5 A4 A3 A2 A1 A0 R/W]
+  - The 7-bit address occupies bits 7..1
+  - The R/W bit occupies bit 0 (0 = write, 1 = read)
+
+  For example, i2c_addr_byte(0x50, 1) = (0x50 << 1) | 1 = 0xA1.
+function_signature: "uint8_t i2c_addr_byte(uint8_t addr_7bit, uint8_t read)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t i2c_addr_byte(uint8_t addr_7bit, uint8_t read) {
+      // TODO: implement
+  }
+test_harness: "i2c_address_tests/test_main.c"
+expected_output: "i2c_address_tests/expected_output.txt"
+hints:
+  - "Shift the 7-bit address left by 1, then OR with the read bit."
+  - "Make sure read is masked to 1 bit: (addr_7bit << 1) | (read & 1)."
+xp: 25
+time_limit: 5

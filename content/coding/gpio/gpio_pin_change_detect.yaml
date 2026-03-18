@@ -1,0 +1,30 @@
+id: gpio_gpio_pin_change_detect
+topic_id: gpio
+title: "GPIO Pin Change Detector"
+difficulty: advanced
+description: |
+  Implement a function that detects which GPIO pins changed between two
+  consecutive port readings. Given the previous and current 8-bit port
+  state, return a 16-bit packed value where:
+  - bits [7:0] = rising edges (pins that went from 0 to 1)
+  - bits [15:8] = falling edges (pins that went from 1 to 0)
+
+  For example, if prev=0x0F and curr=0xF0, pins 0-3 fell (1->0) and pins
+  4-7 rose (0->1). Rising = 0xF0, falling = 0x0F, so result = 0x0FF0.
+
+  This pattern is used in embedded systems to detect GPIO interrupts and
+  edge-triggered events.
+function_signature: "uint16_t gpio_change_detect(uint8_t prev, uint8_t curr)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint16_t gpio_change_detect(uint8_t prev, uint8_t curr) {
+      // TODO: implement
+  }
+test_harness: "gpio_pin_change_detect_tests/test_main.c"
+expected_output: "gpio_pin_change_detect_tests/expected_output.txt"
+hints:
+  - "Rising edges occur where prev has 0 and curr has 1: rising = ~prev & curr."
+  - "Falling edges occur where prev has 1 and curr has 0: falling = prev & ~curr. Pack them as (falling << 8) | rising."
+xp: 50
+time_limit: 5

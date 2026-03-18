@@ -1,0 +1,30 @@
+id: gpio_gpio_port_mask
+topic_id: gpio
+title: "GPIO Masked Write"
+difficulty: intermediate
+description: |
+  Implement a function that performs a masked write to a GPIO port. Only the
+  pins indicated by the mask should be modified; all other pins must remain
+  unchanged.
+
+  Parameters:
+  - port: current 8-bit port value
+  - mask: bitmask indicating which pins to affect (1 = modify, 0 = keep)
+  - values: desired values for the affected pins
+
+  For example, gpio_masked_write(0xFF, 0x0F, 0x05) should set the lower
+  nibble to 0x05 while keeping the upper nibble at 0xF, resulting in 0xF5.
+function_signature: "uint8_t gpio_masked_write(uint8_t port, uint8_t mask, uint8_t values)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t gpio_masked_write(uint8_t port, uint8_t mask, uint8_t values) {
+      // TODO: implement
+  }
+test_harness: "gpio_port_mask_tests/test_main.c"
+expected_output: "gpio_port_mask_tests/expected_output.txt"
+hints:
+  - "Clear the masked bits in port: port & ~mask. Then set the desired values: | (values & mask)."
+  - "The formula is: (port & ~mask) | (values & mask)."
+xp: 30
+time_limit: 5

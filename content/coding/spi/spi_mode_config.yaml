@@ -1,0 +1,31 @@
+id: spi_mode_config
+topic_id: spi
+title: "SPI Mode Configuration"
+difficulty: intermediate
+description: |
+  Given an SPI mode number (0-3), return a configuration byte encoding the
+  CPOL and CPHA settings. CPOL occupies bit 1 and CPHA occupies bit 0:
+
+  - Mode 0: CPOL=0, CPHA=0 -> 0x00
+  - Mode 1: CPOL=0, CPHA=1 -> 0x01
+  - Mode 2: CPOL=1, CPHA=0 -> 0x02
+  - Mode 3: CPOL=1, CPHA=1 -> 0x03
+
+  CPOL (Clock Polarity) sets the idle state of the clock line.
+  CPHA (Clock Phase) determines which clock edge data is sampled on.
+
+  Return 0xFF for any invalid mode (mode > 3).
+function_signature: "uint8_t spi_mode_to_config(uint8_t mode)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t spi_mode_to_config(uint8_t mode) {
+      // TODO: implement
+  }
+test_harness: "spi_mode_config_tests/test_main.c"
+expected_output: "spi_mode_config_tests/expected_output.txt"
+hints:
+  - "CPOL is the upper bit of the mode (mode >> 1) and CPHA is the lower bit (mode & 1)."
+  - "For valid modes (0-3), the config byte is simply the mode value itself with CPOL in bit 1 and CPHA in bit 0."
+xp: 30
+time_limit: 5

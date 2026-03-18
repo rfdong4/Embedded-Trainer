@@ -1,0 +1,36 @@
+id: uart_escape_decoder
+topic_id: uart
+title: "HDLC-like Escape Byte Decoder"
+difficulty: advanced
+description: |
+  Decode an escaped byte stream using HDLC-like byte stuffing rules.
+
+  In HDLC-like framing, the escape character 0x7D indicates that the
+  following byte has been XOR'd with 0x20. To decode:
+  - When you encounter 0x7D, skip it and XOR the next byte with 0x20
+    to recover the original byte.
+  - All other bytes pass through unchanged.
+
+  Implement a function that takes an encoded input buffer and its length,
+  and writes the decoded bytes into an output buffer. Return the number
+  of decoded bytes written.
+
+  Example: input {0x41, 0x7D, 0x5E, 0x42} decodes to {0x41, 0x7E, 0x42}
+  because 0x7D is the escape, and 0x5E ^ 0x20 = 0x7E.
+
+  You may assume the input is well-formed (0x7D is never the last byte).
+function_signature: "int uart_escape_decode(const uint8_t *input, int input_len, uint8_t *output)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int uart_escape_decode(const uint8_t *input, int input_len, uint8_t *output) {
+      // TODO: implement
+  }
+test_harness: "uart_escape_decoder_tests/test_main.c"
+expected_output: "uart_escape_decoder_tests/expected_output.txt"
+hints:
+  - "Walk through the input with an index. When you see 0x7D, advance the index and XOR the next byte with 0x20."
+  - "Keep a separate write index for the output buffer."
+  - "0x7D 0x5D decodes to 0x7D (the escape character itself). 0x7D 0x5E decodes to 0x7E (the flag byte)."
+xp: 50
+time_limit: 5

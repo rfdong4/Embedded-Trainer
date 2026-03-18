@@ -1,0 +1,62 @@
+id: nested_isr_stack
+topic_id: interrupts
+title: "Nested ISR Priority Stack"
+difficulty: advanced
+description: |
+  Simulate a nested interrupt priority stack used in real-time processors
+  like ARM Cortex-M (NVIC). Higher-priority interrupts can preempt
+  lower-priority ones, but not vice versa.
+
+  Priority is numeric: lower number = higher priority (0 is highest).
+
+  Implement:
+  - isr_stack_init: Initialize the stack. No ISR is active. Active priority
+    is 255 (lowest possible, meaning "idle").
+  - isr_push: Attempt to push an ISR context with the given priority.
+    If the new priority is strictly less than (higher than) the current
+    active priority, push it and return 1 (preemption occurred).
+    Otherwise, return 0 (rejected, not high enough priority).
+  - isr_pop: Pop the current active ISR, restoring the previous context.
+    Return the priority of the ISR that was popped, or -1 if stack is
+    empty.
+  - isr_get_active_priority: Return the priority of the currently active
+    ISR, or 255 if no ISR is active.
+  - isr_get_depth: Return the current nesting depth (0 if idle).
+
+  Maximum nesting depth is 8.
+function_signature: "void isr_stack_init(void) / int isr_push(uint8_t priority) / int isr_pop(void) / uint8_t isr_get_active_priority(void) / int isr_get_depth(void)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define ISR_MAX_DEPTH 8
+
+  static uint8_t isr_prio_stack[ISR_MAX_DEPTH];
+  static int isr_depth;
+
+  void isr_stack_init(void) {
+      // TODO: reset depth to 0
+  }
+
+  int isr_push(uint8_t priority) {
+      // TODO: if priority < active priority and stack not full,
+      //       push and return 1; otherwise return 0
+  }
+
+  int isr_pop(void) {
+      // TODO: pop top, return its priority; or -1 if empty
+  }
+
+  uint8_t isr_get_active_priority(void) {
+      // TODO: return top priority or 255 if empty
+  }
+
+  int isr_get_depth(void) {
+      // TODO: return current depth
+  }
+test_harness: "nested_isr_stack_tests/test_main.c"
+expected_output: "nested_isr_stack_tests/expected_output.txt"
+hints:
+  - "Use 255 as the 'idle' priority. Any real ISR priority (0-254) is higher than idle."
+  - "Push condition: priority < isr_get_active_priority() AND depth < ISR_MAX_DEPTH."
+xp: 50
+time_limit: 5

@@ -1,0 +1,23 @@
+id: uart_checksum
+topic_id: uart
+title: "Calculate 8-bit Checksum"
+difficulty: beginner
+description: |
+  Implement a function that calculates an 8-bit checksum of a byte array.
+  The checksum is the sum of all bytes, truncated to 8 bits (natural overflow).
+
+  This is commonly used in simple serial protocols to detect transmission errors.
+function_signature: "uint8_t checksum(uint8_t *data, uint8_t len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t checksum(uint8_t *data, uint8_t len) {
+      // TODO: implement
+  }
+test_harness: "checksum_tests/test_main.c"
+expected_output: "checksum_tests/expected_output.txt"
+hints:
+  - "Accumulate bytes in a uint8_t variable; overflow wraps naturally."
+  - "Loop through each byte and add it to a running sum."
+xp: 25
+time_limit: 5

@@ -1,0 +1,80 @@
+topics:
+  - id: bit_manipulation
+    name: "Bit Manipulation"
+    difficulty: beginner
+    description: "Bitwise operations, masking, and bit fields"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: []
+
+  - id: registers
+    name: "CPU Registers"
+    difficulty: beginner
+    description: "General-purpose registers, SP, LR, PC, and status registers"
+    quiz_count: 10
+    coding_count: 2
+    prerequisites: []
+
+  - id: gpio
+    name: "GPIO"
+    difficulty: beginner
+    description: "General Purpose Input/Output configuration and usage"
+    quiz_count: 10
+    coding_count: 3
+    prerequisites: [bit_manipulation]
+
+  - id: memory_management
+    name: "Memory Management"
+    difficulty: intermediate
+    description: "Stack, heap, memory-mapped I/O, volatile, and linker scripts"
+    quiz_count: 10
+    coding_count: 3
+    prerequisites: [registers]
+
+  - id: interrupts
+    name: "Interrupts"
+    difficulty: intermediate
+    description: "ISRs, NVIC, priority, latency, and critical sections"
+    quiz_count: 10
+    coding_count: 3
+    prerequisites: [registers, gpio]
+
+  - id: timers
+    name: "Timers & PWM"
+    difficulty: intermediate
+    description: "Prescalers, auto-reload, capture/compare, and PWM"
+    quiz_count: 10
+    coding_count: 3
+    prerequisites: [interrupts]
+
+  - id: uart
+    name: "UART"
+    difficulty: intermediate
+    description: "Baud rate, framing, parity, and flow control"
+    quiz_count: 10
+    coding_count: 3
+    prerequisites: [bit_manipulation]
+
+  - id: spi
+    name: "SPI"
+    difficulty: intermediate
+    description: "CPOL/CPHA, master/slave, chip select, and clock modes"
+    quiz_count: 8
+    coding_count: 2
+    prerequisites: [bit_manipulation, gpio]
+
+  - id: i2c
+    name: "I2C"
+    difficulty: intermediate
+    description: "Addressing, ACK/NACK, start/stop conditions"
+    quiz_count: 8
+    coding_count: 2
+    prerequisites: [bit_manipulation, gpio]
+
+  - id: rtos_basics
+    name: "RTOS Basics"
+    difficulty: advanced
+    description: "Tasks, scheduling, semaphores, mutexes, and queues"
+    quiz_count: 10
+    coding_count: 3
+    prerequisites: [interrupts, memory_management]

@@ -1,0 +1,25 @@
+id: rtos_priority_queue
+topic_id: rtos_basics
+title: "Priority Queue Insert"
+difficulty: beginner
+description: |
+  Implement a function that inserts a priority value into a sorted array
+  (ascending order, lower number = higher priority). The array acts as a
+  simple priority queue.
+
+  Insert the value in the correct sorted position. If the queue is full
+  (size == max_size), do not insert. Update *size on successful insertion.
+function_signature: "void pq_insert(uint8_t *queue, uint8_t *size, uint8_t priority, uint8_t max_size)"
+skeleton_code: |
+  #include <stdint.h>
+
+  void pq_insert(uint8_t *queue, uint8_t *size, uint8_t priority, uint8_t max_size) {
+      // TODO: implement
+  }
+test_harness: "priority_queue_tests/test_main.c"
+expected_output: "priority_queue_tests/expected_output.txt"
+hints:
+  - "Find the insertion point by scanning until you find a value >= priority."
+  - "Shift elements right from the end to make room, then insert."
+xp: 35
+time_limit: 5

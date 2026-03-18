@@ -1,0 +1,35 @@
+id: timer_capture_period
+topic_id: timers
+title: "Input Capture Period Measurement"
+difficulty: intermediate
+description: |
+  Calculate the period in microseconds between two input capture events
+  on a 16-bit timer.
+
+  The timer is a 16-bit up-counter that wraps from 65535 back to 0.
+  Given two capture timestamps (cap1 is the earlier capture, cap2 is
+  the later capture) and the timer tick frequency in Hz:
+
+    elapsed_ticks = cap2 - cap1  (handling 16-bit wraparound)
+    period_us = (elapsed_ticks * 1000000) / tick_freq_hz
+
+  Wraparound occurs when cap2 < cap1 (the timer rolled over between
+  captures). In that case:
+    elapsed_ticks = 65536 - cap1 + cap2
+
+  Use integer arithmetic throughout. Be careful with the multiplication
+  by 1000000 -- it can overflow a 32-bit integer.
+function_signature: "uint32_t capture_period_us(uint16_t cap1, uint16_t cap2, uint32_t tick_freq_hz)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t capture_period_us(uint16_t cap1, uint16_t cap2, uint32_t tick_freq_hz) {
+      // TODO: implement
+  }
+test_harness: "timer_capture_period_tests/test_main.c"
+expected_output: "timer_capture_period_tests/expected_output.txt"
+hints:
+  - "If cap2 >= cap1, elapsed = cap2 - cap1. Otherwise, elapsed = 65536 - cap1 + cap2."
+  - "Use uint64_t for the multiplication (elapsed * 1000000) to avoid 32-bit overflow before dividing."
+xp: 30
+time_limit: 5

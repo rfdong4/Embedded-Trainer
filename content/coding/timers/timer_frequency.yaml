@@ -1,0 +1,30 @@
+id: timer_frequency
+topic_id: timers
+title: "Calculate Timer Output Frequency"
+difficulty: intermediate
+description: |
+  Calculate the timer overflow/output frequency given the system clock,
+  prescaler, and reload value.
+
+  The formula is:
+    freq = sys_clk / (prescaler * reload)
+
+  Use integer division (truncate toward zero). The prescaler and reload
+  values are guaranteed to be non-zero.
+
+  Be careful with intermediate multiplication: prescaler and reload are
+  16-bit values, so their product can exceed 16 bits.
+function_signature: "uint32_t timer_overflow_freq(uint32_t sys_clk, uint16_t prescaler, uint16_t reload)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t timer_overflow_freq(uint32_t sys_clk, uint16_t prescaler, uint16_t reload) {
+      // TODO: implement
+  }
+test_harness: "timer_frequency_tests/test_main.c"
+expected_output: "timer_frequency_tests/expected_output.txt"
+hints:
+  - "Cast prescaler and reload to uint32_t before multiplying to avoid 16-bit overflow."
+  - "The division is straightforward: sys_clk / (prescaler * reload)."
+xp: 30
+time_limit: 5

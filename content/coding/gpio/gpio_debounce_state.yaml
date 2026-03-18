@@ -1,0 +1,32 @@
+id: gpio_gpio_debounce_state
+topic_id: gpio
+title: "GPIO Debounce Filter"
+difficulty: intermediate
+description: |
+  Implement a debounce filter for a GPIO pin. The function receives:
+  - history: an 8-bit value where each bit represents a consecutive sample
+    of the pin (bit 0 = most recent, bit 7 = oldest)
+  - num_samples: how many of the most recent samples must agree for the
+    pin to be considered stable (1 to 8)
+
+  Return 1 if the last num_samples bits are all 1 (stable HIGH),
+  return 0 if the last num_samples bits are all 0 (stable LOW),
+  return 2 if the samples are mixed (unstable / bouncing).
+
+  For example, gpio_debounce(0xFF, 4) checks the last 4 bits (all 1s) -> returns 1.
+  gpio_debounce(0xF0, 4) checks the last 4 bits (0000) -> returns 0.
+  gpio_debounce(0xF5, 4) checks the last 4 bits (0101) -> returns 2.
+function_signature: "uint8_t gpio_debounce(uint8_t history, uint8_t num_samples)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t gpio_debounce(uint8_t history, uint8_t num_samples) {
+      // TODO: implement
+  }
+test_harness: "gpio_debounce_state_tests/test_main.c"
+expected_output: "gpio_debounce_state_tests/expected_output.txt"
+hints:
+  - "Create a mask for the lowest num_samples bits: (1 << num_samples) - 1."
+  - "AND history with the mask. If the result equals the mask, all samples are HIGH. If 0, all LOW. Otherwise, unstable."
+xp: 30
+time_limit: 5

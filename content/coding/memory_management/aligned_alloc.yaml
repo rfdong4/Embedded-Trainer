@@ -1,0 +1,24 @@
+id: mem_aligned_alloc
+topic_id: memory_management
+title: "Align Address to Boundary"
+difficulty: beginner
+description: |
+  Implement a function that rounds up an address to the next aligned boundary.
+  The alignment is always a power of 2. If the address is already aligned,
+  return it unchanged.
+
+  For example, align_up(0x1003, 4) should return 0x1004 (next 4-byte boundary).
+function_signature: "uint32_t align_up(uint32_t addr, uint32_t alignment)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t align_up(uint32_t addr, uint32_t alignment) {
+      // TODO: implement
+  }
+test_harness: "aligned_alloc_tests/test_main.c"
+expected_output: "aligned_alloc_tests/expected_output.txt"
+hints:
+  - "For power-of-2 alignment, use the mask trick: (alignment - 1) gives a mask of low bits."
+  - "Formula: (addr + alignment - 1) & ~(alignment - 1)"
+xp: 30
+time_limit: 5

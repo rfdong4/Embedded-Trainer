@@ -1,0 +1,24 @@
+id: bit_manipulation_bit_reverse
+topic_id: bit_manipulation
+title: "Reverse All Bits in a Byte"
+difficulty: intermediate
+description: |
+  Implement a function that reverses all 8 bits of a byte. The most significant
+  bit becomes the least significant bit, and vice versa.
+
+  For example, bit_reverse(0xB1) reverses 0b10110001 to 0b10001101 = 0x8D.
+  Another example: bit_reverse(0x01) reverses 0b00000001 to 0b10000000 = 0x80.
+function_signature: "uint8_t bit_reverse(uint8_t val)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t bit_reverse(uint8_t val) {
+      // TODO: implement
+  }
+test_harness: "bit_reverse_tests/test_main.c"
+expected_output: "bit_reverse_tests/expected_output.txt"
+hints:
+  - "Loop through each of the 8 bits, extracting the LSB and building the result from the other end."
+  - "Use (val >> i) & 1 to extract bit i, then place it at position (7 - i) in the result."
+xp: 30
+time_limit: 5

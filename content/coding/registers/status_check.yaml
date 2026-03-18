@@ -1,0 +1,31 @@
+id: reg_status_check
+topic_id: registers
+title: "Check Status Register Flags"
+difficulty: beginner
+description: |
+  Implement a function that checks specific flags in a simulated
+  Program Status Register (PSR).
+
+  The PSR has the following flag positions:
+  - Bit 31: N (Negative)
+  - Bit 30: Z (Zero)
+  - Bit 29: C (Carry)
+  - Bit 28: V (Overflow)
+
+  Return 1 if the specified flag is set, 0 otherwise.
+  Flag parameter: 'N'=0, 'Z'=1, 'C'=2, 'V'=3
+function_signature: "uint8_t check_psr_flag(uint32_t psr, uint8_t flag)"
+skeleton_code: |
+  #include <stdint.h>
+
+  // flag: 0=N(bit31), 1=Z(bit30), 2=C(bit29), 3=V(bit28)
+  uint8_t check_psr_flag(uint32_t psr, uint8_t flag) {
+      // TODO: implement
+  }
+test_harness: "status_check_tests/test_main.c"
+expected_output: "status_check_tests/expected_output.txt"
+hints:
+  - "The flag bits are at positions 31, 30, 29, 28. Compute bit_pos = 31 - flag."
+  - "Use (psr >> bit_pos) & 1 to extract the flag."
+xp: 25
+time_limit: 5

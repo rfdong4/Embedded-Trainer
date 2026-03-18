@@ -1,0 +1,24 @@
+id: i2c_i2c_crc
+topic_id: i2c
+title: "I2C Packet Error Check (PEC)"
+difficulty: beginner
+description: |
+  Implement a simplified Packet Error Code (PEC) calculation for I2C/SMBus.
+  For this exercise, compute a simple XOR checksum of all bytes in the data array.
+
+  XOR all bytes together and return the result. This detects single-bit errors
+  in transmitted data.
+function_signature: "uint8_t i2c_pec(uint8_t *data, uint8_t len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t i2c_pec(uint8_t *data, uint8_t len) {
+      // TODO: implement
+  }
+test_harness: "i2c_crc_tests/test_main.c"
+expected_output: "i2c_crc_tests/expected_output.txt"
+hints:
+  - "Initialize a result to 0, then XOR each byte in the array."
+  - "XOR is associative and commutative, so order does not matter."
+xp: 25
+time_limit: 5

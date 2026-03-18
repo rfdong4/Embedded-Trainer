@@ -1,0 +1,25 @@
+id: timers_pwm_duty
+topic_id: timers
+title: "Calculate PWM Compare Value"
+difficulty: beginner
+description: |
+  Implement a function that calculates the PWM compare (match) value for a
+  desired duty cycle percentage. The formula is:
+
+    compare = (period * duty_percent) / 100
+
+  The compare value determines when the PWM output toggles within each period.
+function_signature: "uint16_t pwm_compare(uint16_t period, uint8_t duty_percent)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint16_t pwm_compare(uint16_t period, uint8_t duty_percent) {
+      // TODO: implement
+  }
+test_harness: "pwm_duty_tests/test_main.c"
+expected_output: "pwm_duty_tests/expected_output.txt"
+hints:
+  - "Multiply period by duty_percent, then divide by 100."
+  - "Cast to uint32_t before multiplying to avoid overflow: (uint32_t)period * duty_percent / 100."
+xp: 25
+time_limit: 5

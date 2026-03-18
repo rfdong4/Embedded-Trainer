@@ -1,0 +1,39 @@
+id: spi_multi_byte
+topic_id: spi
+title: "Multi-Byte SPI Transaction Simulation"
+difficulty: advanced
+description: |
+  Simulate a full-duplex multi-byte SPI transaction. In real SPI hardware,
+  data is simultaneously shifted out (MOSI) and shifted in (MISO) on every
+  clock cycle.
+
+  In this simulation, a command byte is sent first, followed by N data bytes.
+  The SPI device generates its response by XORing each transmitted byte with
+  a device-specific response pattern byte.
+
+  Implement a function that:
+  1. Takes a command byte, a data buffer (tx_data) of length len, a
+     device response pattern, and an output receive buffer (rx_buf).
+  2. The first received byte corresponds to the command byte XORed with
+     the pattern: rx_buf[0] = cmd ^ pattern.
+  3. Each subsequent received byte corresponds to the data byte XORed
+     with the pattern: rx_buf[i+1] = tx_data[i] ^ pattern.
+  4. rx_buf has length (len + 1): one for the command response plus one
+     for each data byte.
+
+  Example: cmd=0xAA, tx_data={0x55, 0xFF}, pattern=0x0F, len=2
+  -> rx_buf = {0xAA^0x0F, 0x55^0x0F, 0xFF^0x0F} = {0xA5, 0x5A, 0xF0}
+function_signature: "void spi_multi_transfer(uint8_t cmd, const uint8_t *tx_data, uint8_t *rx_buf, uint8_t len, uint8_t pattern)"
+skeleton_code: |
+  #include <stdint.h>
+
+  void spi_multi_transfer(uint8_t cmd, const uint8_t *tx_data, uint8_t *rx_buf, uint8_t len, uint8_t pattern) {
+      // TODO: implement
+  }
+test_harness: "spi_multi_byte_tests/test_main.c"
+expected_output: "spi_multi_byte_tests/expected_output.txt"
+hints:
+  - "The command byte response goes into rx_buf[0]. Data byte responses go into rx_buf[1] through rx_buf[len]."
+  - "rx_buf[0] = cmd ^ pattern; for i in 0..len-1: rx_buf[i+1] = tx_data[i] ^ pattern."
+xp: 50
+time_limit: 5

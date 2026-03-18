@@ -1,0 +1,39 @@
+id: uart_frame_builder
+topic_id: uart
+title: "Build a UART Frame"
+difficulty: intermediate
+description: |
+  Build a complete UART frame from a data byte and parity configuration.
+
+  The frame format (LSB first in the returned uint16_t):
+    Bit 0:      Start bit (always 0)
+    Bits 1-8:   Data bits (LSB of data byte at bit 1)
+    Bit 9:      Parity bit (if parity is enabled)
+    Bit 10:     Stop bit (always 1)
+
+  The parity parameter controls parity:
+    0 = no parity (bit 9 is the stop bit instead, frame is 10 bits)
+    1 = even parity (set parity bit so total 1s in data+parity is even)
+    2 = odd parity (set parity bit so total 1s in data+parity is odd)
+
+  When parity is disabled (parity=0), the stop bit is at bit 9 and the
+  frame is only 10 bits wide. When parity is enabled, the stop bit is
+  at bit 10 and the frame is 11 bits wide.
+
+  Return the frame packed into a uint16_t.
+function_signature: "uint16_t uart_build_frame(uint8_t data, uint8_t parity)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint16_t uart_build_frame(uint8_t data, uint8_t parity) {
+      // TODO: implement
+  }
+test_harness: "uart_frame_builder_tests/test_main.c"
+expected_output: "uart_frame_builder_tests/expected_output.txt"
+hints:
+  - "Start by shifting data left by 1 to place it at bits 1-8. Bit 0 (start) stays 0."
+  - "Count the number of 1-bits in data using a loop or XOR folding."
+  - "For even parity, set the parity bit if the count of 1s is odd. For odd parity, set it if even."
+  - "When parity=0, place the stop bit at bit 9. When parity!=0, place it at bit 10."
+xp: 30
+time_limit: 5

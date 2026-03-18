@@ -1,0 +1,26 @@
+id: timers_timer_reload
+topic_id: timers
+title: "Calculate Timer Reload Value"
+difficulty: beginner
+description: |
+  Implement a function that calculates the timer reload value needed to
+  generate a specific period. The formula is:
+
+    reload = (clock_freq / prescaler) * desired_period_us / 1000000
+
+  This determines how many timer ticks fit in the desired period.
+  Use integer arithmetic (truncation is fine).
+function_signature: "uint16_t timer_reload(uint32_t clock_freq, uint16_t prescaler, uint32_t desired_period_us)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint16_t timer_reload(uint32_t clock_freq, uint16_t prescaler, uint32_t desired_period_us) {
+      // TODO: implement
+  }
+test_harness: "timer_reload_tests/test_main.c"
+expected_output: "timer_reload_tests/expected_output.txt"
+hints:
+  - "Compute the timer clock first: timer_clk = clock_freq / prescaler."
+  - "Then multiply by the period and divide by 1000000 to convert microseconds to ticks. Be careful about overflow in intermediate calculations."
+xp: 30
+time_limit: 5

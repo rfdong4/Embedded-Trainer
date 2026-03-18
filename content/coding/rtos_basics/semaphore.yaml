@@ -1,0 +1,40 @@
+id: rtos_semaphore
+topic_id: rtos_basics
+title: "Counting Semaphore"
+difficulty: beginner
+description: |
+  Implement a simple counting semaphore with wait (acquire) and signal (release)
+  operations.
+
+  - sem_init: Initialize semaphore with a given count and max value
+  - sem_wait: Decrement count if > 0 (acquire). Return 1 if acquired, 0 if count was 0.
+  - sem_signal: Increment count if < max (release). Return 1 if released, 0 if at max.
+
+  Use a struct with: uint8_t count, uint8_t max_count.
+function_signature: "void sem_init(Semaphore *sem, uint8_t initial, uint8_t max_val); uint8_t sem_wait(Semaphore *sem); uint8_t sem_signal(Semaphore *sem)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t count;
+      uint8_t max_count;
+  } Semaphore;
+
+  void sem_init(Semaphore *sem, uint8_t initial, uint8_t max_val) {
+      // TODO: implement
+  }
+
+  uint8_t sem_wait(Semaphore *sem) {
+      // TODO: implement - return 1 if acquired, 0 if empty
+  }
+
+  uint8_t sem_signal(Semaphore *sem) {
+      // TODO: implement - return 1 if released, 0 if full
+  }
+test_harness: "semaphore_tests/test_main.c"
+expected_output: "semaphore_tests/expected_output.txt"
+hints:
+  - "sem_wait: if count > 0, decrement and return 1; otherwise return 0."
+  - "sem_signal: if count < max_count, increment and return 1; otherwise return 0."
+xp: 35
+time_limit: 5

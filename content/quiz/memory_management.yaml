@@ -1,0 +1,134 @@
+topic_id: memory_management
+topic_name: "Memory Management"
+questions:
+  - id: memory_management_q01
+    type: mcq
+    difficulty: beginner
+    text: "In an embedded system, where are uninitialized global variables stored?"
+    options:
+      - "A) .text section"
+      - "B) .data section"
+      - "C) .bss section"
+      - "D) .rodata section"
+    correct: "C"
+    explanation: "The .bss (Block Started by Symbol) section holds uninitialized and zero-initialized global and static variables. It occupies no space in the flash image; the startup code zeroes this region in RAM before main() is called."
+    tags: [bss, linker_sections, global_variables]
+    xp: 10
+
+  - id: memory_management_q02
+    type: mcq
+    difficulty: beginner
+    text: "What is the primary difference between stack and heap memory allocation?"
+    options:
+      - "A) Stack is in ROM, heap is in RAM"
+      - "B) Stack allocation is automatic and LIFO; heap allocation is manual and dynamic"
+      - "C) Stack is slower than heap"
+      - "D) Heap memory is always larger than stack"
+    correct: "B"
+    explanation: "Stack allocation follows Last-In-First-Out order and is managed automatically by the compiler (local variables, function calls). Heap allocation is managed manually by the programmer (malloc/free) and can allocate arbitrarily-sized blocks at runtime."
+    tags: [stack, heap, allocation]
+    xp: 10
+
+  - id: memory_management_q03
+    type: true_false
+    difficulty: beginner
+    text: "The volatile keyword tells the compiler that a variable's value may change at any time without any action being taken by the surrounding code."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "The volatile qualifier prevents the compiler from optimizing away reads/writes to the variable. This is essential for hardware registers, variables shared with ISRs, and memory-mapped I/O, where the value can change outside the normal program flow."
+    tags: [volatile, compiler_optimization]
+    xp: 10
+
+  - id: memory_management_q04
+    type: mcq
+    difficulty: beginner
+    text: "Where is the executable code stored in a typical embedded system?"
+    options:
+      - "A) .bss section in RAM"
+      - "B) .data section in RAM"
+      - "C) .text section in Flash/ROM"
+      - "D) Heap region in RAM"
+    correct: "C"
+    explanation: "The .text section contains the executable machine code and is stored in non-volatile memory (Flash/ROM). The processor fetches and executes instructions from this region."
+    tags: [text_section, flash, code_storage]
+    xp: 10
+
+  - id: memory_management_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is memory-mapped I/O?"
+    options:
+      - "A) A technique to compress data in memory"
+      - "B) Mapping peripheral registers to specific addresses in the processor's memory address space"
+      - "C) Using DMA to transfer data between memory banks"
+      - "D) Storing I/O buffers in external memory"
+    correct: "B"
+    explanation: "In memory-mapped I/O, hardware peripheral registers are assigned addresses in the same address space as regular memory. The CPU accesses peripherals using normal load/store instructions to these addresses."
+    tags: [memory_mapped_io, peripheral_access]
+    xp: 15
+
+  - id: memory_management_q06
+    type: mcq
+    difficulty: intermediate
+    text: "Why is dynamic memory allocation (malloc/free) generally avoided in safety-critical embedded systems?"
+    options:
+      - "A) It is too slow for real-time systems"
+      - "B) It can cause heap fragmentation and non-deterministic allocation times"
+      - "C) It uses too much flash memory"
+      - "D) It is not supported by ARM compilers"
+    correct: "B"
+    explanation: "Repeated malloc/free calls can fragment the heap, eventually causing allocation failures even when total free memory is sufficient. Allocation time is also non-deterministic, which violates real-time constraints. Static allocation or memory pools are preferred."
+    tags: [dynamic_allocation, fragmentation, safety_critical]
+    xp: 15
+
+  - id: memory_management_q07
+    type: mcq
+    difficulty: intermediate
+    text: "In a linker script, what does the ORIGIN and LENGTH of a MEMORY region define?"
+    options:
+      - "A) The compiler optimization level and code size limit"
+      - "B) The start address and size of a physical memory region (e.g., Flash or RAM)"
+      - "C) The entry point and maximum number of functions"
+      - "D) The stack size and heap size"
+    correct: "B"
+    explanation: "The MEMORY command in a linker script defines the available memory regions. ORIGIN specifies the starting address and LENGTH specifies the size. For example: RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 64K defines 64KB of RAM starting at address 0x20000000."
+    tags: [linker_script, memory_regions]
+    xp: 15
+
+  - id: memory_management_q08
+    type: true_false
+    difficulty: intermediate
+    text: "The .data section must be copied from Flash to RAM during startup because it contains initialized global variables that need to be writable."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Initialized global/static variables have their initial values stored in Flash (Load Memory Address) but must execute from RAM (Virtual Memory Address) since they are writable. The startup code copies .data from Flash to RAM before main() runs."
+    tags: [data_section, startup, lma_vma]
+    xp: 15
+
+  - id: memory_management_q09
+    type: mcq
+    difficulty: advanced
+    text: "A Cortex-M4 microcontroller has 256KB Flash at 0x08000000 and 64KB RAM at 0x20000000. After building, the .text section is 120KB, .rodata is 8KB, .data is 4KB, and .bss is 12KB. How much RAM is used at startup?"
+    options:
+      - "A) 4KB"
+      - "B) 12KB"
+      - "C) 16KB"
+      - "D) 144KB"
+    correct: "C"
+    explanation: "RAM usage at startup = .data (4KB, copied from Flash) + .bss (12KB, zeroed) = 16KB. The .text and .rodata sections reside in Flash and don't consume RAM. Stack and heap usage would be additional."
+    tags: [memory_calculation, ram_usage, sections]
+    xp: 25
+
+  - id: memory_management_q10
+    type: mcq
+    difficulty: advanced
+    text: "What happens if you access a hardware register through a pointer that is NOT declared as volatile?"
+    options:
+      - "A) The program will crash immediately"
+      - "B) The compiler may cache the register value in a CPU register, causing stale reads and missed writes"
+      - "C) The register will always return zero"
+      - "D) The access will be redirected to RAM"
+    correct: "B"
+    explanation: "Without volatile, the compiler may optimize by reading the register once and reusing the cached value in subsequent reads, or by eliminating writes it considers redundant. This leads to the program not seeing updated hardware status or failing to trigger hardware actions."
+    tags: [volatile, optimization, hardware_register]
+    xp: 25

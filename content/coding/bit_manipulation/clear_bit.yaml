@@ -1,0 +1,23 @@
+id: bit_clear_bit
+topic_id: bit_manipulation
+title: "Clear a Bit in a Register"
+difficulty: beginner
+description: |
+  Implement a function that clears (makes 0) a specific bit in an 8-bit register
+  value. The bit position ranges from 0 (LSB) to 7 (MSB).
+
+  For example, clear_bit(0xFF, 3) should return 0xF7 (bit 3 cleared).
+function_signature: "uint8_t clear_bit(uint8_t reg, uint8_t bit_pos)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t clear_bit(uint8_t reg, uint8_t bit_pos) {
+      // TODO: implement
+  }
+test_harness: "clear_bit_tests/test_main.c"
+expected_output: "clear_bit_tests/expected_output.txt"
+hints:
+  - "Use the bitwise AND operator (&) with an inverted mask to clear a bit."
+  - "Create an inverted mask with ~(1 << bit_pos)."
+xp: 25
+time_limit: 5

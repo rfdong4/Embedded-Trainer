@@ -1,0 +1,63 @@
+id: irq_mask_manager
+topic_id: interrupts
+title: "IRQ Mask Save/Restore Manager"
+difficulty: intermediate
+description: |
+  Implement an interrupt mask manager with save/restore capability, commonly
+  used in embedded systems to implement critical sections. The manager wraps
+  a 32-bit interrupt mask register where each bit enables/disables one IRQ.
+
+  Unlike simple enable/disable, this manager maintains a save stack so that
+  nested critical sections can save the current mask, modify it, and later
+  restore the previous state.
+
+  Implement:
+  - irq_mgr_init: Initialize the manager. Mask starts at 0 (all disabled),
+    save stack depth at 0.
+  - irq_mgr_enable: Enable IRQ n (set bit n). If n >= 32, do nothing.
+  - irq_mgr_disable: Disable IRQ n (clear bit n). If n >= 32, do nothing.
+  - irq_mgr_is_enabled: Return 1 if IRQ n is enabled, 0 otherwise.
+  - irq_mgr_save: Push the current mask onto the save stack (max depth 8).
+    Return 1 on success, 0 if stack is full.
+  - irq_mgr_restore: Pop the top saved mask and make it the current mask.
+    Return 1 on success, 0 if stack is empty.
+function_signature: "void irq_mgr_init(void) / void irq_mgr_enable(uint8_t n) / void irq_mgr_disable(uint8_t n) / int irq_mgr_is_enabled(uint8_t n) / int irq_mgr_save(void) / int irq_mgr_restore(void)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define IRQ_SAVE_DEPTH 8
+
+  static uint32_t irq_mask;
+  static uint32_t irq_save_stack[IRQ_SAVE_DEPTH];
+  static int irq_save_top;
+
+  void irq_mgr_init(void) {
+      // TODO: reset mask and save stack
+  }
+
+  void irq_mgr_enable(uint8_t n) {
+      // TODO: set bit n in irq_mask
+  }
+
+  void irq_mgr_disable(uint8_t n) {
+      // TODO: clear bit n in irq_mask
+  }
+
+  int irq_mgr_is_enabled(uint8_t n) {
+      // TODO: return 1 if bit n is set, 0 otherwise
+  }
+
+  int irq_mgr_save(void) {
+      // TODO: push irq_mask onto save stack
+  }
+
+  int irq_mgr_restore(void) {
+      // TODO: pop save stack into irq_mask
+  }
+test_harness: "irq_mask_manager_tests/test_main.c"
+expected_output: "irq_mask_manager_tests/expected_output.txt"
+hints:
+  - "Use irq_save_top as the index for the next push. Push: stack[top] = mask; top++. Pop: top--; mask = stack[top]."
+  - "Boundary check: save returns 0 if top >= IRQ_SAVE_DEPTH; restore returns 0 if top <= 0."
+xp: 30
+time_limit: 5

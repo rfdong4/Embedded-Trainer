@@ -1,0 +1,46 @@
+id: memory_management_memory_pool
+topic_id: memory_management
+title: "Fixed-Size Memory Pool Allocator"
+difficulty: intermediate
+description: |
+  Implement a fixed-size memory pool allocator commonly used in embedded systems
+  to avoid dynamic memory allocation overhead and fragmentation.
+
+  The pool has 8 blocks, each 32 bytes in size. Implement these functions:
+  - pool_init: Initialize the pool, marking all blocks as free.
+  - pool_alloc: Allocate and return a pointer to a free block, or NULL if all
+    blocks are in use.
+  - pool_free: Free a previously allocated block. If the pointer does not belong
+    to the pool, do nothing.
+
+  Use static storage for the pool memory and a free/used tracking mechanism
+  (e.g., a bitmask or boolean array).
+function_signature: "void pool_init(void) / void* pool_alloc(void) / void pool_free(void* ptr)"
+skeleton_code: |
+  #include <stdint.h>
+  #include <stddef.h>
+
+  #define POOL_BLOCK_SIZE 32
+  #define POOL_NUM_BLOCKS 8
+
+  static uint8_t pool_memory[POOL_NUM_BLOCKS][POOL_BLOCK_SIZE];
+  static uint8_t pool_used[POOL_NUM_BLOCKS];
+
+  void pool_init(void) {
+      // TODO: mark all blocks as free
+  }
+
+  void* pool_alloc(void) {
+      // TODO: find a free block, mark it used, return pointer (or NULL)
+  }
+
+  void pool_free(void* ptr) {
+      // TODO: find the block and mark it free; ignore invalid pointers
+  }
+test_harness: "memory_pool_tests/test_main.c"
+expected_output: "memory_pool_tests/expected_output.txt"
+hints:
+  - "Use a boolean array (pool_used) to track which blocks are allocated."
+  - "To validate a pointer in pool_free, check if it matches &pool_memory[i][0] for some valid i."
+xp: 30
+time_limit: 5
