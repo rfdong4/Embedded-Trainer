@@ -17,6 +17,11 @@ class QuestionCard(Static):
     QuestionCard {
         padding: 1 2;
         margin: 1 0;
+        width: 1fr;
+        height: auto;
+    }
+    QuestionCard Label {
+        width: 1fr;
     }
     QuestionCard .question-text {
         text-style: bold;
