@@ -1,0 +1,97 @@
+topic_id: memory_management
+articles:
+  - id: memory_regions
+    title: "Memory Regions in Embedded Systems"
+    estimated_minutes: 5
+    content: |
+      # Memory Regions in Embedded Systems
+
+      Embedded systems have several distinct memory regions, each with different
+      characteristics and purposes.
+
+      ## Flash (ROM)
+
+      - Non-volatile — survives power loss
+      - Stores: program code (`.text`), read-only data (`.rodata`), interrupt vectors
+      - Typical sizes: 64 KB – 2 MB on microcontrollers
+      - Slow to write (erase/program cycles), but fast to read
+
+      ## SRAM
+
+      - Volatile — contents lost on power loss
+      - Stores: stack, heap, global/static variables (`.data`, `.bss`)
+      - Typical sizes: 8 KB – 512 KB
+
+      ## Memory Map Segments
+
+      | Segment | Location | Contents |
+      |---------|----------|----------|
+      | `.text`  | Flash    | Compiled code |
+      | `.rodata`| Flash    | const strings, lookup tables |
+      | `.data`  | SRAM (copied from Flash at startup) | Initialized globals |
+      | `.bss`   | SRAM     | Zero-initialized globals |
+      | Stack    | SRAM (top, grows down) | Local variables, return addresses |
+      | Heap     | SRAM (above .bss, grows up) | `malloc` allocations |
+
+      ## Stack vs Heap
+
+      **Stack** — automatic, LIFO, fast, limited size (often 1-4 KB)
+      - Function local variables
+      - Danger: stack overflow if too deep or large arrays on stack
+
+      **Heap** — manual, flexible, fragmentation risk
+      - `malloc` / `free`
+      - Often avoided in safety-critical embedded code
+
+  - id: volatile_and_const
+    title: "volatile, const, and Memory-Mapped I/O"
+    estimated_minutes: 4
+    content: |
+      # volatile, const, and Memory-Mapped I/O
+
+      ## volatile
+
+      Tells the compiler a variable can change at any time outside normal program flow.
+      The compiler must re-read its value from memory every time it is accessed.
+
+      **When to use volatile:**
+      - Hardware registers (can change due to hardware)
+      - Variables shared with ISRs
+      - Variables in spin-wait loops
+
+          volatile uint32_t *status_reg = (volatile uint32_t *)0x40013000;
+          while (!(*status_reg & STATUS_READY)) { }  // Must re-read each iteration
+
+      **Without volatile**, the compiler may load the value once into a CPU register
+      and loop forever reading that cached value.
+
+      ## const
+
+      Promises the program won't modify the value. Compiler may place it in Flash.
+
+          const uint8_t LOOKUP[16] = { 0, 1, 1, 2, 1, 2, 2, 3, ... };
+
+      ## volatile const
+
+      Used together for read-only hardware registers:
+
+          volatile const uint32_t *uid = (volatile const uint32_t *)0x1FFF7A10;
+          uint32_t chip_id = *uid;   // Reads hardware, cannot write
+
+      ## Linker Scripts
+
+      Linker scripts (`.ld`) describe the memory layout to the linker:
+
+          MEMORY {
+              FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 512K
+              SRAM  (rwx) : ORIGIN = 0x20000000, LENGTH = 128K
+          }
+
+          SECTIONS {
+              .text : { *(.text*) } > FLASH
+              .data : { *(.data*) } > SRAM AT > FLASH
+              .bss  : { *(.bss*)  } > SRAM
+          }
+
+      The startup code (reset handler) copies `.data` from Flash to SRAM and
+      zero-fills `.bss` before calling `main()`.

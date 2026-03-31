@@ -1,0 +1,104 @@
+topic_id: uart
+articles:
+  - id: uart_basics
+    title: "UART Communication Basics"
+    estimated_minutes: 5
+    content: |
+      # UART Communication Basics
+
+      UART (Universal Asynchronous Receiver/Transmitter) is the simplest serial
+      protocol — just two wires (TX and RX), no shared clock.
+
+      ## Frame Format
+
+      Each byte is wrapped in a frame:
+
+          [START bit][D0][D1][D2][D3][D4][D5][D6][D7][PARITY?][STOP bit(s)]
+
+      - **Start bit**: Always LOW (logic 0), signals the start of a frame
+      - **Data bits**: LSB first, typically 8 bits
+      - **Parity bit**: Optional error detection (even, odd, or none)
+      - **Stop bit(s)**: Always HIGH (logic 1), 1 or 2 bits
+
+      ## Baud Rate
+
+      Baud rate = bits per second. Both sides must agree on the same baud rate.
+      Common values: 9600, 115200, 230400.
+
+          // STM32: BRR = F_clk / baud
+          USART1->BRR = 72000000 / 115200;   // ≈ 625
+
+      ## UART Init (STM32)
+
+          RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+
+          USART1->BRR = 72000000 / 115200;
+          USART1->CR1 |= USART_CR1_TE;   // Enable transmitter
+          USART1->CR1 |= USART_CR1_RE;   // Enable receiver
+          USART1->CR1 |= USART_CR1_UE;   // Enable USART
+
+      ## Transmitting a Byte
+
+          while (!(USART1->SR & USART_SR_TXE)) { }  // Wait for TX empty
+          USART1->DR = 'A';
+
+      ## Receiving a Byte
+
+          while (!(USART1->SR & USART_SR_RXNE)) { }  // Wait for RX not empty
+          char c = USART1->DR;   // Reading DR clears RXNE
+
+  - id: uart_advanced
+    title: "UART Buffering and Error Handling"
+    estimated_minutes: 4
+    content: |
+      # UART Buffering and Error Handling
+
+      ## Interrupt-Driven UART
+
+      Polling wastes CPU time. Use RX interrupt to buffer incoming data:
+
+          // Enable RX interrupt
+          USART1->CR1 |= USART_CR1_RXNEIE;
+          NVIC_EnableIRQ(USART1_IRQn);
+
+          // Circular buffer
+          #define BUF_SIZE 64
+          volatile char rx_buf[BUF_SIZE];
+          volatile uint8_t rx_head = 0, rx_tail = 0;
+
+          void USART1_IRQHandler(void) {
+              if (USART1->SR & USART_SR_RXNE) {
+                  rx_buf[rx_head] = USART1->DR;
+                  rx_head = (rx_head + 1) % BUF_SIZE;
+              }
+          }
+
+      ## Error Flags
+
+      UART SR register contains error flags:
+
+      | Flag | Meaning |
+      |------|---------|
+      | ORE  | Overrun — new byte arrived before previous was read |
+      | FE   | Framing error — stop bit was 0 |
+      | NE   | Noise error |
+      | PE   | Parity error |
+
+      Clear errors by reading SR then DR:
+
+          if (USART1->SR & USART_SR_ORE) {
+              (void)USART1->SR;
+              (void)USART1->DR;   // Clears ORE
+          }
+
+      ## Flow Control
+
+      - **Software (XON/XOFF)**: Special bytes signal pause/resume
+      - **Hardware (RTS/CTS)**: Extra pins let the receiver tell sender to stop
+
+      Hardware flow control prevents overrun without software overhead.
+
+      ## printf over UART
+
+      Redirect `_write()` syscall (newlib) to send characters via UART,
+      enabling `printf()` for debugging without a debugger.

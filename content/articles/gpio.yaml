@@ -1,0 +1,103 @@
+topic_id: gpio
+articles:
+  - id: gpio_basics
+    title: "GPIO Basics: Input and Output"
+    estimated_minutes: 5
+    content: |
+      # GPIO Basics: Input and Output
+
+      GPIO (General Purpose Input/Output) pins are the most fundamental way a
+      microcontroller interacts with the outside world — driving LEDs, reading buttons,
+      controlling transistors, etc.
+
+      ## Direction Control
+
+      Every GPIO pin can be configured as input or output.
+      This is set via a **direction register** (DDR, MODER, or similar).
+
+      ### AVR-style (8-bit):
+          DDRB |= (1 << PB5);   // PB5 = output
+          DDRB &= ~(1 << PB3);  // PB3 = input
+
+      ### STM32-style (32-bit MODER, 2 bits per pin):
+          GPIOA->MODER |= (1 << (5 * 2));    // PA5 = output (mode=01)
+          GPIOA->MODER &= ~(3 << (5 * 2));   // PA5 = input (mode=00)
+
+      ## Writing Outputs
+
+      Use the output data register (PORT, ODR, or BSRR):
+
+          PORTB |= (1 << PB5);    // AVR: set PB5 high
+          PORTB &= ~(1 << PB5);   // AVR: set PB5 low
+
+          GPIOA->ODR |= (1 << 5);     // STM32: PA5 high
+          GPIOA->BSRR = (1 << 5);     // STM32: PA5 high (atomic set)
+          GPIOA->BSRR = (1 << 21);    // STM32: PA5 low (atomic clear, bits 16-31)
+
+      ## Reading Inputs
+
+      Read from the input data register (PIN, IDR):
+
+          if (PINB & (1 << PB3)) {
+              // PB3 is high
+          }
+
+          if (GPIOA->IDR & (1 << 3)) {
+              // PA3 is high
+          }
+
+      ## Pull-up and Pull-down Resistors
+
+      Floating inputs produce undefined values. Enable internal pull resistors:
+
+      - **Pull-up**: Pin reads HIGH when unconnected; button press pulls it LOW
+      - **Pull-down**: Pin reads LOW when unconnected; button press pulls it HIGH
+
+          // AVR: enable internal pull-up on PB3 (input with PORT bit set)
+          DDRB &= ~(1 << PB3);
+          PORTB |= (1 << PB3);
+
+          // STM32: enable pull-up via PUPDR register
+          GPIOA->PUPDR |= (1 << (3 * 2));   // PA3 pull-up
+
+  - id: gpio_clocks
+    title: "GPIO Clock Enable and Configuration"
+    estimated_minutes: 3
+    content: |
+      # GPIO Clock Enable and Configuration
+
+      On STM32 and similar microcontrollers, peripheral clocks are **disabled by default**
+      to save power. You must enable the clock before accessing any GPIO registers.
+
+      ## Enabling GPIO Clocks (STM32)
+
+          // Enable GPIOA and GPIOC clocks
+          RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+          RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+
+      Forgetting this step causes the peripheral registers to appear frozen or
+      return 0 regardless of what you write.
+
+      ## Full GPIO Init Sequence (STM32 PA5 as Output)
+
+          // 1. Enable clock
+          RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+
+          // 2. Set mode to output (MODER bits = 01)
+          GPIOA->MODER &= ~(3 << (5 * 2));
+          GPIOA->MODER |=  (1 << (5 * 2));
+
+          // 3. Set output type to push-pull (default)
+          GPIOA->OTYPER &= ~(1 << 5);
+
+          // 4. Set speed (optional)
+          GPIOA->OSPEEDR |= (2 << (5 * 2));  // high speed
+
+          // 5. Drive the pin
+          GPIOA->ODR |= (1 << 5);
+
+      ## Open-Drain vs Push-Pull
+
+      - **Push-pull**: Can actively drive high or low. Most common.
+      - **Open-drain**: Can only pull low; an external pull-up resistor pulls it high.
+        Used for I2C and wired-AND applications.

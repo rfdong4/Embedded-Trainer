@@ -1,0 +1,97 @@
+topic_id: timers
+articles:
+  - id: timer_basics
+    title: "Timers and Counters"
+    estimated_minutes: 5
+    content: |
+      # Timers and Counters
+
+      Timers are hardware counters clocked by the system clock (or a prescaled version).
+      They are used for delays, measuring time, generating periodic interrupts, and PWM.
+
+      ## Timer Components
+
+      - **Counter register (CNT)**: The current count value, incremented each tick
+      - **Prescaler (PSC)**: Divides the input clock before it reaches the counter
+      - **Auto-reload register (ARR)**: When CNT reaches ARR, it resets to 0 (overflow)
+      - **Update interrupt flag (UIF)**: Set on overflow; triggers interrupt if enabled
+
+      ## Timer Frequency Formula
+
+          Timer frequency = F_clk / ((PSC + 1) * (ARR + 1))
+
+      Example: 72 MHz clock, PSC=7199, ARR=999
+          = 72,000,000 / (7200 * 1000) = 10 Hz (overflow every 100 ms)
+
+      ## Basic Timer Setup (STM32)
+
+          RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;   // Enable clock
+
+          TIM2->PSC = 7199;     // Prescaler: 72MHz / 7200 = 10kHz
+          TIM2->ARR = 9999;     // Auto-reload: 10kHz / 10000 = 1Hz
+          TIM2->DIER |= TIM_DIER_UIE;   // Enable update interrupt
+          TIM2->CR1 |= TIM_CR1_CEN;     // Start timer
+
+          NVIC_EnableIRQ(TIM2_IRQn);
+
+      ## Timer ISR
+
+          void TIM2_IRQHandler(void) {
+              if (TIM2->SR & TIM_SR_UIF) {
+                  TIM2->SR &= ~TIM_SR_UIF;   // Clear flag
+                  // Your 1Hz task here
+              }
+          }
+
+  - id: pwm_generation
+    title: "PWM Generation with Timers"
+    estimated_minutes: 5
+    content: |
+      # PWM Generation with Timers
+
+      PWM (Pulse-Width Modulation) produces a square wave with variable duty cycle.
+      It's used to control LED brightness, motor speed, servo position, etc.
+
+      ## PWM Concept
+
+          Period  = ARR + 1 timer ticks
+          Duty cycle = CCR / (ARR + 1) × 100%
+
+          If ARR=999 and CCR=499 → 50% duty cycle
+          If ARR=999 and CCR=199 → 20% duty cycle
+
+      ## Capture/Compare Register (CCR)
+
+      Each timer channel has a CCR. The output is high while CNT < CCR,
+      then goes low until the next overflow (PWM mode 1).
+
+      ## PWM Setup (STM32, TIM3 CH1 on PA6)
+
+          // 1. Enable clocks
+          RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+          RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+
+          // 2. Configure PA6 as alternate function (AF2 = TIM3)
+          GPIOA->MODER  |=  (2 << (6*2));    // Alternate function mode
+          GPIOA->AFR[0] |=  (2 << (6*4));    // AF2
+
+          // 3. Configure timer
+          TIM3->PSC = 71;       // 72MHz / 72 = 1MHz
+          TIM3->ARR = 999;      // 1MHz / 1000 = 1kHz PWM frequency
+          TIM3->CCR1 = 499;     // 50% duty cycle
+
+          // 4. Enable PWM mode 1 on channel 1
+          TIM3->CCMR1 |= (6 << TIM_CCMR1_OC1M_Pos);
+          TIM3->CCER  |= TIM_CCER_CC1E;
+
+          // 5. Start timer
+          TIM3->CR1 |= TIM_CR1_CEN;
+
+      ## Changing Duty Cycle at Runtime
+
+          TIM3->CCR1 = new_duty;   // Update immediately (or on next update event)
+
+      ## Input Capture
+
+      Timers can also measure external signals — the CNT value is latched into CCR
+      when a pin edge is detected, allowing pulse width or frequency measurement.

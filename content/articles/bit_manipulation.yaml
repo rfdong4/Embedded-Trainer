@@ -1,0 +1,101 @@
+topic_id: bit_manipulation
+articles:
+  - id: intro_to_bitwise
+    title: "Bitwise Operations Fundamentals"
+    estimated_minutes: 5
+    content: |
+      # Bitwise Operations Fundamentals
+
+      In embedded systems, you often need to control individual bits in hardware registers.
+      Bitwise operators let you do this precisely without affecting other bits.
+
+      ## The Six Bitwise Operators
+
+      | Operator | Symbol | Description |
+      |----------|--------|-------------|
+      | AND      | `&`    | 1 only if both bits are 1 |
+      | OR       | `\|`   | 1 if either bit is 1 |
+      | XOR      | `^`    | 1 if bits differ |
+      | NOT      | `~`    | Flips all bits |
+      | Left Shift  | `<<` | Shifts bits left, fills 0s |
+      | Right Shift | `>>` | Shifts bits right |
+
+      ## Setting a Bit (OR mask)
+
+      To set bit 3 without touching others:
+
+          register |= (1 << 3);
+
+      `1 << 3` = `0b00001000`. OR-ing this in forces bit 3 to 1.
+
+      ## Clearing a Bit (AND with inverted mask)
+
+          register &= ~(1 << 3);
+
+      `~(1 << 3)` = `0b11110111`. AND-ing clears bit 3, leaves all others.
+
+      ## Toggling a Bit (XOR mask)
+
+          register ^= (1 << 3);
+
+      XOR flips only bit 3 each time this runs.
+
+      ## Reading a Bit
+
+          if (register & (1 << 3)) {
+              // bit 3 is set
+          }
+
+      ## Practical Example: GPIO Direction Register
+
+      Suppose bits 0-7 of DDRB control pin directions (1=output, 0=input):
+
+          DDRB |= (1 << 5);   // Set pin 5 as output
+          DDRB &= ~(1 << 3);  // Set pin 3 as input
+
+  - id: masks_and_fields
+    title: "Bit Masks and Bit Fields"
+    estimated_minutes: 4
+    content: |
+      # Bit Masks and Bit Fields
+
+      ## What is a Bit Mask?
+
+      A bit mask is a value used to isolate, set, or clear specific bits.
+      Masks are usually defined as constants for readability:
+
+          #define LED_PIN     (1 << 5)
+          #define BUTTON_PIN  (1 << 3)
+
+          PORTB |= LED_PIN;       // Turn on LED
+          PORTB &= ~LED_PIN;      // Turn off LED
+
+      ## Extracting a Multi-Bit Field
+
+      If bits 4-6 of a register hold a 3-bit value:
+
+          uint8_t field = (register >> 4) & 0x07;
+
+      Steps:
+      1. Shift right to bring the field to bit position 0
+      2. AND with a mask that keeps only those bits (`0x07` = `0b00000111`)
+
+      ## Writing a Multi-Bit Field
+
+          // Write value 5 into bits 4-6
+          register &= ~(0x07 << 4);   // Clear the field
+          register |=  (5   << 4);    // Write new value
+
+      ## Common Mask Patterns
+
+          0xFF   = 0b11111111  (all 8 bits)
+          0x0F   = 0b00001111  (lower nibble)
+          0xF0   = 0b11110000  (upper nibble)
+          0x01   = 0b00000001  (bit 0 only)
+
+      ## Tip: Use Hex for Multi-Byte Masks
+
+      For 32-bit registers, hexadecimal is cleaner:
+
+          #define UART_ENABLE  (1U << 13)
+          #define BAUD_MASK    (0xFFFF)

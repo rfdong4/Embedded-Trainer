@@ -22,10 +22,19 @@ class TopicSelectScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        title = "Select a Topic - Quiz Mode" if self.mode == "quiz" else "Select a Topic - Coding Mode"
-        yield Label(title, classes="section-title")
+        titles = {
+            "quiz": "Select a Topic - Quiz Mode",
+            "coding": "Select a Topic - Coding Mode",
+            "learn": "Select a Topic - Learn Mode",
+        }
+        yield Label(titles.get(self.mode, "Select a Topic"), classes="section-title")
 
-        from embedded_trainer.core.content_loader import load_topics
+        from embedded_trainer.core.content_loader import (
+            load_articles,
+            load_coding_challenges,
+            load_quiz_questions,
+            load_topics,
+        )
         topics = load_topics()
         topic_progress = self.app.db.get_topic_progress(self.app.user_profile.id)
 
@@ -37,11 +46,14 @@ class TopicSelectScreen(Screen):
             progress = topic_progress.get(tid)
 
             if self.mode == "quiz":
-                count = topic.get("quiz_count", "?")
+                count = len(load_quiz_questions(tid))
                 completed = progress.quiz_completed if progress else 0
                 info = f"  [{difficulty}] {count} questions, {completed} completed"
+            elif self.mode == "learn":
+                count = len(load_articles(tid))
+                info = f"  [{difficulty}] {count} articles"
             else:
-                count = topic.get("coding_count", "?")
+                count = len(load_coding_challenges(tid))
                 completed = progress.coding_completed if progress else 0
                 info = f"  [{difficulty}] {count} challenges, {completed} completed"
 
@@ -60,6 +72,12 @@ class TopicSelectScreen(Screen):
         if self.mode == "quiz":
             from embedded_trainer.screens.quiz import QuizScreen
             self.app.push_screen(QuizScreen(topic_id=topic_id))
+        elif self.mode == "learn":
+            from embedded_trainer.core.content_loader import load_topics
+            topics = load_topics()
+            topic_name = next((t["name"] for t in topics if t["id"] == topic_id), topic_id)
+            from embedded_trainer.screens.learn import ArticleListScreen
+            self.app.push_screen(ArticleListScreen(topic_id=topic_id, topic_name=topic_name))
         else:
             from embedded_trainer.screens.coding import CodingSelectScreen
             self.app.push_screen(CodingSelectScreen(topic_id=topic_id))

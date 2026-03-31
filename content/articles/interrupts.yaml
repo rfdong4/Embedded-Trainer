@@ -1,0 +1,100 @@
+topic_id: interrupts
+articles:
+  - id: interrupt_basics
+    title: "Interrupts and ISRs"
+    estimated_minutes: 5
+    content: |
+      # Interrupts and ISRs
+
+      An interrupt is a signal that causes the CPU to stop what it's doing,
+      save its state, run a special handler function (ISR), then return.
+
+      ## Interrupt Service Routine (ISR)
+
+      An ISR is a function called automatically by hardware when an interrupt fires.
+
+          void USART1_IRQHandler(void) {
+              if (USART1->SR & USART_SR_RXNE) {
+                  char c = USART1->DR;   // Read clears the flag
+                  buffer[head++] = c;
+              }
+          }
+
+      **ISR rules:**
+      - Keep them short and fast
+      - No blocking calls (`delay()`, `printf()`)
+      - Variables shared with main code must be `volatile`
+
+      ## NVIC (Nested Vectored Interrupt Controller)
+
+      The NVIC on ARM Cortex-M manages interrupt enabling and priority.
+
+          // Enable an interrupt
+          NVIC_EnableIRQ(USART1_IRQn);
+
+          // Set priority (lower number = higher priority)
+          NVIC_SetPriority(USART1_IRQn, 5);
+
+      ## Interrupt Vector Table
+
+      A table of function pointers in Flash, one per exception/interrupt.
+      The CPU indexes into this table using the interrupt number.
+      Defined in the startup assembly file or startup C file.
+
+      ## Interrupt Flags
+
+      Most peripherals set a status flag when an interrupt condition occurs.
+      The ISR must clear this flag, or the interrupt will immediately re-fire.
+
+          // Common patterns for clearing flags:
+          USART1->SR &= ~USART_SR_RXNE;   // Clear by writing 0
+          TIM2->SR = ~TIM_SR_UIF;          // Clear by writing 0
+          EXTI->PR |= EXTI_PR_PR0;         // Clear by writing 1 (write-1-to-clear)
+
+  - id: critical_sections
+    title: "Critical Sections and Interrupt Safety"
+    estimated_minutes: 4
+    content: |
+      # Critical Sections and Interrupt Safety
+
+      When an ISR and main code share data, you must prevent the ISR from
+      interrupting a read-modify-write operation midway.
+
+      ## The Problem
+
+          // Main code:
+          counter++;   // NOT atomic: load, add, store — ISR can interrupt between steps
+
+      If the ISR also modifies `counter`, you get a race condition.
+
+      ## Disabling Interrupts (Critical Section)
+
+          __disable_irq();    // or: __asm volatile ("cpsid i")
+          counter++;
+          __enable_irq();     // or: __asm volatile ("cpsie i")
+
+      Keep critical sections as short as possible — disabled interrupts increase latency.
+
+      ## volatile for Shared Variables
+
+          volatile uint32_t counter = 0;
+
+      `volatile` ensures the compiler always reads/writes memory rather than keeping
+      the value in a register. It does NOT make the operation atomic.
+
+      ## Atomic Operations
+
+      Single-instruction operations are naturally atomic on most architectures:
+      - Read or write of a naturally-aligned word
+      - ARM Cortex-M: LDREX/STREX for load-exclusive/store-exclusive sequences
+
+      ## Interrupt Latency
+
+      Latency = time from interrupt assertion to first ISR instruction.
+      Cortex-M has a fixed 12-cycle interrupt entry overhead (state save).
+      Priority affects which ISR runs when multiple interrupts are pending.
+
+      ## Priority Levels
+
+      Higher priority (lower number) ISRs can preempt lower priority ones.
+      Configure priority grouping with `NVIC_SetPriorityGrouping()`.

@@ -1,0 +1,88 @@
+topic_id: registers
+articles:
+  - id: cpu_registers_overview
+    title: "CPU Registers Overview"
+    estimated_minutes: 5
+    content: |
+      # CPU Registers Overview
+
+      Registers are small, fast storage locations inside the CPU. On ARM Cortex-M
+      microcontrollers (the most common embedded target), there are 16 core registers.
+
+      ## General-Purpose Registers: R0-R12
+
+      R0 through R12 are general-purpose integer registers.
+      - R0-R3: Function arguments and return values (per AAPCS calling convention)
+      - R4-R11: Saved registers — a function must preserve these
+      - R12: Intra-procedure scratch register (IP)
+
+      ## Special Registers
+
+      | Register | Name | Purpose |
+      |----------|------|---------|
+      | R13 | SP  | Stack Pointer — points to top of current stack |
+      | R14 | LR  | Link Register — holds return address for function calls |
+      | R15 | PC  | Program Counter — address of next instruction |
+
+      ## Program Status Register (xPSR)
+
+      The xPSR bundles three status registers:
+      - **APSR** — Application flags: N (negative), Z (zero), C (carry), V (overflow)
+      - **IPSR** — Current exception/interrupt number
+      - **EPSR** — Execution state (Thumb bit)
+
+      ## How BL Uses LR
+
+          BL target   ; Branch with Link — saves PC+4 into LR, jumps to target
+          BX LR       ; Branch eXchange — returns to caller via LR
+
+      ## Stack Pointer Modes
+
+      Cortex-M has two stack pointers:
+      - **MSP** (Main Stack Pointer) — used in handler mode and privileged thread mode
+      - **PSP** (Process Stack Pointer) — used by unprivileged tasks in an RTOS
+
+  - id: memory_mapped_registers
+    title: "Memory-Mapped Peripheral Registers"
+    estimated_minutes: 4
+    content: |
+      # Memory-Mapped Peripheral Registers
+
+      On microcontrollers, peripherals (GPIO, UART, timers) are controlled through
+      **memory-mapped registers** — special addresses in the address space that
+      correspond to hardware, not RAM.
+
+      ## Accessing Peripheral Registers in C
+
+      Cast an address to a volatile pointer:
+
+          #define GPIOA_ODR  (*((volatile uint32_t *)0x40020014))
+
+          GPIOA_ODR |= (1 << 5);   // Set PA5 high
+
+      The `volatile` keyword is critical — it tells the compiler not to optimize
+      away reads/writes because the value can change outside program control.
+
+      ## Why volatile Matters
+
+      Without `volatile`, the compiler may:
+      - Cache a register value in a CPU register and never re-read it
+      - Eliminate "redundant" writes it thinks have no effect
+
+          volatile uint32_t *status = (volatile uint32_t *)0x40013000;
+          while (!(*status & 0x01)) {}  // Wait for hardware flag
+
+      ## Device Header Files
+
+      In practice, vendor CMSIS headers define all registers as structs:
+
+          GPIOA->ODR |= GPIO_PIN_5;
+          USART1->CR1 |= USART_CR1_UE;
+
+      These expand to volatile pointer dereferences at the correct addresses.
+
+      ## Read-Only, Write-Only, and Read-Write Registers
+
+      - **Read-only**: Status registers — writing has no effect or is forbidden
+      - **Write-only**: Some clear registers — reading returns undefined data
+      - **Read-write**: Most configuration registers

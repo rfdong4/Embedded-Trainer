@@ -20,6 +20,7 @@ class HomeScreen(Screen):
         ("q", "quit_app", "Quit"),
         ("1", "quiz_mode", "Quiz Mode"),
         ("2", "coding_mode", "Coding Mode"),
+        ("3", "learn_mode", "Learn Mode"),
         ("p", "profile", "Profile"),
     ]
 
@@ -54,6 +55,12 @@ class HomeScreen(Screen):
                 classes="mode-button",
             )
             yield Button(
+                "Learn Mode\n[3] Read articles",
+                id="btn-learn",
+                variant="warning",
+                classes="mode-button",
+            )
+            yield Button(
                 "Profile\n[P] Stats & Achievements",
                 id="btn-profile",
                 variant="default",
@@ -67,6 +74,8 @@ class HomeScreen(Screen):
             self.action_quiz_mode()
         elif event.button.id == "btn-coding":
             self.action_coding_mode()
+        elif event.button.id == "btn-learn":
+            self.action_learn_mode()
         elif event.button.id == "btn-profile":
             self.action_profile()
 
@@ -80,6 +89,10 @@ class HomeScreen(Screen):
     def action_coding_mode(self):
         from embedded_trainer.screens.topic_select import TopicSelectScreen
         self.app.push_screen(TopicSelectScreen(mode="coding"))
+
+    def action_learn_mode(self):
+        from embedded_trainer.screens.topic_select import TopicSelectScreen
+        self.app.push_screen(TopicSelectScreen(mode="learn"))
 
     def action_profile(self):
         from embedded_trainer.screens.profile import ProfileScreen

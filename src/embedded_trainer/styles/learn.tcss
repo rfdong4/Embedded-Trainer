@@ -1,0 +1,29 @@
+ArticleListScreen, ArticleScreen {
+    layout: vertical;
+}
+
+#article-list {
+    height: 1fr;
+    margin: 1 2;
+}
+
+.empty-msg {
+    margin: 2 4;
+    color: $text-muted;
+}
+
+#article-header {
+    text-style: bold;
+    color: $accent;
+    margin: 1 2;
+    height: auto;
+    padding: 0 1;
+    border-bottom: solid $primary;
+}
+
+#article-body {
+    height: 1fr;
+    margin: 0 2 1 2;
+    overflow-y: auto;
+    padding: 1 2;
+}

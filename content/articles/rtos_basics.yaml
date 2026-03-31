@@ -1,0 +1,121 @@
+topic_id: rtos_basics
+articles:
+  - id: rtos_concepts
+    title: "RTOS Concepts: Tasks and Scheduling"
+    estimated_minutes: 6
+    content: |
+      # RTOS Concepts: Tasks and Scheduling
+
+      A Real-Time Operating System (RTOS) manages multiple tasks running
+      "simultaneously" on a single CPU by rapidly switching between them.
+
+      ## What is a Task?
+
+      A task (or thread) is an independent unit of execution with its own:
+      - Stack
+      - Program counter (current instruction)
+      - Priority
+      - State (running, ready, blocked, suspended)
+
+          // FreeRTOS task creation
+          xTaskCreate(
+              vMyTask,        // Task function
+              "MyTask",       // Name (debug)
+              128,            // Stack size in words
+              NULL,           // Parameter
+              2,              // Priority (higher = more urgent)
+              &xTaskHandle    // Handle (optional)
+          );
+
+          void vMyTask(void *pvParameters) {
+              for (;;) {
+                  // Task code
+                  vTaskDelay(pdMS_TO_TICKS(100));  // Block for 100ms
+              }
+          }
+
+      ## Scheduler Types
+
+      **Preemptive**: The scheduler can interrupt a running task at any time
+      to run a higher-priority task. Most RTOSes default to this.
+
+      **Cooperative**: Tasks must voluntarily yield the CPU. Simpler but
+      a misbehaving task can starve all others.
+
+      ## Task States
+
+          RUNNING → (preempted or yields) → READY
+          RUNNING → (waits for resource) → BLOCKED
+          BLOCKED → (resource available)  → READY
+          READY   → (scheduler selects)   → RUNNING
+
+      ## Priority Inversion
+
+      A high-priority task blocks waiting for a resource held by a low-priority task,
+      while a medium-priority task runs instead. Solution: priority inheritance.
+
+  - id: rtos_sync
+    title: "Semaphores, Mutexes, and Queues"
+    estimated_minutes: 5
+    content: |
+      # Semaphores, Mutexes, and Queues
+
+      ## Semaphore
+
+      A semaphore is a signaling mechanism with a count.
+
+      **Binary semaphore**: Count is 0 or 1. Used for task-to-task signaling.
+
+          // ISR gives semaphore, task takes it
+          SemaphoreHandle_t xSem = xSemaphoreCreateBinary();
+
+          void ISR_Handler(void) {
+              xSemaphoreGiveFromISR(xSem, &xHigherPriorityTaskWoken);
+          }
+
+          void vTask(void *p) {
+              for (;;) {
+                  xSemaphoreTake(xSem, portMAX_DELAY);  // Block until signaled
+                  process_data();
+              }
+          }
+
+      **Counting semaphore**: Count > 1. Tracks available resources.
+
+      ## Mutex (Mutual Exclusion)
+
+      A mutex is a binary semaphore with ownership — only the task that
+      took it can give it back. Prevents two tasks from accessing a
+      shared resource simultaneously.
+
+          MutexHandle_t xMutex = xSemaphoreCreateMutex();
+
+          void vTask(void *p) {
+              xSemaphoreTake(xMutex, portMAX_DELAY);
+              // Critical section — exclusive access
+              shared_resource_access();
+              xSemaphoreGive(xMutex);
+          }
+
+      **Never take a mutex from an ISR** — use binary semaphores instead.
+
+      ## Queue
+
+      Queues pass data between tasks safely. They are thread-safe and
+      can block senders (when full) or receivers (when empty).
+
+          QueueHandle_t xQueue = xQueueCreate(10, sizeof(uint32_t));
+
+          // Sender task
+          uint32_t value = 42;
+          xQueueSend(xQueue, &value, portMAX_DELAY);
+
+          // Receiver task
+          uint32_t received;
+          xQueueReceive(xQueue, &received, portMAX_DELAY);
+
+      ## Stack Overflow
+
+      Each task needs enough stack. Too little → stack overflow → corruption.
+      Enable `configCHECK_FOR_STACK_OVERFLOW` during development to detect it.
+      Use `uxTaskGetStackHighWaterMark()` to measure actual usage.

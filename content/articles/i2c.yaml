@@ -1,0 +1,73 @@
+topic_id: i2c
+articles:
+  - id: i2c_basics
+    title: "I2C Protocol Fundamentals"
+    estimated_minutes: 5
+    content: |
+      # I2C Protocol Fundamentals
+
+      I2C (Inter-Integrated Circuit) is a two-wire synchronous protocol that
+      supports multiple masters and multiple slaves on the same bus.
+
+      ## I2C Signals
+
+      | Signal | Description |
+      |--------|-------------|
+      | SDA    | Serial Data (bidirectional, open-drain) |
+      | SCL    | Serial Clock (driven by master, open-drain) |
+
+      Both lines require pull-up resistors (typically 4.7kΩ for 100kHz,
+      2.2kΩ for 400kHz).
+
+      ## Addressing
+
+      Each slave has a 7-bit address (128 possible devices).
+      Some devices support 10-bit addressing.
+      After the address, a R/W bit indicates the direction:
+      - `0` = Write (master sends data)
+      - `1` = Read (slave sends data)
+
+      ## Transaction Structure
+
+          START | ADDR(7) + R/W | ACK | DATA | ACK | ... | STOP
+
+      - **START**: SDA falls while SCL is high
+      - **ACK**: Receiver pulls SDA low during the 9th clock = acknowledge
+      - **NACK**: Receiver releases SDA (high) = not acknowledged
+      - **STOP**: SDA rises while SCL is high
+
+      ## Write Transaction
+
+          I2C_Start();
+          I2C_SendByte(DEVICE_ADDR << 1 | 0);  // Address + Write
+          I2C_WaitACK();
+          I2C_SendByte(register_addr);
+          I2C_WaitACK();
+          I2C_SendByte(data_byte);
+          I2C_WaitACK();
+          I2C_Stop();
+
+      ## Read Transaction (Repeated Start)
+
+          I2C_Start();
+          I2C_SendByte(DEVICE_ADDR << 1 | 0);  // Write register address first
+          I2C_WaitACK();
+          I2C_SendByte(register_addr);
+          I2C_WaitACK();
+          I2C_Start();                           // Repeated START
+          I2C_SendByte(DEVICE_ADDR << 1 | 1);  // Address + Read
+          I2C_WaitACK();
+          data = I2C_ReadByte(NACK);             // NACK on last byte
+          I2C_Stop();
+
+      ## Clock Speeds
+
+      - **Standard mode**: 100 kHz
+      - **Fast mode**: 400 kHz
+      - **Fast-mode Plus**: 1 MHz
+      - **High-speed**: 3.4 MHz (rare)
+
+      ## Clock Stretching
+
+      A slave can hold SCL low to pause the master while it prepares data.
+      The master must tolerate this.

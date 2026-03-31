@@ -102,3 +102,13 @@ def load_coding_challenge(topic_id: str, challenge_id: str) -> CodingChallenge |
         if c.id == challenge_id:
             return c
     return None
+
+
+def load_articles(topic_id: str) -> list[dict]:
+    """Load all articles for a given topic."""
+    articles_file = get_content_dir() / "articles" / f"{topic_id}.yaml"
+    if not articles_file.exists():
+        return []
+    with open(articles_file) as f:
+        data = yaml.safe_load(f)
+    return data.get("articles", [])
