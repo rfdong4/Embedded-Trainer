@@ -10,7 +10,8 @@ from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Label, Static
 
 from embedded_trainer.core.gamification import check_achievements, update_streak
-from embedded_trainer.core.quiz_engine import check_answer, get_quiz_questions, score_quiz
+from embedded_trainer.core.quiz_engine import check_answer, get_adaptive_questions, score_quiz
+from embedded_trainer.core.spaced_repetition import schedule_review
 from embedded_trainer.models.question import Question
 from embedded_trainer.widgets.achievement_toast import format_achievement
 from embedded_trainer.widgets.question_card import QuestionCard
@@ -33,7 +34,10 @@ class QuizScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        self.questions = get_quiz_questions(self.topic_id)
+        history = self.app.db.get_question_history(
+            self.app.user_profile.id, self.topic_id
+        )
+        self.questions = get_adaptive_questions(self.topic_id, history)
         if not self.questions:
             yield Label("No questions available for this topic.", classes="section-title")
             yield Footer()
@@ -58,6 +62,17 @@ class QuizScreen(Screen):
 
     def on_question_card_answered(self, event: QuestionCard.Answered):
         self.results.append((event.question, event.correct))
+        # Save per-question result for adaptive quizzes and spaced repetition
+        self.app.db.save_question_result(
+            self.app.user_profile.id,
+            event.question.id,
+            self.topic_id,
+            event.correct,
+        )
+        schedule_review(
+            self.app.db, self.app.user_profile.id,
+            event.question.id, self.topic_id, event.correct,
+        )
         next_btn = self.query_one("#btn-next", Button)
         next_btn.disabled = False
         if self.current_index >= len(self.questions) - 1:

@@ -1,0 +1,46 @@
+id: embedded_security_access_control
+topic_id: embedded_security
+title: "Bitmask-Based Access Control"
+difficulty: beginner
+description: |
+  Implement a function that checks whether a user has the required permissions
+  using bitmask-based access control.
+
+  Permissions are represented as bits in a uint32_t:
+  - Bit 0: READ
+  - Bit 1: WRITE
+  - Bit 2: EXECUTE
+  - Bit 3: ADMIN
+
+  Given a user's permission bitmask and a required permission bitmask, return 1
+  if the user has ALL of the required permissions, or 0 otherwise.
+
+  Parameters:
+  - user_perms: the user's permission bitmask
+  - required_perms: the required permission bitmask
+
+  Return 1 if all required permissions are present, 0 otherwise.
+function_signature: "int check_access(uint32_t user_perms, uint32_t required_perms)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int check_access(uint32_t user_perms, uint32_t required_perms) {
+      // TODO: implement
+  }
+test_harness: "access_control_tests/test_main.c"
+expected_output: "access_control_tests/expected_output.txt"
+hints:
+  - "Use bitwise AND to check if specific bits are set."
+  - "All required bits must be present in user_perms."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int check_access(uint32_t user_perms, uint32_t required_perms) {
+      return (user_perms & required_perms) == required_perms ? 1 : 0;
+  }
+solution_explanation: |
+  By ANDing user_perms with required_perms, we isolate only the bits that are
+  both required and present. If the result equals required_perms, all required
+  bits are set in user_perms, so access is granted.

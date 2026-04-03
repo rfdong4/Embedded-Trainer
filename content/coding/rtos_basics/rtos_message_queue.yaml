@@ -64,3 +64,53 @@ hints:
   - "Track count separately so you can distinguish full from empty without wasting a slot."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define MAX_QUEUE_SIZE 8
+
+  typedef struct {
+      uint32_t buffer[MAX_QUEUE_SIZE];
+      uint8_t head;
+      uint8_t tail;
+      uint8_t count;
+  } MsgQueue;
+
+  void mq_init(MsgQueue *q) {
+      q->head = 0;
+      q->tail = 0;
+      q->count = 0;
+  }
+
+  int mq_send(MsgQueue *q, uint32_t msg) {
+      if (q->count >= MAX_QUEUE_SIZE) return 0;
+      q->buffer[q->tail] = msg;
+      q->tail = (q->tail + 1) % MAX_QUEUE_SIZE;
+      q->count++;
+      return 1;
+  }
+
+  int mq_receive(MsgQueue *q, uint32_t *msg) {
+      if (q->count == 0) return 0;
+      *msg = q->buffer[q->head];
+      q->head = (q->head + 1) % MAX_QUEUE_SIZE;
+      q->count--;
+      return 1;
+  }
+
+  int mq_is_full(MsgQueue *q) {
+      return q->count >= MAX_QUEUE_SIZE;
+  }
+
+  int mq_is_empty(MsgQueue *q) {
+      return q->count == 0;
+  }
+
+  uint8_t mq_count(MsgQueue *q) {
+      return q->count;
+  }
+solution_explanation: |
+  The message queue uses a circular buffer with separate head (read) and tail
+  (write) indices, plus a count field to distinguish full from empty. mq_send
+  writes at the tail and advances it with modulo wrapping. mq_receive reads
+  from the head and advances it similarly. The count field tracks occupancy.

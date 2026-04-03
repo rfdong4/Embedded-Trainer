@@ -1,0 +1,57 @@
+id: riscv_trap_handler
+topic_id: riscv
+title: "Trap Dispatch Table"
+difficulty: intermediate
+description: |
+  Implement a trap dispatch function that determines the handler index based
+  on the mcause register value.
+
+  In RISC-V, mcause encodes:
+  - Bit 31: 1 = interrupt, 0 = exception
+  - Bits [30:0]: cause code
+
+  Implement dispatch_trap which takes an mcause value and returns:
+  - For interrupts (bit 31 set): return 100 + cause_code
+  - For exceptions (bit 31 clear): return the cause_code directly
+  - If the cause code exceeds max_causes, return -1 (invalid)
+
+  Parameters:
+  - mcause: 32-bit mcause register value
+  - max_causes: maximum valid cause code (for both interrupts and exceptions)
+function_signature: "int dispatch_trap(uint32_t mcause, uint32_t max_causes)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int dispatch_trap(uint32_t mcause, uint32_t max_causes) {
+      // TODO: check if interrupt (bit 31)
+      // Extract cause code from bits [30:0]
+      // Return 100 + code for interrupts, code for exceptions
+      // Return -1 if cause code > max_causes
+  }
+test_harness: "trap_handler_tests/test_main.c"
+expected_output: "trap_handler_tests/expected_output.txt"
+hints:
+  - "Check bit 31 with: mcause & 0x80000000"
+  - "Extract cause code with: mcause & 0x7FFFFFFF"
+  - "Validate cause code before computing the handler index"
+xp: 40
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int dispatch_trap(uint32_t mcause, uint32_t max_causes) {
+      int is_interrupt = (mcause >> 31) & 1;
+      uint32_t cause_code = mcause & 0x7FFFFFFF;
+      if (cause_code > max_causes) {
+          return -1;
+      }
+      if (is_interrupt) {
+          return 100 + (int)cause_code;
+      }
+      return (int)cause_code;
+  }
+solution_explanation: |
+  The function checks the MSB of mcause to distinguish interrupts from exceptions.
+  The lower 31 bits give the specific cause code. Interrupts are offset by 100 to
+  separate them from exception codes in the dispatch table. Invalid cause codes
+  (exceeding max_causes) return -1.

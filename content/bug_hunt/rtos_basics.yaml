@@ -1,0 +1,111 @@
+topic_id: rtos_basics
+challenges:
+  - id: bug_priority_inversion
+    title: "Priority Inversion"
+    difficulty: advanced
+    buggy_code: |
+      // Three tasks with priorities: High=3, Med=2, Low=1
+      // Low-priority task holds a mutex that High needs
+
+      SemaphoreHandle_t shared_mutex;
+
+      void vLowTask(void *p) {
+          for (;;) {
+              xSemaphoreTake(shared_mutex, portMAX_DELAY);
+              // Long operation with shared resource
+              heavy_computation();
+              xSemaphoreGive(shared_mutex);
+          }
+      }
+
+      void vMedTask(void *p) {
+          for (;;) {
+              // CPU-intensive work, no mutex needed
+              compute_data();
+          }
+      }
+
+      void vHighTask(void *p) {
+          for (;;) {
+              xSemaphoreTake(shared_mutex, portMAX_DELAY);
+              read_shared_resource();
+              xSemaphoreGive(shared_mutex);
+          }
+      }
+    correct_answer: "C"
+    options:
+      - "A) shared_mutex should be a binary semaphore"
+      - "B) vMedTask priority should be lower"
+      - "C) Use a mutex with priority inheritance — Medium task can preempt Low, starving High"
+      - "D) Tasks need vTaskDelay calls"
+    explanation: "Classic priority inversion: Low holds the mutex, High blocks waiting for it, but Medium (which doesn't need the mutex) preempts Low, preventing it from releasing the mutex. Use xSemaphoreCreateMutex() which supports priority inheritance."
+    xp: 20
+    tags: [priority_inversion, mutex, priority_inheritance]
+
+  - id: bug_stack_too_small
+    title: "Task Stack Overflow"
+    difficulty: intermediate
+    buggy_code: |
+      void vSensorTask(void *p) {
+          char log_buffer[256];
+          float readings[32];
+          for (;;) {
+              read_all_sensors(readings, 32);
+              format_log(log_buffer, readings, 32);
+              send_log(log_buffer);
+              vTaskDelay(pdMS_TO_TICKS(100));
+          }
+      }
+
+      void setup(void) {
+          xTaskCreate(vSensorTask, "Sensor", 64, NULL, 2, NULL);
+      }
+    correct_answer: "B"
+    options:
+      - "A) readings array should be static"
+      - "B) Stack size 64 words (256 bytes) is too small for 256+128 bytes of local variables"
+      - "C) vTaskDelay value is wrong"
+      - "D) Priority should be higher"
+    explanation: "The task allocates 256 bytes (log_buffer) + 128 bytes (readings) = 384 bytes on stack, plus RTOS overhead (~64 bytes). Stack size of 64 words = 256 bytes is far too small. Use at least 256 words (1KB)."
+    xp: 15
+    tags: [stack_overflow, task_creation, stack_size]
+
+  - id: bug_shared_no_mutex
+    title: "Shared Resource Without Protection"
+    difficulty: intermediate
+    buggy_code: |
+      typedef struct {
+          uint32_t temperature;
+          uint32_t humidity;
+          uint32_t timestamp;
+      } SensorData;
+
+      SensorData latest_data;
+
+      void vWriterTask(void *p) {
+          for (;;) {
+              latest_data.temperature = read_temp();
+              latest_data.humidity = read_humidity();
+              latest_data.timestamp = get_tick();
+              vTaskDelay(pdMS_TO_TICKS(100));
+          }
+      }
+
+      void vReaderTask(void *p) {
+          for (;;) {
+              uint32_t t = latest_data.temperature;
+              uint32_t h = latest_data.humidity;
+              uint32_t ts = latest_data.timestamp;
+              display(t, h, ts);
+              vTaskDelay(pdMS_TO_TICKS(200));
+          }
+      }
+    correct_answer: "A"
+    options:
+      - "A) No mutex protection — reader can get a mix of old and new fields (torn read)"
+      - "B) latest_data should be declared volatile"
+      - "C) Writer task runs too often"
+      - "D) Reader should use a pointer"
+    explanation: "Without mutual exclusion, the reader task can be preempted between reading temperature and humidity, getting temperature from one sample and humidity from another. Wrap both read and write in a mutex."
+    xp: 15
+    tags: [shared_resource, mutex, torn_read]

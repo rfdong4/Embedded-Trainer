@@ -33,3 +33,20 @@ hints:
   - "Use uint64_t for the multiplication (elapsed * 1000000) to avoid 32-bit overflow before dividing."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t capture_period_us(uint16_t cap1, uint16_t cap2, uint32_t tick_freq_hz) {
+      uint32_t elapsed;
+      if (cap2 >= cap1) {
+          elapsed = cap2 - cap1;
+      } else {
+          elapsed = 65536 - cap1 + cap2;
+      }
+      return (uint32_t)((uint64_t)elapsed * 1000000ULL / tick_freq_hz);
+  }
+solution_explanation: |
+  Calculate elapsed ticks handling 16-bit wraparound: if cap2 >= cap1, elapsed is the
+  simple difference; otherwise the timer wrapped, so elapsed is 65536 - cap1 + cap2.
+  Convert ticks to microseconds by multiplying by 1,000,000 and dividing by the tick
+  frequency, using uint64_t to avoid 32-bit overflow in the intermediate multiplication.

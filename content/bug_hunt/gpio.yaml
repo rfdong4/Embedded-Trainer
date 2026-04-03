@@ -1,0 +1,69 @@
+topic_id: gpio
+challenges:
+  - id: bug_gpio_read_write_conflict
+    title: "Read-Modify-Write on Output Register"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      #define GPIOA_ODR (*(volatile uint32_t*)0x40020014)
+
+      void set_pin_5(void) {
+          GPIOA_ODR = GPIOA_ODR | (1 << 5);
+      }
+
+      // Called from both main loop and ISR
+    correct_answer: "C"
+    options:
+      - "A) Should use &= instead of |="
+      - "B) Pin 5 doesn't exist"
+      - "C) Read-modify-write on ODR is not atomic — use BSRR register instead"
+      - "D) Missing volatile on GPIOA_ODR"
+    explanation: "When called from both main code and an ISR, the read-modify-write sequence (read ODR, OR, write ODR) can be interrupted, causing a race condition. The BSRR (bit set/reset register) provides atomic single-write pin control."
+    xp: 15
+    tags: [race_condition, atomic, bsrr]
+
+  - id: bug_gpio_no_config
+    title: "Using GPIO Without Clock Enable"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      #define GPIOB_MODER (*(volatile uint32_t*)0x40020400)
+      #define GPIOB_ODR   (*(volatile uint32_t*)0x40020414)
+
+      void led_on(void) {
+          GPIOB_MODER |= (1 << 14);  // PB7 output
+          GPIOB_ODR   |= (1 << 7);   // Set PB7
+      }
+    correct_answer: "A"
+    options:
+      - "A) GPIO port clock is never enabled in RCC — writes to GPIO registers have no effect"
+      - "B) MODER bits are wrong for output mode"
+      - "C) Should clear ODR first"
+      - "D) Need to configure pull-up resistor"
+    explanation: "Before accessing any GPIO peripheral, its clock must be enabled via the RCC (Reset and Clock Control) register. Without the clock, the GPIO registers are not powered and all reads return 0, all writes are ignored."
+    xp: 10
+    tags: [rcc, clock_enable, peripheral]
+
+  - id: bug_gpio_wrong_moder
+    title: "Wrong MODER Bits for Output"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      #define GPIOA_MODER (*(volatile uint32_t*)0x40020000)
+
+      void configure_pa5_output(void) {
+          // Set PA5 as general-purpose output
+          GPIOA_MODER |= (1 << 5);
+      }
+    correct_answer: "B"
+    options:
+      - "A) Should use &= instead of |="
+      - "B) MODER uses 2 bits per pin — PA5 needs bit 10 set, not bit 5"
+      - "C) Must set alternate function first"
+      - "D) Wrong register address"
+    explanation: "The MODER register uses 2 bits per pin. PA5 is controlled by MODER[11:10]. Output mode is 01, so the correct operation is: GPIOA_MODER = (GPIOA_MODER & ~(3 << 10)) | (1 << 10). Using bit 5 modifies the wrong pin's configuration."
+    xp: 10
+    tags: [moder, pin_config, two_bits_per_pin]

@@ -63,3 +63,53 @@ hints:
   - "wdt_kick reloads counter from the stored timeout value. Only works when enabled."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t counter;
+      uint32_t timeout;
+      uint8_t enabled;
+  } Watchdog;
+
+  void wdt_init(Watchdog *w) {
+      w->counter = 0;
+      w->timeout = 0;
+      w->enabled = 0;
+  }
+
+  int wdt_configure(Watchdog *w, uint32_t timeout) {
+      if (timeout == 0) return 0;
+      w->timeout = timeout;
+      w->counter = timeout;
+      w->enabled = 1;
+      return 1;
+  }
+
+  int wdt_kick(Watchdog *w) {
+      if (!w->enabled) return 0;
+      w->counter = w->timeout;
+      return 1;
+  }
+
+  int wdt_check_expired(Watchdog *w) {
+      if (!w->enabled) return 0;
+      w->counter--;
+      if (w->counter == 0) return 1;
+      return 0;
+  }
+
+  uint32_t wdt_get_counter(Watchdog *w) {
+      return w->counter;
+  }
+
+  void wdt_disable(Watchdog *w) {
+      w->enabled = 0;
+      w->counter = 0;
+  }
+solution_explanation: |
+  The watchdog struct tracks a countdown counter, configured timeout value, and
+  enabled state. wdt_configure loads the counter and enables the timer.
+  wdt_check_expired decrements the counter when enabled, returning 1 when it
+  reaches zero. wdt_kick reloads the counter from the stored timeout to prevent
+  expiration.

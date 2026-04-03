@@ -1,0 +1,59 @@
+id: low_power_power_budget
+topic_id: low_power
+title: "Calculate Power Budget from Component Current Draws"
+difficulty: intermediate
+description: |
+  Implement a function that calculates the total current draw of a system
+  given an array of component current values.
+
+  Each component is described by a struct with:
+  - current_ua (uint32_t): current draw in microamps
+  - enabled (uint8_t): 1 if the component is active, 0 if disabled
+
+  The function should sum the current of all enabled components and return
+  the total in microamps.
+
+  Parameters:
+  - components: pointer to array of component_t
+  - count: number of components
+function_signature: "uint32_t calc_power_budget(component_t *components, uint32_t count)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t current_ua;
+      uint8_t enabled;
+  } component_t;
+
+  uint32_t calc_power_budget(component_t *components, uint32_t count) {
+      // TODO: implement
+  }
+test_harness: "power_budget_tests/test_main.c"
+expected_output: "power_budget_tests/expected_output.txt"
+hints:
+  - "Iterate through the array and sum current_ua for components where enabled == 1."
+  - "Skip components where enabled == 0."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t current_ua;
+      uint8_t enabled;
+  } component_t;
+
+  uint32_t calc_power_budget(component_t *components, uint32_t count) {
+      uint32_t total = 0;
+      for (uint32_t i = 0; i < count; i++) {
+          if (components[i].enabled) {
+              total += components[i].current_ua;
+          }
+      }
+      return total;
+  }
+solution_explanation: |
+  The function iterates through all components, checking the enabled flag.
+  Only active components contribute to the total current budget. This models
+  a real power budget analysis where disabling unused subsystems reduces
+  overall system current draw.

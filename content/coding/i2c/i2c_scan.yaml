@@ -35,3 +35,25 @@ hints:
   - "For i2c_scan_count, simply count elements until the 0x00 terminator."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t i2c_check_addr(const uint8_t *present, uint8_t target) {
+      for (uint8_t i = 0; present[i] != 0x00; i++) {
+          if (present[i] == target) return 1;
+      }
+      return 0;
+  }
+
+  uint8_t i2c_scan_count(const uint8_t *present) {
+      uint8_t count = 0;
+      while (present[count] != 0x00) {
+          count++;
+      }
+      return count;
+  }
+solution_explanation: |
+  i2c_check_addr iterates through the 0x00-terminated list of present addresses,
+  returning 1 if the target is found. i2c_scan_count simply counts elements until
+  the 0x00 sentinel is reached. Both functions treat 0x00 as the end-of-list
+  marker since address 0 is reserved in I2C.

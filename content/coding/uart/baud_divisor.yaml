@@ -24,3 +24,13 @@ hints:
   - "Be careful with integer overflow: 16 * baud_rate could overflow if baud_rate is large, but typical UART baud rates are small enough."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint16_t baud_divisor(uint32_t clock_freq, uint32_t baud_rate) {
+      return (uint16_t)(clock_freq / (16 * baud_rate));
+  }
+solution_explanation: |
+  The baud rate divisor is computed by dividing the system clock frequency by
+  16 times the desired baud rate, following the standard UART hardware formula.
+  Integer division naturally truncates the result.

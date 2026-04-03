@@ -1,0 +1,49 @@
+topic_id: i2c
+challenges:
+  - id: bug_i2c_address_shift
+    title: "I2C Address Shift Error"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      #define I2C_DR (*(volatile uint32_t*)0x40005410)
+
+      // Sensor I2C address from datasheet: 0x68
+      void i2c_write_to_sensor(uint8_t data) {
+          I2C_DR = 0x68;  // Send address
+          // ... wait for ACK ...
+          I2C_DR = data;
+      }
+    correct_answer: "A"
+    options:
+      - "A) Address must be left-shifted by 1 and OR'd with R/W bit: (0x68 << 1) | 0"
+      - "B) Should send data before address"
+      - "C) Address should be 0x69"
+      - "D) Missing start condition"
+    explanation: "I2C sends 7-bit address in bits [7:1] with R/W bit in bit [0]. The address byte should be (0x68 << 1) = 0xD0 for write, or (0x68 << 1) | 1 = 0xD1 for read."
+    xp: 10
+    tags: [address, shift, read_write_bit]
+
+  - id: bug_i2c_no_nack
+    title: "Missing NACK on Last Byte"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      void i2c_read_bytes(uint8_t *buf, uint8_t len) {
+          for (uint8_t i = 0; i < len; i++) {
+              // Send ACK for every byte
+              send_ack();
+              buf[i] = read_byte();
+          }
+          send_stop();
+      }
+    correct_answer: "C"
+    options:
+      - "A) Should send ACK after read, not before"
+      - "B) Missing start condition"
+      - "C) Last byte must receive NACK (not ACK) to signal end of read to slave"
+      - "D) len should be uint16_t"
+    explanation: "In I2C master receive mode, the master must send NACK after the last byte to tell the slave to release the bus. Sending ACK on the last byte causes the slave to keep sending data, corrupting the stop condition."
+    xp: 15
+    tags: [nack, last_byte, master_receive]

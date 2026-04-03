@@ -1,0 +1,89 @@
+id: dma_circular_buffer
+topic_id: dma
+title: "Implement a Circular Buffer"
+difficulty: beginner
+description: |
+  Implement a circular buffer (ring buffer) commonly used with DMA transfers.
+
+  You need to implement three functions:
+
+  1. cb_init: Initialize the circular buffer with the given backing array and size.
+  2. cb_write: Write one byte to the buffer. Return 1 on success, 0 if buffer is full.
+  3. cb_read: Read one byte from the buffer into *data. Return 1 on success, 0 if buffer is empty.
+
+  The circular_buffer_t struct has: buffer (uint8_t*), size (uint32_t), head (uint32_t),
+  tail (uint32_t), and count (uint32_t).
+function_signature: "void cb_init(circular_buffer_t *cb, uint8_t *buf, uint32_t size); int cb_write(circular_buffer_t *cb, uint8_t data); int cb_read(circular_buffer_t *cb, uint8_t *data)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t *buffer;
+      uint32_t size;
+      uint32_t head;
+      uint32_t tail;
+      uint32_t count;
+  } circular_buffer_t;
+
+  void cb_init(circular_buffer_t *cb, uint8_t *buf, uint32_t size) {
+      // TODO: implement
+  }
+
+  int cb_write(circular_buffer_t *cb, uint8_t data) {
+      // TODO: implement
+  }
+
+  int cb_read(circular_buffer_t *cb, uint8_t *data) {
+      // TODO: implement
+  }
+test_harness: "circular_buffer_tests/test_main.c"
+expected_output: "circular_buffer_tests/expected_output.txt"
+hints:
+  - "Use head for write position and tail for read position."
+  - "Wrap indices using modulo: head = (head + 1) % size."
+  - "Track the count to distinguish full from empty."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t *buffer;
+      uint32_t size;
+      uint32_t head;
+      uint32_t tail;
+      uint32_t count;
+  } circular_buffer_t;
+
+  void cb_init(circular_buffer_t *cb, uint8_t *buf, uint32_t size) {
+      cb->buffer = buf;
+      cb->size = size;
+      cb->head = 0;
+      cb->tail = 0;
+      cb->count = 0;
+  }
+
+  int cb_write(circular_buffer_t *cb, uint8_t data) {
+      if (cb->count >= cb->size) {
+          return 0;
+      }
+      cb->buffer[cb->head] = data;
+      cb->head = (cb->head + 1) % cb->size;
+      cb->count++;
+      return 1;
+  }
+
+  int cb_read(circular_buffer_t *cb, uint8_t *data) {
+      if (cb->count == 0) {
+          return 0;
+      }
+      *data = cb->buffer[cb->tail];
+      cb->tail = (cb->tail + 1) % cb->size;
+      cb->count--;
+      return 1;
+  }
+solution_explanation: |
+  The circular buffer uses head (write pointer) and tail (read pointer) indices
+  that wrap around using modulo arithmetic. A count field tracks how many items
+  are in the buffer, making it easy to check for full (count == size) and empty
+  (count == 0) conditions.

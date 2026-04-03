@@ -28,3 +28,16 @@ hints:
   - "Falling edges occur where prev has 1 and curr has 0: falling = prev & ~curr. Pack them as (falling << 8) | rising."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint16_t gpio_change_detect(uint8_t prev, uint8_t curr) {
+      uint8_t rising  = ~prev & curr;
+      uint8_t falling = prev & ~curr;
+      return ((uint16_t)falling << 8) | rising;
+  }
+solution_explanation: |
+  Rising edges are detected where the previous state was 0 and current is 1
+  using ~prev & curr. Falling edges are where previous was 1 and current is 0
+  using prev & ~curr. The two results are packed into a 16-bit value with
+  falling edges in the upper byte and rising edges in the lower byte.

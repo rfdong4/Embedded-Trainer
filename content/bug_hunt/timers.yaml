@@ -1,0 +1,50 @@
+topic_id: timers
+challenges:
+  - id: bug_timer_off_by_one
+    title: "Timer Period Off-by-One"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      #define TIM2_ARR (*(volatile uint32_t*)0x4000002C)
+      #define TIM2_PSC (*(volatile uint32_t*)0x40000028)
+
+      // Want 1ms period with 72MHz clock
+      void timer_init_1ms(void) {
+          TIM2_PSC = 72;      // Prescaler: 72MHz / 72 = 1MHz
+          TIM2_ARR = 1000;    // Auto-reload: 1000 ticks = 1ms
+      }
+    correct_answer: "B"
+    options:
+      - "A) Should use TIM3 instead of TIM2"
+      - "B) Both PSC and ARR are off by one — prescaler divides by (PSC+1), counter counts to (ARR+1)"
+      - "C) The clock frequency is wrong"
+      - "D) Missing timer enable bit"
+    explanation: "Timer prescaler divides by (PSC+1) and the counter counts from 0 to ARR inclusive. So PSC should be 71 (divides by 72) and ARR should be 999 (1000 counts). This is a very common embedded bug."
+    xp: 10
+    tags: [off_by_one, prescaler, auto_reload]
+
+  - id: bug_pwm_inverted
+    title: "PWM Duty Cycle Inverted"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      // Configure 25% duty cycle PWM
+      // Timer counts 0 to 999 (ARR = 999)
+      #define TIM_CCR1 (*(volatile uint32_t*)0x40000034)
+      #define TIM_ARR  (*(volatile uint32_t*)0x4000002C)
+
+      void set_duty_25_percent(void) {
+          TIM_ARR = 999;
+          TIM_CCR1 = 750;  // 75% of 1000
+      }
+    correct_answer: "A"
+    options:
+      - "A) CCR1 should be 250 for 25% duty — 750 gives 75% (or 25% if using inverted PWM mode)"
+      - "B) ARR should be 1000"
+      - "C) Missing output enable"
+      - "D) Timer prescaler not set"
+    explanation: "In PWM mode 1 (default), the output is high when counter < CCR and low when counter >= CCR. For 25% duty with ARR=999, CCR should be 250. Setting CCR=750 gives 75% duty cycle."
+    xp: 15
+    tags: [pwm, duty_cycle, ccr]

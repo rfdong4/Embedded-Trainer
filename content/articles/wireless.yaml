@@ -1,0 +1,160 @@
+topic_id: wireless
+articles:
+  - id: ble_stack_overview
+    title: "BLE Protocol Stack Overview"
+    estimated_minutes: 6
+    content: |
+      # BLE Protocol Stack Overview
+
+      Bluetooth Low Energy (BLE) is designed for short-range, low-power wireless
+      communication. Understanding its layered protocol stack is essential for
+      embedded development.
+
+      ## Stack Layers
+
+          +---------------------+
+          |    Application      |  (User code, profiles)
+          +---------------------+
+          |       GAP           |  (Discovery, connection)
+          +---------------------+
+          |       GATT          |  (Services, characteristics)
+          +---------------------+
+          |       ATT           |  (Attribute protocol)
+          +---------------------+
+          |       L2CAP         |  (Logical link, fragmentation)
+          +---------------------+
+          |       HCI           |  (Host-Controller interface)
+          +---------------------+
+          |    Link Layer       |  (Packets, channels, hopping)
+          +---------------------+
+          |   Physical Layer    |  (2.4 GHz radio, GFSK)
+          +---------------------+
+
+      ## Physical Layer
+
+      BLE operates in the 2.4 GHz ISM band with 40 channels (2 MHz spacing):
+
+      - **3 advertising channels**: 37, 38, 39 (spaced to avoid Wi-Fi interference)
+      - **37 data channels**: 0-36 (used during connections with frequency hopping)
+      - **Modulation**: GFSK (Gaussian Frequency-Shift Keying)
+      - **Data rates**: 1 Mbps (BLE 4.x), 2 Mbps (BLE 5.0 LE 2M PHY)
+
+      ## Advertising and Scanning
+
+      A BLE peripheral advertises by broadcasting packets on channels 37, 38, 39
+      in sequence. A central device scans by listening on these channels.
+
+          // Typical advertising flow
+          Peripheral:  ADV_IND (ch37) -> ADV_IND (ch38) -> ADV_IND (ch39) -> delay -> repeat
+
+          // Advertising packet structure (simplified)
+          | Preamble | Access Addr | PDU Header | Adv Addr | Adv Data | CRC |
+          | 1 byte   | 4 bytes     | 2 bytes    | 6 bytes  | 0-31 B   | 3 B |
+
+      ## GATT: Services and Characteristics
+
+      After connection, data exchange uses GATT:
+
+      - **Service**: A collection of related data (e.g., Heart Rate Service)
+      - **Characteristic**: A single data point within a service (e.g., Heart Rate
+        Measurement). Has a value, properties (read/write/notify), and optional
+        descriptors.
+      - **UUID**: Each service and characteristic is identified by a UUID (16-bit
+        for adopted specs, 128-bit for custom).
+
+          // Example: Reading a temperature characteristic
+          Service: Environmental Sensing (UUID: 0x181A)
+            Characteristic: Temperature (UUID: 0x2A6E)
+              Value: 0x0A12  (26.42 deg C in 0.01 resolution)
+              Properties: Read, Notify
+
+      ## Connection Parameters
+
+      Key parameters negotiated during connection:
+
+      - **Connection Interval**: Time between data exchanges (7.5 ms to 4 s)
+      - **Slave Latency**: Number of connection events a peripheral can skip
+      - **Supervision Timeout**: Max time without successful packet before disconnect
+
+      These parameters trade off between latency, throughput, and power consumption.
+
+  - id: lora_modulation
+    title: "LoRa Modulation and Link Budget"
+    estimated_minutes: 5
+    content: |
+      # LoRa Modulation and Link Budget
+
+      LoRa (Long Range) is a physical-layer modulation technique designed for
+      long-range, low-power, low-data-rate communication in IoT applications.
+
+      ## Chirp Spread Spectrum (CSS)
+
+      LoRa uses CSS modulation where the carrier frequency continuously sweeps
+      (chirps) across the bandwidth:
+
+      - **Up-chirp**: Frequency increases linearly from f_min to f_max
+      - **Down-chirp**: Frequency decreases linearly from f_max to f_min
+      - **Data encoding**: Information is encoded in the initial frequency offset
+        of each chirp symbol
+
+          Frequency
+          ^
+          |    /|    /|    /|
+          |   / |   / |   / |    <- Up-chirps (symbols)
+          |  /  |  /  |  /  |
+          | /   | /   | /   |
+          +-----|-----|-------> Time
+
+      ## Spreading Factor (SF)
+
+      The spreading factor (SF7 to SF12) controls how many chirps represent one
+      symbol:
+
+      | SF  | Chips/Symbol | Bit Rate (125kHz BW) | Sensitivity  |
+      |-----|-------------|---------------------|-------------|
+      | SF7 | 128         | 5.47 kbps           | -123 dBm   |
+      | SF8 | 256         | 3.13 kbps           | -126 dBm   |
+      | SF9 | 512         | 1.76 kbps           | -129 dBm   |
+      | SF10| 1024        | 0.98 kbps           | -132 dBm   |
+      | SF11| 2048        | 0.54 kbps           | -134.5 dBm |
+      | SF12| 4096        | 0.29 kbps           | -137 dBm   |
+
+      Higher SF = more chips per symbol = easier to decode in noise = longer range
+      but slower data rate.
+
+      ## Link Budget Calculation
+
+      Link budget determines the maximum communication distance:
+
+          Link Budget (dB) = TX Power (dBm) - Receiver Sensitivity (dBm)
+
+          Example:
+          TX Power = +14 dBm
+          Receiver Sensitivity = -137 dBm (SF12, 125 kHz BW)
+          Link Budget = 14 - (-137) = 151 dB
+
+      Free-space path loss at 868 MHz:
+
+          FSPL (dB) = 20*log10(d) + 20*log10(f) - 147.55
+          where d = distance in meters, f = frequency in Hz
+
+      With a 151 dB link budget, the theoretical free-space range exceeds 15 km.
+      Real-world range is 2-5 km (urban) to 10-15 km (rural) due to obstacles.
+
+      ## LoRa Packet Structure
+
+          | Preamble | Sync Word | Header | Payload | CRC |
+          | 8+ syms  | 2 syms    | (opt)  | N bytes | 2 B |
+
+      - **Preamble**: Sequence of up-chirps for receiver synchronization
+      - **Sync Word**: Identifies the network (0x12 for private, 0x34 for LoRaWAN)
+      - **Header**: Optional, contains payload length and coding rate
+      - **CRC**: Error detection for the payload
+
+      ## LoRaWAN
+
+      LoRaWAN is a MAC-layer protocol on top of LoRa that defines:
+
+      - **Device classes**: A (lowest power), B (beacon-scheduled), C (continuous RX)
+      - **Adaptive Data Rate (ADR)**: Server adjusts SF based on link quality
+      - **Security**: AES-128 encryption with separate network and application keys

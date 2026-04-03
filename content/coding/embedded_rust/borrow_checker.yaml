@@ -1,0 +1,119 @@
+id: embedded_rust_borrow_checker
+topic_id: embedded_rust
+title: "Borrow Checker Simulation"
+difficulty: advanced
+description: |
+  Simulate Rust's borrow checker rules in C. Rust enforces that at any time,
+  a value can have either:
+  - Multiple immutable borrows (&T), OR
+  - Exactly one mutable borrow (&mut T)
+  But never both simultaneously.
+
+  Implement a borrow tracker using a BorrowState struct:
+
+  typedef struct {
+      int immutable_count;   // number of active immutable borrows
+      int mutable_active;    // 1 if a mutable borrow is active, 0 otherwise
+  } BorrowState;
+
+  Functions:
+  - borrow_init: Initialize the borrow state (zero borrows)
+  - borrow_immutable: Try to take an immutable borrow. Succeeds (returns 1)
+    if no mutable borrow is active. Fails (returns 0) otherwise.
+  - borrow_mutable: Try to take a mutable borrow. Succeeds (returns 1) only
+    if no borrows of any kind are active. Fails (returns 0) otherwise.
+  - release_immutable: Release one immutable borrow. Returns 1 on success,
+    0 if no immutable borrows are active.
+  - release_mutable: Release the mutable borrow. Returns 1 on success,
+    0 if no mutable borrow is active.
+function_signature: |
+  void borrow_init(BorrowState *state);
+  int borrow_immutable(BorrowState *state);
+  int borrow_mutable(BorrowState *state);
+  int release_immutable(BorrowState *state);
+  int release_mutable(BorrowState *state);
+skeleton_code: |
+  #include <stdint.h>
+
+  /* Simulates Rust's borrow checker:
+   * - Multiple immutable borrows (&T) are allowed simultaneously
+   * - Only one mutable borrow (&mut T) is allowed, with no other borrows
+   * - Rust enforces this at compile time; here we check at runtime */
+
+  typedef struct {
+      int immutable_count;
+      int mutable_active;
+  } BorrowState;
+
+  void borrow_init(BorrowState *state) {
+      // TODO: initialize to zero borrows
+  }
+
+  int borrow_immutable(BorrowState *state) {
+      // TODO: allow if no mutable borrow is active
+  }
+
+  int borrow_mutable(BorrowState *state) {
+      // TODO: allow only if no borrows of any kind are active
+  }
+
+  int release_immutable(BorrowState *state) {
+      // TODO: decrement immutable count if > 0
+  }
+
+  int release_mutable(BorrowState *state) {
+      // TODO: clear mutable flag if active
+  }
+test_harness: "borrow_checker_tests/test_main.c"
+expected_output: "borrow_checker_tests/expected_output.txt"
+hints:
+  - "borrow_mutable must check that immutable_count == 0 AND mutable_active == 0"
+  - "borrow_immutable must check that mutable_active == 0"
+xp: 50
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  /* Simulates Rust's borrow checker:
+   * - Multiple immutable borrows (&T) are allowed simultaneously
+   * - Only one mutable borrow (&mut T) is allowed, with no other borrows
+   * - Rust enforces this at compile time; here we check at runtime */
+
+  typedef struct {
+      int immutable_count;
+      int mutable_active;
+  } BorrowState;
+
+  void borrow_init(BorrowState *state) {
+      state->immutable_count = 0;
+      state->mutable_active = 0;
+  }
+
+  int borrow_immutable(BorrowState *state) {
+      if (state->mutable_active) return 0;
+      state->immutable_count++;
+      return 1;
+  }
+
+  int borrow_mutable(BorrowState *state) {
+      if (state->immutable_count > 0 || state->mutable_active) return 0;
+      state->mutable_active = 1;
+      return 1;
+  }
+
+  int release_immutable(BorrowState *state) {
+      if (state->immutable_count <= 0) return 0;
+      state->immutable_count--;
+      return 1;
+  }
+
+  int release_mutable(BorrowState *state) {
+      if (!state->mutable_active) return 0;
+      state->mutable_active = 0;
+      return 1;
+  }
+solution_explanation: |
+  This simulates Rust's core borrowing invariant: you can have either multiple
+  readers (&T) or one writer (&mut T), but not both. In Rust, the compiler
+  enforces this at compile time through lifetime analysis. This C version does
+  the same checks at runtime, returning failure for invalid borrow attempts.

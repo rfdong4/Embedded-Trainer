@@ -37,3 +37,17 @@ hints:
   - "rx_buf[0] = cmd ^ pattern; for i in 0..len-1: rx_buf[i+1] = tx_data[i] ^ pattern."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  void spi_multi_transfer(uint8_t cmd, const uint8_t *tx_data, uint8_t *rx_buf, uint8_t len, uint8_t pattern) {
+      rx_buf[0] = cmd ^ pattern;
+      for (uint8_t i = 0; i < len; i++) {
+          rx_buf[i + 1] = tx_data[i] ^ pattern;
+      }
+  }
+solution_explanation: |
+  The function simulates full-duplex SPI by XORing each transmitted byte with the
+  device response pattern. The command byte response goes into rx_buf[0], and each
+  subsequent data byte response goes into rx_buf[i+1], producing len+1 total
+  received bytes.

@@ -50,3 +50,51 @@ hints:
   - "To get the block index from a pointer, cast to uint8_t* and compute (ptr - &pool_memory[0][0]) / POOL_BLOCK_SIZE."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+  #include <stddef.h>
+
+  #define POOL_BLOCK_SIZE 64
+  #define POOL_NUM_BLOCKS 16
+
+  static uint8_t pool_memory[POOL_NUM_BLOCKS][POOL_BLOCK_SIZE];
+  static uint16_t pool_bitmap;
+
+  void pool_init(void) {
+      pool_bitmap = 0;
+  }
+
+  void* pool_alloc(void) {
+      for (int i = 0; i < POOL_NUM_BLOCKS; i++) {
+          if (!(pool_bitmap & (1U << i))) {
+              pool_bitmap |= (1U << i);
+              return &pool_memory[i][0];
+          }
+      }
+      return NULL;
+  }
+
+  void pool_free(void* ptr) {
+      uint8_t *p = (uint8_t *)ptr;
+      uint8_t *base = &pool_memory[0][0];
+      if (p < base || p >= base + POOL_NUM_BLOCKS * POOL_BLOCK_SIZE) return;
+      uint32_t offset = (uint32_t)(p - base);
+      if (offset % POOL_BLOCK_SIZE != 0) return;
+      uint32_t index = offset / POOL_BLOCK_SIZE;
+      pool_bitmap &= ~(1U << index);
+  }
+
+  int pool_count_free(void) {
+      int count = 0;
+      for (int i = 0; i < POOL_NUM_BLOCKS; i++) {
+          if (!(pool_bitmap & (1U << i))) {
+              count++;
+          }
+      }
+      return count;
+  }
+solution_explanation: |
+  A uint16_t bitmap tracks 16 blocks where each bit represents one block's allocation
+  status. pool_alloc finds the lowest clear bit, sets it, and returns the block pointer.
+  pool_free computes the block index from the pointer offset and clears the corresponding
+  bit, ignoring pointers outside the pool. pool_count_free counts zero bits in the bitmap.

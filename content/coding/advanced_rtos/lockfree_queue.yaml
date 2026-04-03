@@ -1,0 +1,88 @@
+id: advanced_rtos_lockfree_queue
+topic_id: advanced_rtos
+title: "Lock-Free SPSC Queue"
+difficulty: advanced
+description: |
+  Implement a lock-free single-producer single-consumer (SPSC) circular queue.
+
+  This pattern is safe without mutexes when exactly one task writes and
+  one task reads, because head and tail are each modified by only one side.
+
+  Implement:
+  - `spsc_init`: Initialize the queue
+  - `spsc_push`: Add an element. Return 1 on success, 0 if full.
+  - `spsc_pop`: Remove an element into *out. Return 1 on success, 0 if empty.
+
+  The queue capacity is QUEUE_SIZE - 1 (one slot wasted to distinguish
+  full from empty).
+function_signature: "void spsc_init(SPSCQueue *q); uint8_t spsc_push(SPSCQueue *q, uint32_t value); uint8_t spsc_pop(SPSCQueue *q, uint32_t *out)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define QUEUE_SIZE 8
+
+  typedef struct {
+      uint32_t buffer[QUEUE_SIZE];
+      uint32_t head;  /* Next write position (producer) */
+      uint32_t tail;  /* Next read position (consumer) */
+  } SPSCQueue;
+
+  void spsc_init(SPSCQueue *q) {
+      // TODO: implement
+  }
+
+  uint8_t spsc_push(SPSCQueue *q, uint32_t value) {
+      // TODO: return 0 if full
+  }
+
+  uint8_t spsc_pop(SPSCQueue *q, uint32_t *out) {
+      // TODO: return 0 if empty
+  }
+test_harness: "lockfree_queue_tests/test_main.c"
+expected_output: "lockfree_queue_tests/expected_output.txt"
+hints:
+  - "Full condition: (head + 1) % QUEUE_SIZE == tail"
+  - "Empty condition: head == tail"
+  - "Write at buffer[head], then advance head. Read at buffer[tail], then advance tail."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define QUEUE_SIZE 8
+
+  typedef struct {
+      uint32_t buffer[QUEUE_SIZE];
+      uint32_t head;
+      uint32_t tail;
+  } SPSCQueue;
+
+  void spsc_init(SPSCQueue *q) {
+      q->head = 0;
+      q->tail = 0;
+  }
+
+  uint8_t spsc_push(SPSCQueue *q, uint32_t value) {
+      uint32_t next_head = (q->head + 1) % QUEUE_SIZE;
+      if (next_head == q->tail) {
+          return 0;  /* Full */
+      }
+      q->buffer[q->head] = value;
+      q->head = next_head;
+      return 1;
+  }
+
+  uint8_t spsc_pop(SPSCQueue *q, uint32_t *out) {
+      if (q->head == q->tail) {
+          return 0;  /* Empty */
+      }
+      *out = q->buffer[q->tail];
+      q->tail = (q->tail + 1) % QUEUE_SIZE;
+      return 1;
+  }
+solution_explanation: |
+  The SPSC queue uses a circular buffer with head (write) and tail (read)
+  indices. It's lock-free because head is only written by the producer and
+  tail only by the consumer. One slot is sacrificed to distinguish full
+  (next_head == tail) from empty (head == tail). This pattern is widely
+  used in embedded systems for ISR-to-task communication.

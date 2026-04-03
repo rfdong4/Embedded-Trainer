@@ -21,3 +21,16 @@ hints:
   - "Byte 0 goes to position 3, byte 1 to position 2, etc."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t swap_endian(uint32_t value) {
+      return ((value >> 24) & 0xFF) |
+             ((value >>  8) & 0xFF00) |
+             ((value <<  8) & 0xFF0000) |
+             ((value << 24) & 0xFF000000);
+  }
+solution_explanation: |
+  Each of the four bytes is extracted using shifts and masks, then placed in the reversed
+  position. Byte 0 (LSB) moves to byte 3 (MSB) and vice versa, and bytes 1 and 2 swap
+  positions. The four repositioned bytes are ORed together to form the result.

@@ -1,0 +1,134 @@
+topic_id: dma
+topic_name: "DMA & Zero-Copy Transfers"
+questions:
+  - id: dma_q01
+    type: mcq
+    difficulty: beginner
+    text: "What does DMA stand for in embedded systems?"
+    options:
+      - "A) Direct Memory Allocation"
+      - "B) Direct Memory Access"
+      - "C) Dynamic Memory Addressing"
+      - "D) Dual Mode Architecture"
+    correct: "B"
+    explanation: "DMA stands for Direct Memory Access. It allows peripherals to transfer data to/from memory without CPU intervention, freeing the processor for other tasks."
+    tags: [dma, basics]
+    xp: 10
+
+  - id: dma_q02
+    type: true_false
+    difficulty: beginner
+    text: "A DMA transfer can move data between a peripheral and memory without involving the CPU after the transfer is configured."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "This is the primary advantage of DMA. Once the CPU configures the DMA channel (source, destination, length), the DMA controller handles the entire transfer autonomously, allowing the CPU to perform other work."
+    tags: [dma, basics, cpu_offload]
+    xp: 10
+
+  - id: dma_q03
+    type: mcq
+    difficulty: beginner
+    text: "Which of the following is NOT a typical DMA transfer mode?"
+    options:
+      - "A) Memory-to-memory"
+      - "B) Peripheral-to-memory"
+      - "C) Memory-to-peripheral"
+      - "D) Register-to-register"
+    correct: "D"
+    explanation: "DMA typically supports memory-to-memory, peripheral-to-memory, and memory-to-peripheral transfers. Register-to-register transfers are handled directly by the CPU since registers are part of the CPU core, not the memory bus."
+    tags: [dma, transfer_modes]
+    xp: 10
+
+  - id: dma_q04
+    type: mcq
+    difficulty: intermediate
+    text: "What is a circular buffer in the context of DMA?"
+    options:
+      - "A) A buffer that can only store circular data structures"
+      - "B) A buffer where the DMA automatically wraps back to the start address when it reaches the end"
+      - "C) A buffer that rotates data bits in a circle"
+      - "D) A buffer shared between two DMA channels"
+    correct: "B"
+    explanation: "In circular DMA mode, when the DMA reaches the end of the buffer, it automatically wraps the address pointer back to the beginning. This is essential for continuous data streams like ADC sampling or audio, where data must be received without interruption."
+    tags: [dma, circular_buffer]
+    xp: 15
+
+  - id: dma_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is scatter-gather DMA?"
+    options:
+      - "A) A mode where DMA scatters data randomly across memory"
+      - "B) A mode where a linked list of descriptors defines multiple non-contiguous transfers"
+      - "C) A mode where multiple DMA channels share the same buffer"
+      - "D) A mode where DMA gathers data from the CPU cache"
+    correct: "B"
+    explanation: "Scatter-gather DMA uses a linked list of descriptors, each specifying a source, destination, and length. This allows the DMA to transfer data between non-contiguous memory regions in a single logical operation without CPU intervention between segments."
+    tags: [dma, scatter_gather]
+    xp: 15
+
+  - id: dma_q06
+    type: mcq
+    difficulty: intermediate
+    text: "In a system with both CPU and DMA accessing the bus, what mechanism prevents conflicts?"
+    options:
+      - "A) Clock gating"
+      - "B) Bus arbitration"
+      - "C) Interrupt masking"
+      - "D) Voltage regulation"
+    correct: "B"
+    explanation: "Bus arbitration determines which master (CPU or DMA) gets access to the bus when both request it simultaneously. Common schemes include fixed priority (DMA often has higher priority to meet timing) and round-robin arbitration."
+    tags: [dma, bus_arbitration]
+    xp: 15
+
+  - id: dma_q07
+    type: true_false
+    difficulty: intermediate
+    text: "Zero-copy means data is transferred from source to destination without being copied into an intermediate buffer by the CPU."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Zero-copy techniques eliminate unnecessary data copies. With DMA, data can move directly from a peripheral's data register to the final destination buffer in memory, avoiding the CPU copying data through an intermediate buffer, which saves both CPU cycles and memory bandwidth."
+    tags: [dma, zero_copy]
+    xp: 15
+
+  - id: dma_q08
+    type: mcq
+    difficulty: advanced
+    text: "What is double buffering in the context of DMA transfers?"
+    options:
+      - "A) Using two DMA channels for the same peripheral"
+      - "B) Alternating between two buffers so one can be processed while the other is being filled"
+      - "C) Duplicating every byte transferred for error checking"
+      - "D) Using twice the normal buffer size for overflow protection"
+    correct: "B"
+    explanation: "Double buffering uses two memory buffers alternately. While the DMA fills one buffer, the application processes the other. When the DMA completes one buffer, it switches to the other, and the roles swap. This ensures continuous data flow without gaps."
+    tags: [dma, double_buffer]
+    xp: 20
+
+  - id: dma_q09
+    type: mcq
+    difficulty: advanced
+    text: "Why must source and destination addresses in a DMA transfer often be aligned to the transfer width?"
+    options:
+      - "A) To simplify the DMA driver software"
+      - "B) Because unaligned access may cause bus faults or require multiple bus cycles"
+      - "C) To reduce power consumption during transfer"
+      - "D) Because the DMA controller only supports power-of-2 addresses"
+    correct: "B"
+    explanation: "Many bus architectures require aligned memory access. For example, a 32-bit (word) transfer requires the address to be 4-byte aligned. Unaligned access may trigger a hard fault on ARM Cortex-M or result in multiple bus transactions, reducing throughput."
+    tags: [dma, alignment, bus]
+    xp: 20
+
+  - id: dma_q10
+    type: mcq
+    difficulty: advanced
+    text: "Which DMA interrupt is used to detect that the DMA transfer has completed the first half of a circular buffer?"
+    options:
+      - "A) Transfer complete interrupt"
+      - "B) Transfer error interrupt"
+      - "C) Half-transfer interrupt"
+      - "D) FIFO overrun interrupt"
+    correct: "C"
+    explanation: "The half-transfer interrupt fires when the DMA has transferred half the configured number of items in circular mode. This is commonly used in double-buffering schemes: the application processes the first half of the buffer while the DMA fills the second half, and vice versa."
+    tags: [dma, interrupts, circular_buffer]
+    xp: 20

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from embedded_trainer.models.question import CodingChallenge, Question
+from embedded_trainer.models.question import BugHuntChallenge, CodingChallenge, Question
 
 
 def _find_content_dir() -> Path:
@@ -91,6 +91,8 @@ def load_coding_challenges(topic_id: str) -> list[CodingChallenge]:
             xp_value=c.get("xp", 25),
             hints=c.get("hints", []),
             time_limit_seconds=c.get("time_limit", 5),
+            solution=c.get("solution", ""),
+            solution_explanation=c.get("solution_explanation", ""),
         ))
     return challenges
 
@@ -102,6 +104,42 @@ def load_coding_challenge(topic_id: str, challenge_id: str) -> CodingChallenge |
         if c.id == challenge_id:
             return c
     return None
+
+
+def load_bug_hunt_challenges(topic_id: str) -> list[BugHuntChallenge]:
+    """Load all bug hunt challenges for a given topic."""
+    bug_hunt_file = get_content_dir() / "bug_hunt" / f"{topic_id}.yaml"
+    if not bug_hunt_file.exists():
+        return []
+    with open(bug_hunt_file) as f:
+        data = yaml.safe_load(f)
+
+    challenges = []
+    for c in data.get("challenges", []):
+        challenges.append(BugHuntChallenge(
+            id=c["id"],
+            topic_id=data.get("topic_id", topic_id),
+            title=c["title"],
+            difficulty=c.get("difficulty", "beginner"),
+            buggy_code=c["buggy_code"],
+            bug_description=c.get("bug_description", ""),
+            correct_answer=c["correct_answer"],
+            options=c["options"],
+            explanation=c.get("explanation", ""),
+            xp_value=c.get("xp", 15),
+            tags=c.get("tags", []),
+        ))
+    return challenges
+
+
+def load_register_exercises(topic_id: str) -> list[dict]:
+    """Load register simulator exercises for a given topic."""
+    reg_file = get_content_dir() / "register_sim" / f"{topic_id}.yaml"
+    if not reg_file.exists():
+        return []
+    with open(reg_file) as f:
+        data = yaml.safe_load(f)
+    return data.get("exercises", [])
 
 
 def load_articles(topic_id: str) -> list[dict]:

@@ -1,0 +1,66 @@
+topic_id: timers
+exercises:
+  - id: timer_cr1_config
+    title: "Timer Control Register Setup"
+    difficulty: intermediate
+    register_name: TIM2_CR1
+    address: "0x4000_0000"
+    initial_value: 0
+    bit_width: 32
+    description: |
+      ## Timer CR1 (Control Register 1)
+
+      Key bits in TIM2_CR1:
+      - **Bit 0** (CEN): Counter enable
+      - **Bit 1** (UDIS): Update disable
+      - **Bit 2** (URS): Update request source
+      - **Bit 3** (OPM): One-pulse mode
+      - **Bit 4** (DIR): Direction (0=up, 1=down)
+      - **Bits [6:5]** (CMS): Center-aligned mode
+      - **Bit 7** (ARPE): Auto-reload preload enable
+    xp: 20
+    steps:
+      - instruction: "Enable auto-reload preload (set bit 7, ARPE)"
+        expected_value: 0x00000080
+        hint: "Use: reg |= (1 << 7)"
+        explanation: "ARPE enables buffered auto-reload — changes take effect at next update event."
+      - instruction: "Set direction to down-counting (set bit 4, DIR)"
+        expected_value: 0x00000090
+        hint: "Use: reg |= (1 << 4)"
+        explanation: "DIR=1 makes the counter count downward."
+      - instruction: "Enable the counter (set bit 0, CEN)"
+        expected_value: 0x00000091
+        hint: "Use: reg |= (1 << 0)"
+        explanation: "CEN=1 starts the counter. Timer is now running in down-count mode with ARPE."
+
+  - id: timer_ccmr_pwm
+    title: "PWM Mode Configuration"
+    difficulty: advanced
+    register_name: TIM2_CCMR1
+    address: "0x4000_0018"
+    initial_value: 0
+    bit_width: 32
+    description: |
+      ## Timer CCMR1 (Capture/Compare Mode Register)
+
+      Channel 1 output compare configuration (bits [6:0]):
+      - **Bits [1:0]** (CC1S): Capture/compare selection (00=output)
+      - **Bit 2** (OC1FE): Output compare fast enable
+      - **Bit 3** (OC1PE): Output compare preload enable
+      - **Bits [6:4]** (OC1M): Output compare mode
+        - `110` = PWM mode 1
+        - `111` = PWM mode 2
+    xp: 25
+    steps:
+      - instruction: "Set CC1S to output mode (bits [1:0] = 00 — already default)"
+        expected_value: 0x00000000
+        hint: "Output mode is the default (00). No change needed — just enter: reg = 0"
+        explanation: "CC1S = 00 means the channel is configured as output."
+      - instruction: "Enable output compare preload (set bit 3, OC1PE)"
+        expected_value: 0x00000008
+        hint: "Use: reg |= (1 << 3)"
+        explanation: "Preload ensures CCR changes take effect at the next update event."
+      - instruction: "Set PWM mode 1 (bits [6:4] = 110)"
+        expected_value: 0x00000068
+        hint: "PWM mode 1 = 110 binary = 6 decimal. Use: reg |= (6 << 4)"
+        explanation: "OC1M = 110 sets PWM mode 1: output high when counter < CCR."

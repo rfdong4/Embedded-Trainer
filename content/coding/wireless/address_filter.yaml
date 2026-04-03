@@ -1,0 +1,45 @@
+id: wireless_address_filter
+topic_id: wireless
+title: "Address Filter with Mask"
+difficulty: beginner
+description: |
+  Implement a function that checks whether a received 32-bit address matches a
+  filter address, considering a bitmask.
+
+  In wireless protocols, address filtering allows a receiver to accept packets
+  only from specific addresses. A mask specifies which bits of the address are
+  significant for matching.
+
+  The comparison: (received & mask) == (filter & mask)
+
+  Parameters:
+  - received_addr: the 32-bit address from the received packet
+  - filter_addr: the configured filter address
+  - mask: bitmask indicating which bits to compare (1 = compare, 0 = ignore)
+
+  Return 1 if the address matches, 0 otherwise.
+function_signature: "int address_match(uint32_t received_addr, uint32_t filter_addr, uint32_t mask)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int address_match(uint32_t received_addr, uint32_t filter_addr, uint32_t mask) {
+      // TODO: implement
+  }
+test_harness: "address_filter_tests/test_main.c"
+expected_output: "address_filter_tests/expected_output.txt"
+hints:
+  - "Apply the mask to both addresses before comparing."
+  - "Use bitwise AND to apply the mask."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int address_match(uint32_t received_addr, uint32_t filter_addr, uint32_t mask) {
+      return (received_addr & mask) == (filter_addr & mask) ? 1 : 0;
+  }
+solution_explanation: |
+  The function applies the mask to both the received address and the filter
+  address using bitwise AND, then compares the results. Only the bits set in
+  the mask are considered; all other bits are zeroed out and ignored. This is
+  how hardware address filters work in wireless transceivers.

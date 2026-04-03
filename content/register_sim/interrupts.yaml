@@ -1,0 +1,36 @@
+topic_id: interrupts
+exercises:
+  - id: nvic_iser_config
+    title: "NVIC Interrupt Enable"
+    difficulty: beginner
+    register_name: NVIC_ISER0
+    address: "0xE000_E100"
+    initial_value: 0
+    bit_width: 32
+    description: |
+      ## NVIC ISER (Interrupt Set-Enable Register)
+
+      Each bit enables the corresponding interrupt:
+      - **Bit N** = IRQ N enable
+      - Writing 1 enables the interrupt
+      - Writing 0 has no effect (use ICER to disable)
+
+      Common IRQ numbers (Cortex-M):
+      - IRQ 6: EXTI0 (external interrupt line 0)
+      - IRQ 15: SysTick
+      - IRQ 28: USART1
+      - IRQ 29: USART2
+    xp: 15
+    steps:
+      - instruction: "Enable EXTI0 interrupt (set bit 6)"
+        expected_value: 0x00000040
+        hint: "Use: reg |= (1 << 6)"
+        explanation: "Bit 6 enables IRQ 6 (EXTI0)."
+      - instruction: "Also enable USART1 interrupt (set bit 28)"
+        expected_value: 0x10000040
+        hint: "Use: reg |= (1 << 28)"
+        explanation: "Bit 28 enables IRQ 28 (USART1). Both EXTI0 and USART1 are now enabled."
+      - instruction: "Also enable USART2 interrupt (set bit 29)"
+        expected_value: 0x30000040
+        hint: "Use: reg |= (1 << 29)"
+        explanation: "Three interrupts are now enabled: EXTI0, USART1, USART2."

@@ -23,8 +23,20 @@ HomeScreen {
 
 #mode-buttons {
     layout: horizontal;
-    height: 7;
-    margin: 1 2;
+    height: 5;
+    margin: 1 2 0 2;
+}
+
+#mode-buttons-2 {
+    layout: horizontal;
+    height: 5;
+    margin: 0 2;
+}
+
+#mode-buttons-3 {
+    layout: horizontal;
+    height: 5;
+    margin: 0 2;
 }
 
 #recent-activity {

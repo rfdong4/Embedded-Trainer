@@ -78,3 +78,67 @@ topics:
     quiz_count: 10
     coding_count: 3
     prerequisites: [interrupts, memory_management]
+
+  - id: dma
+    name: "DMA & Zero-Copy"
+    difficulty: intermediate
+    description: "DMA controllers, circular buffers, scatter-gather, and zero-copy transfers"
+    quiz_count: 10
+    coding_count: 6
+    prerequisites: [memory_management, interrupts]
+
+  - id: low_power
+    name: "Low-Power Modes"
+    difficulty: intermediate
+    description: "Sleep/stop/standby modes, wake sources, clock gating, and power domains"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: [registers, interrupts]
+
+  - id: embedded_security
+    name: "Embedded Security"
+    difficulty: advanced
+    description: "Secure boot, TrustZone, hardware crypto, key storage, and fault injection"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: [memory_management]
+
+  - id: wireless
+    name: "Wireless Protocols"
+    difficulty: advanced
+    description: "BLE, LoRa, Thread/Matter, Zigbee, and packet-level operations"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: [uart, spi, i2c]
+
+  - id: riscv
+    name: "RISC-V Architecture"
+    difficulty: intermediate
+    description: "CSRs, privilege modes, trap handling, and custom extensions"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: [registers]
+
+  - id: embedded_rust
+    name: "Embedded Rust"
+    difficulty: advanced
+    description: "no_std, ownership for safety, PACs, HALs, and RAII patterns"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: [memory_management]
+
+  - id: functional_safety
+    name: "Functional Safety"
+    difficulty: advanced
+    description: "ISO 26262, ASIL levels, watchdogs, redundancy, MPU, and CRC validation"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: [interrupts, memory_management]
+
+  - id: advanced_rtos
+    name: "Advanced RTOS"
+    difficulty: advanced
+    description: "Memory pools, event groups, software timers, tickless idle, and multicore"
+    quiz_count: 10
+    coding_count: 5
+    prerequisites: [rtos_basics]

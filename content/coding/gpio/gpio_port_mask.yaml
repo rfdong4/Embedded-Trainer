@@ -28,3 +28,13 @@ hints:
   - "The formula is: (port & ~mask) | (values & mask)."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t gpio_masked_write(uint8_t port, uint8_t mask, uint8_t values) {
+      return (port & ~mask) | (values & mask);
+  }
+solution_explanation: |
+  The masked write clears the bits indicated by the mask using AND with the
+  inverted mask, then sets the desired values for those bits using AND with
+  the mask followed by OR. Bits outside the mask are preserved unchanged.

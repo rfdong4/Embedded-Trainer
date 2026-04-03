@@ -22,3 +22,14 @@ hints:
   - "Formula: (addr + alignment - 1) & ~(alignment - 1)"
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t align_up(uint32_t addr, uint32_t alignment) {
+      return (addr + alignment - 1) & ~(alignment - 1);
+  }
+solution_explanation: |
+  For power-of-2 alignment, (alignment - 1) creates a bitmask of the low bits. Adding
+  (alignment - 1) to the address ensures it rounds up, then ANDing with the inverted mask
+  clears the low bits to snap to the next aligned boundary. If already aligned, the addition
+  does not cross the boundary so the address is returned unchanged.

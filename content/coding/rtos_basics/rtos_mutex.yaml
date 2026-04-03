@@ -56,3 +56,47 @@ hints:
   - "In mutex_unlock, verify that the caller's task_id matches the owner before releasing."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t locked;
+      uint8_t owner;
+  } Mutex;
+
+  void mutex_init(Mutex *m) {
+      m->locked = 0;
+      m->owner = 0;
+  }
+
+  int mutex_lock(Mutex *m, uint8_t task_id) {
+      if (!m->locked) {
+          m->locked = 1;
+          m->owner = task_id;
+          return 1;
+      }
+      return 0;
+  }
+
+  int mutex_unlock(Mutex *m, uint8_t task_id) {
+      if (m->locked && m->owner == task_id) {
+          m->locked = 0;
+          m->owner = 0;
+          return 1;
+      }
+      return 0;
+  }
+
+  int mutex_try_lock(Mutex *m, uint8_t task_id) {
+      return mutex_lock(m, task_id);
+  }
+
+  uint8_t mutex_get_owner(Mutex *m) {
+      if (!m->locked) return 0;
+      return m->owner;
+  }
+solution_explanation: |
+  The mutex tracks ownership via a locked flag and owner task_id. mutex_lock only
+  succeeds when unlocked, setting the owner. mutex_unlock only succeeds when the
+  caller matches the current owner. mutex_try_lock has identical behavior to
+  mutex_lock for this non-blocking implementation.

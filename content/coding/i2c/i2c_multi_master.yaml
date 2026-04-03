@@ -41,3 +41,21 @@ hints:
   - "XOR the addresses to find differing bits. The highest set bit in the XOR result is where they first differ. The master with 0 at that position wins."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t i2c_arbitrate(uint8_t addr1, uint8_t addr2) {
+      for (int i = 7; i >= 0; i--) {
+          uint8_t bit1 = (addr1 >> i) & 1;
+          uint8_t bit2 = (addr2 >> i) & 1;
+          if (bit1 != bit2) {
+              return (bit1 == 0) ? 1 : 2;
+          }
+      }
+      return 0;
+  }
+solution_explanation: |
+  The function compares the two addresses bit by bit from MSB (bit 7) to LSB
+  (bit 0). At the first differing bit position, the master sending 0 wins
+  because 0 dominates on the open-drain I2C bus (wired-AND logic). If all
+  bits match, it returns 0 indicating a tie.

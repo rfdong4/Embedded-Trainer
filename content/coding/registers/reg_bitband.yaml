@@ -29,3 +29,15 @@ hints:
   - "Then alias = 0x42000000 + (byte_offset * 32) + (bit_num * 4)."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t calc_bitband_addr(uint32_t periph_addr, uint8_t bit_num) {
+      uint32_t byte_offset = periph_addr - 0x40000000;
+      return 0x42000000 + (byte_offset * 32) + (bit_num * 4);
+  }
+solution_explanation: |
+  The Cortex-M bit-band formula maps each bit in the peripheral region to a
+  unique 32-bit word in the alias region. The byte offset from the peripheral
+  base is multiplied by 32 (bits per byte times 4 bytes per alias word), and
+  the bit number is multiplied by 4 (each bit maps to one 32-bit word).

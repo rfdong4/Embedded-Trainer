@@ -48,3 +48,35 @@ hints:
   - "For worst-case, iterate all ISRs and track the maximum using calc_isr_latency for each."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t body_cycles;
+      int is_nested;
+  } ISR_Timing;
+
+  uint32_t calc_isr_latency(uint32_t entry, uint32_t body,
+                             uint32_t exit_oh, uint32_t preempt_cost,
+                             int is_nested) {
+      uint32_t total = entry + body + exit_oh;
+      if (is_nested) total += preempt_cost;
+      return total;
+  }
+
+  uint32_t calc_worst_case_latency(const ISR_Timing *isrs, uint32_t count,
+                                    uint32_t entry, uint32_t exit_oh,
+                                    uint32_t preempt_cost) {
+      uint32_t worst = 0;
+      for (uint32_t i = 0; i < count; i++) {
+          uint32_t lat = calc_isr_latency(entry, isrs[i].body_cycles,
+                                           exit_oh, preempt_cost,
+                                           isrs[i].is_nested);
+          if (lat > worst) worst = lat;
+      }
+      return worst;
+  }
+solution_explanation: |
+  calc_isr_latency sums entry overhead, body cycles, and exit overhead, adding the
+  preemption cost only when is_nested is true. calc_worst_case_latency iterates all
+  ISR descriptors, computes each latency, and returns the maximum value found.

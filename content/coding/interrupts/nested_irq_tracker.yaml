@@ -54,3 +54,40 @@ hints:
   - "The active IRQ is at irq_stack[irq_depth - 1] when depth > 0."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define IRQ_MAX_DEPTH 8
+
+  static uint8_t irq_stack[IRQ_MAX_DEPTH];
+  static int irq_depth;
+
+  void irq_tracker_init(void) {
+      irq_depth = 0;
+  }
+
+  void irq_enter(uint8_t irq) {
+      if (irq_depth < IRQ_MAX_DEPTH) {
+          irq_stack[irq_depth] = irq;
+          irq_depth++;
+      }
+  }
+
+  void irq_exit(void) {
+      if (irq_depth > 0) {
+          irq_depth--;
+      }
+  }
+
+  int irq_get_depth(void) {
+      return irq_depth;
+  }
+
+  int irq_get_active(void) {
+      if (irq_depth == 0) return -1;
+      return irq_stack[irq_depth - 1];
+  }
+solution_explanation: |
+  The tracker uses a static array as a stack with irq_depth as the index. irq_enter
+  pushes the IRQ number at the current depth and increments, while irq_exit simply
+  decrements. irq_get_active returns the top-of-stack element, or -1 when empty.

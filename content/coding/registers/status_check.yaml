@@ -29,3 +29,14 @@ hints:
   - "Use (psr >> bit_pos) & 1 to extract the flag."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t check_psr_flag(uint32_t psr, uint8_t flag) {
+      uint8_t bit_pos = 31 - flag;
+      return (psr >> bit_pos) & 1;
+  }
+solution_explanation: |
+  The PSR flags N, Z, C, V are at bit positions 31, 30, 29, 28 respectively.
+  The flag parameter (0-3) maps to bit position (31 - flag). The function
+  shifts the PSR right by that amount and masks with 1 to extract the flag.

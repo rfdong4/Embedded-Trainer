@@ -1,0 +1,62 @@
+id: wireless_packet_frame
+topic_id: wireless
+title: "Build a Wireless Packet Frame"
+difficulty: intermediate
+description: |
+  Implement a function that builds a simple wireless packet frame in a buffer.
+
+  The frame format is:
+  - Byte 0: Preamble (0xAA)
+  - Byte 1: Sync word (0x7E)
+  - Byte 2: Payload length (number of payload bytes, max 255)
+  - Bytes 3..3+len-1: Payload data (copied from input)
+  - Last 2 bytes: Simple checksum (16-bit sum of all payload bytes, big-endian:
+    high byte first, then low byte)
+
+  Parameters:
+  - frame: output buffer (caller guarantees sufficient size)
+  - payload: pointer to payload data
+  - payload_len: number of payload bytes (0-255)
+
+  Return the total frame length in bytes (4 + payload_len + 2 for preamble, sync,
+  length field, payload, and 2-byte checksum, but the length field is 1 byte so
+  total = 3 + payload_len + 2 = payload_len + 5).
+function_signature: "uint32_t build_frame(uint8_t *frame, const uint8_t *payload, uint8_t payload_len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t build_frame(uint8_t *frame, const uint8_t *payload, uint8_t payload_len) {
+      // TODO: implement
+  }
+test_harness: "packet_frame_tests/test_main.c"
+expected_output: "packet_frame_tests/expected_output.txt"
+hints:
+  - "Start by writing the preamble (0xAA), sync (0x7E), and length byte."
+  - "Copy the payload and compute the 16-bit sum simultaneously."
+  - "Write the checksum in big-endian (high byte first)."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t build_frame(uint8_t *frame, const uint8_t *payload, uint8_t payload_len) {
+      frame[0] = 0xAA;
+      frame[1] = 0x7E;
+      frame[2] = payload_len;
+
+      uint16_t checksum = 0;
+      for (uint8_t i = 0; i < payload_len; i++) {
+          frame[3 + i] = payload[i];
+          checksum += payload[i];
+      }
+
+      frame[3 + payload_len] = (uint8_t)(checksum >> 8);
+      frame[3 + payload_len + 1] = (uint8_t)(checksum & 0xFF);
+
+      return (uint32_t)(payload_len + 5);
+  }
+solution_explanation: |
+  The function writes the fixed header bytes (preamble, sync word, length), then
+  copies the payload while accumulating a 16-bit checksum. Finally, the checksum
+  is appended in big-endian byte order. The total frame size is always
+  payload_len + 5 (1 preamble + 1 sync + 1 length + payload + 2 checksum).

@@ -1,0 +1,172 @@
+topic_id: riscv
+articles:
+  - id: riscv_overview
+    title: "RISC-V Architecture Overview"
+    estimated_minutes: 8
+    content: |
+      # RISC-V Architecture Overview
+
+      RISC-V is an open-standard instruction set architecture (ISA) based on RISC
+      principles. Unlike ARM or x86, RISC-V is royalty-free and designed for
+      extensibility from tiny embedded cores to supercomputers.
+
+      ## Base Integer ISA
+
+      The base integer ISA comes in two main variants:
+
+      - **RV32I**: 32-bit integer base, 32 registers (x0-x31), each 32 bits wide
+      - **RV64I**: 64-bit integer base, 32 registers (x0-x31), each 64 bits wide
+
+      Register x0 is hardwired to zero. Key register conventions (ABI names):
+
+      | Register | ABI Name | Purpose                    |
+      |----------|----------|----------------------------|
+      | x0       | zero     | Hardwired zero             |
+      | x1       | ra       | Return address             |
+      | x2       | sp       | Stack pointer              |
+      | x3       | gp       | Global pointer             |
+      | x4       | tp       | Thread pointer             |
+      | x5-x7    | t0-t2    | Temporaries                |
+      | x8       | s0/fp    | Saved register / frame ptr |
+      | x9       | s1       | Saved register             |
+      | x10-x11  | a0-a1    | Arguments / return values  |
+      | x12-x17  | a2-a7    | Arguments                  |
+      | x18-x27  | s2-s11   | Saved registers            |
+      | x28-x31  | t3-t6    | Temporaries                |
+
+      ## Standard Extensions
+
+      RISC-V uses a modular extension system:
+
+      - **M**: Integer multiplication and division
+      - **A**: Atomic instructions
+      - **F**: Single-precision floating-point
+      - **D**: Double-precision floating-point
+      - **C**: Compressed 16-bit instructions
+
+      The common combination **RV32IMAC** is popular for embedded microcontrollers.
+
+      ## Instruction Formats
+
+      RISC-V defines six instruction formats, all 32 bits wide:
+
+      - **R-type**: Register-register operations (ADD, SUB, XOR)
+          - [funct7 | rs2 | rs1 | funct3 | rd | opcode]
+      - **I-type**: Immediate operations (ADDI, LOAD, JALR)
+          - [imm[11:0] | rs1 | funct3 | rd | opcode]
+      - **S-type**: Store instructions (SW, SH, SB)
+          - [imm[11:5] | rs2 | rs1 | funct3 | imm[4:0] | opcode]
+      - **B-type**: Branch instructions (BEQ, BNE, BLT)
+      - **U-type**: Upper immediate (LUI, AUIPC)
+      - **J-type**: Jump (JAL)
+
+      The opcode is always in bits [6:0], making initial decoding uniform.
+
+      ## Control and Status Registers (CSRs)
+
+      CSRs control processor behavior and report status. Key M-mode CSRs:
+
+      - **mstatus**: Global interrupt enable, privilege mode tracking
+      - **mtvec**: Trap vector base address
+      - **mcause**: Trap cause (interrupt bit + exception code)
+      - **mepc**: Exception program counter (return address)
+      - **mie/mip**: Interrupt enable and pending bits
+
+      CSR instructions:
+
+          CSRRW  rd, csr, rs1   // Read CSR into rd, write rs1 to CSR
+          CSRRS  rd, csr, rs1   // Read CSR into rd, set bits from rs1
+          CSRRC  rd, csr, rs1   // Read CSR into rd, clear bits from rs1
+
+      ## Comparison with ARM Cortex-M
+
+      | Feature        | RISC-V              | ARM Cortex-M          |
+      |----------------|---------------------|-----------------------|
+      | ISA License    | Open, royalty-free  | Proprietary (ARM)     |
+      | Instruction    | Fixed 32-bit (+ C)  | Thumb-2 mixed 16/32   |
+      | Interrupts     | Trap-based (CLINT)  | Hardware NVIC         |
+      | Context save   | Software            | Hardware (automatic)  |
+      | Extensions     | Modular, custom OK  | Fixed feature sets    |
+
+  - id: riscv_privilege_modes
+    title: "RISC-V Privilege Modes and Trap Handling"
+    estimated_minutes: 6
+    content: |
+      # RISC-V Privilege Modes and Trap Handling
+
+      RISC-V defines a privilege model that controls access to system resources
+      and provides isolation between software layers.
+
+      ## Privilege Levels
+
+      Three privilege levels are defined (from highest to lowest):
+
+      | Level | Encoding | Name       | Typical Use           |
+      |-------|----------|------------|-----------------------|
+      | 3     | 11       | Machine    | Firmware / bootloader |
+      | 1     | 01       | Supervisor | OS kernel             |
+      | 0     | 00       | User       | Applications          |
+
+      **Machine mode (M-mode)** is the only mandatory level. Simple embedded
+      systems often run entirely in M-mode. Systems with an OS add S-mode and
+      U-mode.
+
+      ## Trap Handling
+
+      A trap is any transfer of control to the trap handler. Traps include:
+
+      - **Exceptions**: Synchronous events (illegal instruction, ecall, page fault)
+      - **Interrupts**: Asynchronous events (timer, external, software)
+
+      ### Trap Entry Sequence
+
+      When a trap occurs in M-mode:
+
+      1. **mepc** is set to the address of the instruction that was interrupted
+         (or the faulting instruction for exceptions)
+      2. **mcause** is set to the trap cause code, with the MSB indicating
+         interrupt (1) or exception (0)
+      3. **mstatus.MPIE** saves the current MIE bit, then MIE is cleared
+         (disabling interrupts)
+      4. **mstatus.MPP** saves the previous privilege mode
+      5. PC is set to the address in **mtvec**
+
+      ### Trap Return
+
+      The MRET instruction returns from a trap:
+
+      1. PC is restored from **mepc**
+      2. **mstatus.MIE** is restored from **mstatus.MPIE**
+      3. Privilege mode is restored from **mstatus.MPP**
+
+      ### mtvec Modes
+
+      The mtvec register supports two modes (in the lowest 2 bits):
+
+      - **Direct (0)**: All traps jump to the base address
+      - **Vectored (1)**: Exceptions jump to base, interrupts jump to
+        base + 4 * cause
+
+      ### mcause Values (Common)
+
+      | Code | Type      | Description                    |
+      |------|-----------|--------------------------------|
+      | 0    | Exception | Instruction address misaligned |
+      | 2    | Exception | Illegal instruction            |
+      | 3    | Exception | Breakpoint                     |
+      | 7    | Interrupt | Machine timer interrupt         |
+      | 8    | Exception | Environment call from U-mode   |
+      | 11   | Exception | Environment call from M-mode   |
+      | 11   | Interrupt | Machine external interrupt      |
+
+      ## CSR Access Protection
+
+      CSRs are numbered with a 12-bit address. The top two bits encode the
+      minimum privilege level required to access them:
+
+      - 0x000-0x0FF: User-level CSRs
+      - 0x100-0x1FF: Supervisor-level CSRs
+      - 0x300-0x3FF: Machine-level CSRs
+
+      Attempting to access a CSR from an insufficient privilege level causes
+      an illegal instruction exception.

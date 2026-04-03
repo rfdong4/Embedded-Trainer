@@ -1,0 +1,94 @@
+topic_id: gpio
+exercises:
+  - id: gpio_moder_output
+    title: "Configure GPIO Pin as Output"
+    difficulty: beginner
+    register_name: GPIOA_MODER
+    address: "0x4002_0000"
+    initial_value: 0
+    bit_width: 32
+    description: |
+      ## GPIO MODER Register
+
+      The MODER register controls the mode of each GPIO pin using **2 bits per pin**:
+      - `00` = Input (reset state)
+      - `01` = General-purpose output
+      - `10` = Alternate function
+      - `11` = Analog
+
+      **Pin mapping:** Pin N uses bits `[2N+1:2N]`
+
+      For example, PA5 uses bits [11:10].
+    xp: 15
+    steps:
+      - instruction: "Set PA0 as general-purpose output (set bit 0)"
+        expected_value: 0x00000001
+        hint: "PA0 uses MODER bits [1:0]. Output mode = 01. Use: reg |= (1 << 0)"
+        explanation: "PA0 output mode sets bit 0 to 1, bit 1 stays 0 → MODER[1:0] = 01"
+      - instruction: "Now also set PA5 as output (set bit 10)"
+        expected_value: 0x00000401
+        hint: "PA5 uses bits [11:10]. Output mode = 01. Use: reg |= (1 << 10)"
+        explanation: "PA5 is at position 10. Setting bit 10 makes MODER[11:10] = 01"
+      - instruction: "Set PA7 as analog mode (set bits 14 and 15)"
+        expected_value: 0x0000C401
+        hint: "PA7 uses bits [15:14]. Analog = 11. Use: reg |= (3 << 14)"
+        explanation: "Analog mode is 11 in the MODER field. 3 << 14 sets both bits."
+
+  - id: gpio_odr_toggle
+    title: "Toggle GPIO Output Pins"
+    difficulty: beginner
+    register_name: GPIOA_ODR
+    address: "0x4002_0014"
+    initial_value: 0x00000000
+    bit_width: 32
+    description: |
+      ## GPIO ODR (Output Data Register)
+
+      Each bit in ODR controls the output state of the corresponding pin:
+      - `1` = Pin HIGH
+      - `0` = Pin LOW
+    xp: 10
+    steps:
+      - instruction: "Turn on LED on PA5 (set bit 5)"
+        expected_value: 0x00000020
+        hint: "Use: reg |= (1 << 5)"
+        explanation: "Setting bit 5 drives PA5 high."
+      - instruction: "Also turn on PA0 (set bit 0)"
+        expected_value: 0x00000021
+        hint: "Use: reg |= (1 << 0)"
+        explanation: "Now both PA0 and PA5 are high."
+      - instruction: "Turn off PA5 without affecting PA0 (clear bit 5)"
+        expected_value: 0x00000001
+        hint: "Use: reg &= ~(1 << 5)"
+        explanation: "AND with complement clears only bit 5, leaving PA0 set."
+
+  - id: gpio_bsrr_atomic
+    title: "Atomic Pin Control with BSRR"
+    difficulty: intermediate
+    register_name: GPIOA_ODR
+    address: "0x4002_0014"
+    initial_value: 0x000000FF
+    bit_width: 32
+    description: |
+      ## GPIO BSRR (Bit Set/Reset Register)
+
+      BSRR provides atomic pin control (simulated here on ODR):
+      - **Bits [15:0]** (BS): Write 1 to SET the corresponding ODR bit
+      - **Bits [31:16]** (BR): Write 1 to RESET the corresponding ODR bit
+
+      In this exercise, we simulate BSRR operations on ODR directly.
+      Practice setting and clearing specific pins without read-modify-write.
+    xp: 20
+    steps:
+      - instruction: "Clear pins 0-3 (clear bits 0,1,2,3)"
+        expected_value: 0x000000F0
+        hint: "Use: reg &= ~0x0F"
+        explanation: "Clearing the lower nibble leaves only pins 4-7 set."
+      - instruction: "Set pin 8 (set bit 8)"
+        expected_value: 0x000001F0
+        hint: "Use: reg |= (1 << 8)"
+        explanation: "Setting bit 8 adds pin 8 to the output."
+      - instruction: "Clear all pins except pin 8 (result should be 0x100)"
+        expected_value: 0x00000100
+        hint: "Use: reg &= (1 << 8) or reg = 0x100"
+        explanation: "Only pin 8 remains set."

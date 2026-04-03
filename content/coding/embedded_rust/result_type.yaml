@@ -1,0 +1,110 @@
+id: embedded_rust_result_type
+topic_id: embedded_rust
+title: "Result Type for Error Handling"
+difficulty: beginner
+description: |
+  Simulate Rust's Result<T, E> type in C. In Rust, functions that can fail
+  return Result<T, E> which is either Ok(value) or Err(error), forcing the
+  caller to handle errors explicitly.
+
+  Implement a Result-like struct and helper functions:
+
+  typedef struct {
+      int is_ok;      // 1 = Ok, 0 = Err
+      int value;      // the success value (valid when is_ok == 1)
+      int error_code; // the error code (valid when is_ok == 0)
+  } Result;
+
+  Functions:
+  - result_ok: Create a Result with is_ok=1 and the given value
+  - result_err: Create a Result with is_ok=0 and the given error code
+  - result_unwrap: Return the value if Ok, or return default_val if Err
+  - result_is_ok: Return 1 if the Result is Ok, 0 if Err
+
+  This simulates how Rust prevents unchecked error handling at compile time.
+function_signature: |
+  Result result_ok(int value);
+  Result result_err(int error_code);
+  int result_unwrap(const Result *r, int default_val);
+  int result_is_ok(const Result *r);
+skeleton_code: |
+  #include <stdint.h>
+
+  /* Simulates Rust's Result<T, E> type:
+   * - In Rust, Result forces you to handle both Ok and Err cases
+   * - unwrap() panics on Err; unwrap_or(default) provides a fallback
+   * - This prevents ignoring error return values (a common C bug) */
+
+  typedef struct {
+      int is_ok;
+      int value;
+      int error_code;
+  } Result;
+
+  Result result_ok(int value) {
+      // TODO: create an Ok result
+  }
+
+  Result result_err(int error_code) {
+      // TODO: create an Err result
+  }
+
+  int result_unwrap(const Result *r, int default_val) {
+      // TODO: return value if Ok, default_val if Err
+  }
+
+  int result_is_ok(const Result *r) {
+      // TODO: return 1 if Ok, 0 if Err
+  }
+test_harness: "result_type_tests/test_main.c"
+expected_output: "result_type_tests/expected_output.txt"
+hints:
+  - "result_ok should set is_ok=1 and store the value"
+  - "result_err should set is_ok=0 and store the error code"
+  - "result_unwrap checks is_ok to decide what to return"
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  /* Simulates Rust's Result<T, E> type:
+   * - In Rust, Result forces you to handle both Ok and Err cases
+   * - unwrap() panics on Err; unwrap_or(default) provides a fallback
+   * - This prevents ignoring error return values (a common C bug) */
+
+  typedef struct {
+      int is_ok;
+      int value;
+      int error_code;
+  } Result;
+
+  Result result_ok(int value) {
+      Result r;
+      r.is_ok = 1;
+      r.value = value;
+      r.error_code = 0;
+      return r;
+  }
+
+  Result result_err(int error_code) {
+      Result r;
+      r.is_ok = 0;
+      r.value = 0;
+      r.error_code = error_code;
+      return r;
+  }
+
+  int result_unwrap(const Result *r, int default_val) {
+      if (r->is_ok) return r->value;
+      return default_val;
+  }
+
+  int result_is_ok(const Result *r) {
+      return r->is_ok;
+  }
+solution_explanation: |
+  This simulates Rust's Result<T, E> enum. In Rust, functions return Result
+  instead of error codes, and the compiler warns if the Result is unused.
+  The ? operator propagates errors automatically. Here we use a struct with
+  an is_ok flag to distinguish Ok from Err, and result_unwrap acts like
+  Rust's unwrap_or() which provides a fallback value on error.

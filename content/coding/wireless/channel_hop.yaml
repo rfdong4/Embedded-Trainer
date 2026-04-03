@@ -1,0 +1,54 @@
+id: wireless_channel_hop
+topic_id: wireless
+title: "Channel Hopping Sequence"
+difficulty: intermediate
+description: |
+  Implement a function that calculates the next channel in a frequency hopping
+  sequence, similar to BLE's channel selection algorithm.
+
+  The hopping formula:
+    next_channel = (current_channel + hop_increment) % num_channels
+
+  However, some channels may be marked as "used" in a channel map bitmask. If
+  the calculated channel is NOT in the channel map (its bit is 0), keep adding
+  hop_increment and taking modulo until a used channel is found.
+
+  Parameters:
+  - current_channel: the current channel number (0 to num_channels-1)
+  - hop_increment: the hop increment value (1 to num_channels-1)
+  - channel_map: bitmask where bit N = 1 means channel N is usable
+  - num_channels: total number of channels (max 32)
+
+  Return the next usable channel number. You may assume at least one bit is
+  set in the channel_map.
+function_signature: "uint8_t next_channel(uint8_t current_channel, uint8_t hop_increment, uint32_t channel_map, uint8_t num_channels)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t next_channel(uint8_t current_channel, uint8_t hop_increment, uint32_t channel_map, uint8_t num_channels) {
+      // TODO: implement
+  }
+test_harness: "channel_hop_tests/test_main.c"
+expected_output: "channel_hop_tests/expected_output.txt"
+hints:
+  - "Start by computing (current_channel + hop_increment) % num_channels."
+  - "Check if the resulting channel's bit is set in channel_map."
+  - "If not, keep advancing by hop_increment modulo num_channels until you find a used channel."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t next_channel(uint8_t current_channel, uint8_t hop_increment, uint32_t channel_map, uint8_t num_channels) {
+      uint8_t ch = (current_channel + hop_increment) % num_channels;
+      while (!(channel_map & ((uint32_t)1 << ch))) {
+          ch = (ch + hop_increment) % num_channels;
+      }
+      return ch;
+  }
+solution_explanation: |
+  The function computes the initial candidate channel using modular addition.
+  It then checks whether that channel is marked as usable in the channel map
+  bitmask. If not, it advances by hop_increment again (modulo num_channels)
+  and repeats until it finds a channel whose bit is set. Since at least one
+  bit is guaranteed set, the loop always terminates.

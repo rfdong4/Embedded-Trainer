@@ -27,3 +27,25 @@ hints:
   - "When comparing, replace the best candidate if the new priority is strictly lower, or if equal priority but lower IRQ number."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t next_irq_to_service(const uint8_t* pending, uint8_t count, const uint8_t* priorities) {
+      if (count == 0) return 255;
+      uint8_t best_irq = pending[0];
+      uint8_t best_prio = priorities[pending[0]];
+      for (uint8_t i = 1; i < count; i++) {
+          uint8_t irq = pending[i];
+          uint8_t prio = priorities[irq];
+          if (prio < best_prio || (prio == best_prio && irq < best_irq)) {
+              best_irq = irq;
+              best_prio = prio;
+          }
+      }
+      return best_irq;
+  }
+solution_explanation: |
+  The function iterates through all pending IRQs, looking up each one's priority
+  in the priority table. It tracks the best candidate, replacing it when a
+  strictly lower priority value is found, or when priority ties but the IRQ
+  number is lower.

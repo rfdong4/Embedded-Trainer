@@ -37,3 +37,25 @@ hints:
   - "Enable: OR with the mask. Disable: AND with the inverted mask. Check: AND and compare to non-zero."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t enable_irq(uint32_t mask_reg, uint8_t irq_num) {
+      if (irq_num >= 32) return mask_reg;
+      return mask_reg | (1U << irq_num);
+  }
+
+  uint32_t disable_irq(uint32_t mask_reg, uint8_t irq_num) {
+      if (irq_num >= 32) return mask_reg;
+      return mask_reg & ~(1U << irq_num);
+  }
+
+  uint8_t is_irq_enabled(uint32_t mask_reg, uint8_t irq_num) {
+      if (irq_num >= 32) return 0;
+      return (mask_reg >> irq_num) & 1;
+  }
+solution_explanation: |
+  Each function first checks if irq_num is out of range (>= 32) and returns
+  safely if so. enable_irq sets the bit using OR, disable_irq clears it using
+  AND with the inverted mask, and is_irq_enabled extracts the bit by shifting
+  and masking.

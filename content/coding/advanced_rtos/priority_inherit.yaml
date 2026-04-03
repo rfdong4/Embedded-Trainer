@@ -1,0 +1,93 @@
+id: advanced_rtos_priority_inherit
+topic_id: advanced_rtos
+title: "Priority Inheritance"
+difficulty: advanced
+description: |
+  Implement a simplified priority inheritance mechanism for a mutex.
+
+  When a high-priority task blocks on a mutex held by a lower-priority task,
+  the holder's effective priority is temporarily raised to the blocker's priority.
+
+  Implement:
+  - `mutex_lock`: Acquire mutex. If already held, record the waiting task and
+    boost the holder's effective priority if needed. Return 1 if acquired, 0 if blocked.
+  - `mutex_unlock`: Release mutex. Restore the holder's original priority.
+  - `get_effective_priority`: Return a task's current effective priority.
+
+  Lower number = higher priority (0 is highest).
+function_signature: "uint8_t mutex_lock(PIMutex *m, uint8_t task_id, uint8_t task_prio); void mutex_unlock(PIMutex *m, uint8_t tasks[][2], uint8_t num_tasks); uint8_t get_effective_priority(PIMutex *m, uint8_t tasks[][2], uint8_t task_id, uint8_t num_tasks)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t held;           /* 1 if locked, 0 if free */
+      uint8_t owner;          /* task_id of holder */
+      uint8_t owner_orig_prio;/* holder's original priority */
+      uint8_t boosted_prio;   /* holder's boosted priority (or orig if no boost) */
+  } PIMutex;
+
+  /* tasks[][0] = task_id, tasks[][1] = base priority */
+
+  uint8_t mutex_lock(PIMutex *m, uint8_t task_id, uint8_t task_prio) {
+      // TODO: acquire or boost holder
+  }
+
+  void mutex_unlock(PIMutex *m, uint8_t tasks[][2], uint8_t num_tasks) {
+      // TODO: release and restore priority
+  }
+
+  uint8_t get_effective_priority(PIMutex *m, uint8_t tasks[][2], uint8_t task_id, uint8_t num_tasks) {
+      // TODO: return effective priority
+  }
+test_harness: "priority_inherit_tests/test_main.c"
+expected_output: "priority_inherit_tests/expected_output.txt"
+hints:
+  - "When locking a held mutex, compare the blocker's priority with the holder's. If blocker has higher priority (lower number), boost the holder."
+  - "On unlock, restore boosted_prio to owner_orig_prio."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t held;
+      uint8_t owner;
+      uint8_t owner_orig_prio;
+      uint8_t boosted_prio;
+  } PIMutex;
+
+  uint8_t mutex_lock(PIMutex *m, uint8_t task_id, uint8_t task_prio) {
+      if (!m->held) {
+          m->held = 1;
+          m->owner = task_id;
+          m->owner_orig_prio = task_prio;
+          m->boosted_prio = task_prio;
+          return 1;
+      }
+      /* Mutex is held — boost holder if blocker has higher priority */
+      if (task_prio < m->boosted_prio) {
+          m->boosted_prio = task_prio;
+      }
+      return 0;
+  }
+
+  void mutex_unlock(PIMutex *m, uint8_t tasks[][2], uint8_t num_tasks) {
+      m->held = 0;
+      m->boosted_prio = m->owner_orig_prio;
+  }
+
+  uint8_t get_effective_priority(PIMutex *m, uint8_t tasks[][2], uint8_t task_id, uint8_t num_tasks) {
+      if (m->held && m->owner == task_id) {
+          return m->boosted_prio;
+      }
+      for (uint8_t i = 0; i < num_tasks; i++) {
+          if (tasks[i][0] == task_id) return tasks[i][1];
+      }
+      return 255;
+  }
+solution_explanation: |
+  Priority inheritance prevents unbounded priority inversion. When a
+  high-priority task (lower number) blocks on the mutex, the holder's
+  effective priority is raised to match. On unlock, the original priority
+  is restored. get_effective_priority checks if the task currently holds
+  the mutex and returns the boosted priority if so.

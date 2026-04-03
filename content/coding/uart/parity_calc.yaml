@@ -23,3 +23,17 @@ hints:
   - "You can XOR the byte with itself shifted: data ^= (data >> 4); data ^= (data >> 2); data ^= (data >> 1); return data & 1;"
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t even_parity(uint8_t data) {
+      data ^= (data >> 4);
+      data ^= (data >> 2);
+      data ^= (data >> 1);
+      return data & 1;
+  }
+solution_explanation: |
+  The function uses XOR folding to compute parity efficiently. By successively
+  XORing the byte with right-shifted versions of itself, all bit values are
+  collapsed into the least significant bit, which indicates whether the
+  original byte had an odd number of 1-bits.

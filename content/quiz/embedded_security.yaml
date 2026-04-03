@@ -1,0 +1,134 @@
+topic_id: embedded_security
+topic_name: "Embedded Security"
+questions:
+  - id: embedded_security_q01
+    type: mcq
+    difficulty: beginner
+    text: "What is the primary purpose of a secure boot process?"
+    options:
+      - "A) To speed up the boot time of the device"
+      - "B) To verify the authenticity and integrity of firmware before execution"
+      - "C) To encrypt all data stored in flash memory"
+      - "D) To prevent the CPU from entering low-power modes"
+    correct: "B"
+    explanation: "Secure boot verifies that each stage of the boot process is cryptographically signed and unmodified before allowing it to execute. This creates a chain of trust from the immutable boot ROM to the application firmware."
+    tags: [secure_boot, chain_of_trust]
+    xp: 10
+
+  - id: embedded_security_q02
+    type: mcq
+    difficulty: beginner
+    text: "What is ARM TrustZone?"
+    options:
+      - "A) A dedicated encryption coprocessor"
+      - "B) A hardware-based security extension that partitions the system into Secure and Non-Secure worlds"
+      - "C) A software library for TLS communication"
+      - "D) A type of memory protection unit"
+    correct: "B"
+    explanation: "ARM TrustZone is a hardware security extension available on Cortex-A and Cortex-M33+ processors. It creates two isolated execution environments: the Secure world (for trusted code and keys) and the Non-Secure world (for the main application), enforced by hardware."
+    tags: [trustzone, arm, security_architecture]
+    xp: 10
+
+  - id: embedded_security_q03
+    type: true_false
+    difficulty: beginner
+    text: "A hardware crypto accelerator performs cryptographic operations faster and with lower power consumption than equivalent software implementations."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Hardware crypto accelerators are dedicated circuits optimized for specific cryptographic algorithms (AES, SHA, ECC). They offload computation from the CPU, run faster, consume less power, and can also be more resistant to side-channel attacks than software implementations."
+    tags: [hardware_crypto, accelerator]
+    xp: 10
+
+  - id: embedded_security_q04
+    type: mcq
+    difficulty: beginner
+    text: "Where should cryptographic keys be stored on an embedded device for maximum security?"
+    options:
+      - "A) In a header file compiled into the firmware"
+      - "B) In an unprotected region of external flash"
+      - "C) In a hardware key storage area such as OTP fuses or a secure element"
+      - "D) In a configuration file on an SD card"
+    correct: "C"
+    explanation: "Hardware key storage (OTP fuses, secure elements, or TrustZone-protected memory) provides physical protection against key extraction. Keys stored in source code or unprotected flash can be easily read out through debug interfaces or flash dumps."
+    tags: [key_storage, secure_element, otp]
+    xp: 10
+
+  - id: embedded_security_q05
+    type: mcq
+    difficulty: intermediate
+    text: "Which of the following is a side-channel attack on an embedded system?"
+    options:
+      - "A) Buffer overflow via UART input"
+      - "B) Measuring power consumption during AES encryption to recover the key"
+      - "C) Brute-forcing a password over a network connection"
+      - "D) Injecting malicious firmware through an unsecured bootloader"
+    correct: "B"
+    explanation: "Side-channel attacks exploit physical characteristics of the computation (power consumption, electromagnetic emissions, timing) rather than algorithmic weaknesses. Differential Power Analysis (DPA) can recover AES keys by statistically analyzing power traces during encryption."
+    tags: [side_channel, dpa, power_analysis]
+    xp: 15
+
+  - id: embedded_security_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What is the purpose of code signing in embedded firmware development?"
+    options:
+      - "A) To compress the firmware image for faster downloads"
+      - "B) To ensure the firmware was produced by an authorized party and has not been tampered with"
+      - "C) To encrypt the firmware so it cannot be reverse-engineered"
+      - "D) To add version information to the firmware binary"
+    correct: "B"
+    explanation: "Code signing uses asymmetric cryptography (e.g., ECDSA or RSA) to create a digital signature of the firmware image. The bootloader verifies this signature using the corresponding public key, ensuring authenticity (from the right source) and integrity (not modified)."
+    tags: [code_signing, digital_signature, ecdsa]
+    xp: 15
+
+  - id: embedded_security_q07
+    type: mcq
+    difficulty: intermediate
+    text: "In a secure firmware update (OTA) mechanism, which step should occur FIRST after receiving the new firmware image?"
+    options:
+      - "A) Write the image to the main application flash region"
+      - "B) Reboot the device to apply the update"
+      - "C) Verify the digital signature and integrity hash of the received image"
+      - "D) Erase the existing firmware"
+    correct: "C"
+    explanation: "Before writing any new firmware, the device must verify its digital signature and integrity (e.g., SHA-256 hash). Writing an unverified image risks bricking the device or installing malicious code. Only after successful verification should the image be written to flash."
+    tags: [secure_update, ota, firmware_verification]
+    xp: 15
+
+  - id: embedded_security_q08
+    type: true_false
+    difficulty: intermediate
+    text: "A constant-time comparison function prevents timing attacks by ensuring the comparison takes the same amount of time regardless of where a mismatch occurs."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Standard memcmp returns early on the first mismatch, leaking information about how many bytes matched. A constant-time comparison checks all bytes regardless, using XOR accumulation, so an attacker cannot determine the position of mismatches by measuring execution time."
+    tags: [timing_attack, constant_time, side_channel]
+    xp: 15
+
+  - id: embedded_security_q09
+    type: mcq
+    difficulty: advanced
+    text: "What is a fault injection attack, and how can it compromise secure boot?"
+    options:
+      - "A) Sending malformed network packets to cause a denial of service"
+      - "B) Inducing voltage glitches or clock disruptions to skip signature verification instructions"
+      - "C) Exploiting a stack overflow in the bootloader's UART handler"
+      - "D) Using a JTAG debugger to read out the firmware"
+    correct: "B"
+    explanation: "Fault injection attacks use physical methods (voltage glitching, laser pulses, electromagnetic pulses, clock manipulation) to cause the CPU to skip instructions or corrupt data. An attacker might glitch the processor during the signature check to skip the verification branch, allowing unsigned firmware to boot."
+    tags: [fault_injection, voltage_glitch, secure_boot]
+    xp: 20
+
+  - id: embedded_security_q10
+    type: mcq
+    difficulty: advanced
+    text: "In an ARM TrustZone-M system (Cortex-M33), what prevents Non-Secure code from directly accessing Secure memory regions?"
+    options:
+      - "A) The compiler inserts runtime checks automatically"
+      - "B) The Secure Attribution Unit (SAU) and Implementation-Defined Attribution Unit (IDAU) enforce memory partitioning in hardware"
+      - "C) The MPU in the Non-Secure world blocks all memory above 0x10000000"
+      - "D) A software firewall running in the Secure world intercepts all memory accesses"
+    correct: "B"
+    explanation: "The SAU and IDAU are hardware units that classify every memory address as Secure, Non-Secure, or Non-Secure Callable. Any attempt by Non-Secure code to access a Secure address triggers a SecureFault exception. This is enforced by the bus hardware, not software."
+    tags: [trustzone_m, sau, idau, memory_protection]
+    xp: 20

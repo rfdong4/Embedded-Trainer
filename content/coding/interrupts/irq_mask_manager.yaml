@@ -61,3 +61,48 @@ hints:
   - "Boundary check: save returns 0 if top >= IRQ_SAVE_DEPTH; restore returns 0 if top <= 0."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define IRQ_SAVE_DEPTH 8
+
+  static uint32_t irq_mask;
+  static uint32_t irq_save_stack[IRQ_SAVE_DEPTH];
+  static int irq_save_top;
+
+  void irq_mgr_init(void) {
+      irq_mask = 0;
+      irq_save_top = 0;
+  }
+
+  void irq_mgr_enable(uint8_t n) {
+      if (n < 32) irq_mask |= (1U << n);
+  }
+
+  void irq_mgr_disable(uint8_t n) {
+      if (n < 32) irq_mask &= ~(1U << n);
+  }
+
+  int irq_mgr_is_enabled(uint8_t n) {
+      if (n >= 32) return 0;
+      return (irq_mask >> n) & 1;
+  }
+
+  int irq_mgr_save(void) {
+      if (irq_save_top >= IRQ_SAVE_DEPTH) return 0;
+      irq_save_stack[irq_save_top] = irq_mask;
+      irq_save_top++;
+      return 1;
+  }
+
+  int irq_mgr_restore(void) {
+      if (irq_save_top <= 0) return 0;
+      irq_save_top--;
+      irq_mask = irq_save_stack[irq_save_top];
+      return 1;
+  }
+solution_explanation: |
+  The manager uses a static mask variable and a save stack. Enable/disable/query
+  use standard bit manipulation with bounds checking. Save pushes the current mask
+  onto the stack, and restore pops it back, enabling nested critical sections up
+  to 8 levels deep.

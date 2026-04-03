@@ -37,3 +37,40 @@ hints:
   - "When parity=0, place the stop bit at bit 9. When parity!=0, place it at bit 10."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint16_t uart_build_frame(uint8_t data, uint8_t parity) {
+      uint16_t frame = 0;
+      // Bit 0 is start bit (0)
+      // Bits 1-8 are data
+      frame |= ((uint16_t)data << 1);
+
+      if (parity == 0) {
+          // No parity: stop bit at bit 9
+          frame |= (1 << 9);
+      } else {
+          // Count 1-bits in data
+          uint8_t p = data;
+          p ^= (p >> 4);
+          p ^= (p >> 2);
+          p ^= (p >> 1);
+          uint8_t ones_odd = p & 1;
+          if (parity == 1) {
+              // Even parity: set parity bit if odd number of 1s
+              if (ones_odd) frame |= (1 << 9);
+          } else {
+              // Odd parity: set parity bit if even number of 1s
+              if (!ones_odd) frame |= (1 << 9);
+          }
+          // Stop bit at bit 10
+          frame |= (1 << 10);
+      }
+      return frame;
+  }
+solution_explanation: |
+  The frame starts with a 0 start bit and places data at bits 1-8. When
+  parity is disabled, the stop bit goes at bit 9 for a 10-bit frame. When
+  parity is enabled, XOR folding determines the 1-bit count: even parity
+  sets the parity bit if the count is odd, odd parity sets it if even, and
+  the stop bit is placed at bit 10.

@@ -1,0 +1,85 @@
+id: dma_double_buffer
+topic_id: dma
+title: "Implement Double Buffering Logic"
+difficulty: intermediate
+description: |
+  Implement double-buffering management for DMA transfers. The system uses two
+  buffers that alternate: while DMA fills one, the application processes the other.
+
+  Implement three functions:
+
+  1. db_init: Initialize the double buffer state. Set active_buffer to 0,
+     buffer_ready[0] and buffer_ready[1] to 0.
+  2. db_swap: Called when a DMA transfer completes. Mark the current active
+     buffer as ready for processing, then switch to the other buffer.
+     Return the index of the buffer that is now ready for processing (the old active).
+  3. db_get_ready_buffer: Return the index of a buffer that is ready for processing
+     (check buffer 0 first, then buffer 1). Mark it as not ready. Return -1 if none ready.
+
+  The double_buffer_t struct has: active_buffer (uint8_t), buffer_ready[2] (uint8_t array).
+function_signature: "void db_init(double_buffer_t *db); uint8_t db_swap(double_buffer_t *db); int db_get_ready_buffer(double_buffer_t *db)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t active_buffer;
+      uint8_t buffer_ready[2];
+  } double_buffer_t;
+
+  void db_init(double_buffer_t *db) {
+      // TODO: implement
+  }
+
+  uint8_t db_swap(double_buffer_t *db) {
+      // TODO: implement
+  }
+
+  int db_get_ready_buffer(double_buffer_t *db) {
+      // TODO: implement
+  }
+test_harness: "double_buffer_tests/test_main.c"
+expected_output: "double_buffer_tests/expected_output.txt"
+hints:
+  - "active_buffer toggles between 0 and 1 using XOR: active ^= 1."
+  - "db_swap marks the current active buffer as ready before switching."
+  - "db_get_ready_buffer should clear the ready flag when returning a buffer index."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t active_buffer;
+      uint8_t buffer_ready[2];
+  } double_buffer_t;
+
+  void db_init(double_buffer_t *db) {
+      db->active_buffer = 0;
+      db->buffer_ready[0] = 0;
+      db->buffer_ready[1] = 0;
+  }
+
+  uint8_t db_swap(double_buffer_t *db) {
+      uint8_t completed = db->active_buffer;
+      db->buffer_ready[completed] = 1;
+      db->active_buffer ^= 1;
+      return completed;
+  }
+
+  int db_get_ready_buffer(double_buffer_t *db) {
+      if (db->buffer_ready[0]) {
+          db->buffer_ready[0] = 0;
+          return 0;
+      }
+      if (db->buffer_ready[1]) {
+          db->buffer_ready[1] = 0;
+          return 1;
+      }
+      return -1;
+  }
+solution_explanation: |
+  db_swap records the completed buffer index, marks it ready for processing,
+  then toggles the active buffer using XOR. db_get_ready_buffer checks each
+  buffer in order, clears its ready flag, and returns its index. This pattern
+  ensures the application always processes the most recently completed buffer
+  while DMA fills the other.

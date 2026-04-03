@@ -1,0 +1,81 @@
+topic_id: bit_manipulation
+challenges:
+  - id: bug_bit_shift_overflow
+    title: "Shift Overflow"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      uint8_t set_high_bit(uint8_t reg) {
+          return reg | (1 << 8);
+      }
+    correct_answer: "B"
+    options:
+      - "A) Should use &= instead of |="
+      - "B) Shifting 1 by 8 overflows an 8-bit value"
+      - "C) Missing return statement"
+      - "D) reg should be uint16_t"
+    explanation: "Shifting 1 left by 8 positions in an 8-bit context produces 0x100, which when cast to uint8_t becomes 0. The shift should be (1 << 7) to set bit 7."
+    xp: 10
+    tags: [shift, overflow]
+
+  - id: bug_wrong_mask
+    title: "Wrong Clear Mask"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      uint8_t clear_bit(uint8_t reg, uint8_t bit) {
+          return reg & (1 << bit);
+      }
+    correct_answer: "A"
+    options:
+      - "A) Missing bitwise NOT (~) on the mask"
+      - "B) Should use |= instead of &="
+      - "C) bit should be decremented by 1"
+      - "D) Return type should be void"
+    explanation: "To clear a bit, you need to AND with the complement of the mask: reg & ~(1 << bit). Without the ~, this isolates the bit instead of clearing it."
+    xp: 10
+    tags: [clear_bit, mask]
+
+  - id: bug_signed_shift
+    title: "Signed Right Shift Trap"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      int8_t arithmetic_shift(int8_t val) {
+          // Intended: logical right shift by 2
+          return val >> 2;
+      }
+      // arithmetic_shift(0x80) expected: 0x20
+      // arithmetic_shift(0x80) actual:   0xE0
+    correct_answer: "C"
+    options:
+      - "A) Should shift left instead of right"
+      - "B) The shift amount should be 3"
+      - "C) Right shift on signed types is arithmetic, not logical — use unsigned type"
+      - "D) Missing parentheses around val >> 2"
+    explanation: "Right-shifting a signed negative value performs arithmetic shift (sign-extends), so 0x80 >> 2 gives 0xE0 instead of the expected 0x20. Cast to uint8_t first for logical shift."
+    xp: 15
+    tags: [signed, shift, undefined_behavior]
+
+  - id: bug_extract_nibble
+    title: "Nibble Extract Off-by-One"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      // Extract the upper nibble of a byte
+      uint8_t get_upper_nibble(uint8_t byte) {
+          return (byte >> 4) & 0xF0;
+      }
+    correct_answer: "B"
+    options:
+      - "A) Should shift left, not right"
+      - "B) Mask should be 0x0F, not 0xF0 — the shift already moved the nibble down"
+      - "C) Should use | instead of &"
+      - "D) Return type should be uint16_t"
+    explanation: "After shifting right by 4, the upper nibble is in bits 3:0. Masking with 0xF0 selects bits 7:4 which are now zero. The mask should be 0x0F."
+    xp: 15
+    tags: [nibble, mask, shift]

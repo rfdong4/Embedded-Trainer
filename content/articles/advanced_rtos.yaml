@@ -1,0 +1,199 @@
+topic_id: advanced_rtos
+articles:
+  - id: advanced_rtos_patterns
+    title: "Advanced RTOS Patterns and Mechanisms"
+    estimated_minutes: 7
+    content: |
+      # Advanced RTOS Patterns and Mechanisms
+
+      Beyond basic tasks, semaphores, and queues, modern RTOSes provide
+      advanced features for complex embedded applications.
+
+      ## Memory Pools
+
+      Fixed-size memory pools eliminate heap fragmentation:
+
+          #define BLOCK_SIZE 64
+          #define NUM_BLOCKS 16
+          static uint8_t pool[NUM_BLOCKS][BLOCK_SIZE];
+          static uint8_t free_mask[NUM_BLOCKS];
+
+          void* pool_alloc(void) {
+              for (int i = 0; i < NUM_BLOCKS; i++) {
+                  if (!free_mask[i]) {
+                      free_mask[i] = 1;
+                      return pool[i];
+                  }
+              }
+              return NULL;
+          }
+
+      Benefits:
+      - O(1) allocation time (deterministic)
+      - No external fragmentation
+      - No need for malloc/free
+
+      ## Event Flag Groups
+
+      Event flags allow tasks to synchronize on multiple conditions:
+
+          // FreeRTOS event groups
+          EventGroupHandle_t xEvents = xEventGroupCreate();
+
+          // Task A: signal data ready
+          xEventGroupSetBits(xEvents, BIT_DATA_READY);
+
+          // Task B: wait for both data ready AND config done
+          xEventGroupWaitBits(xEvents,
+              BIT_DATA_READY | BIT_CONFIG_DONE,
+              pdTRUE,     // Clear bits on exit
+              pdTRUE,     // Wait for ALL bits (AND)
+              portMAX_DELAY);
+
+      Modes:
+      - **Wait Any (OR)**: Unblock when any specified bit is set
+      - **Wait All (AND)**: Unblock only when all specified bits are set
+
+      ## Software Timers
+
+      Software timers execute callbacks after a specified delay:
+
+          // One-shot timer (fires once)
+          TimerHandle_t xTimer = xTimerCreate("OneShot", pdMS_TO_TICKS(500),
+              pdFALSE, NULL, vTimerCallback);
+          xTimerStart(xTimer, 0);
+
+          // Auto-reload timer (fires periodically)
+          TimerHandle_t xPeriodic = xTimerCreate("Periodic", pdMS_TO_TICKS(100),
+              pdTRUE, NULL, vPeriodicCallback);
+
+      **Important**: Timer callbacks run in the timer service task context.
+      Keep them short and non-blocking.
+
+      ## Tickless Idle
+
+      In standard mode, the tick interrupt fires every 1ms even when
+      idle. Tickless mode suppresses unnecessary ticks:
+
+          1. All tasks blocked → idle task runs
+          2. Calculate time until next scheduled event
+          3. Program low-power timer for that duration
+          4. Enter deep sleep
+          5. Wake on timer or external interrupt
+          6. Compensate tick count for elapsed time
+
+      Power savings can be dramatic — from milliamps to microamps.
+
+      ## Priority Inheritance vs Priority Ceiling
+
+      **Priority Inheritance**: Reactive — raises mutex holder's priority
+      only when a higher-priority task blocks on the mutex.
+
+      **Priority Ceiling**: Proactive — immediately raises to the ceiling
+      (highest priority of any potential user) when mutex is acquired.
+
+      PCP prevents deadlocks and reduces worst-case blocking time.
+
+  - id: multicore_embedded
+    title: "Multicore Embedded Systems with RTOS"
+    estimated_minutes: 6
+    content: |
+      # Multicore Embedded Systems with RTOS
+
+      Modern MCUs like STM32H7, NXP i.MX RT, and TI Sitara feature
+      multiple cores. Understanding multicore architectures is essential.
+
+      ## AMP: Asymmetric Multiprocessing
+
+      Each core runs independently:
+
+          Core 0: Linux / RTOS (application processing)
+          Core 1: Bare-metal / RTOS (real-time control)
+
+      Characteristics:
+      - Each core has its own binary and memory space
+      - Communication via shared memory + hardware mailbox
+      - Easy to reason about — no shared scheduler
+
+      Example: STM32MP1 (Cortex-A7 + Cortex-M4)
+
+          // Core 0 sends message to Core 1
+          shared_memory->msg = data;
+          shared_memory->flag = 1;
+          trigger_mailbox_interrupt(CORE_1);
+
+          // Core 1 receives
+          void MAILBOX_IRQHandler(void) {
+              if (shared_memory->flag) {
+                  process(shared_memory->msg);
+                  shared_memory->flag = 0;
+              }
+          }
+
+      ## SMP: Symmetric Multiprocessing
+
+      A single RTOS instance manages all cores:
+
+          Core 0 ─┐
+          Core 1 ─┤── Single RTOS scheduler ── Task pool
+          Core 2 ─┘
+
+      Characteristics:
+      - Any task can run on any core
+      - Automatic load balancing
+      - Requires SMP-aware synchronization
+
+      ## Spinlocks
+
+      In multicore systems, disabling interrupts on one core does not
+      protect against access from another core. Spinlocks provide
+      cross-core mutual exclusion:
+
+          static volatile uint32_t lock = 0;
+
+          void spin_lock(volatile uint32_t *lock) {
+              while (__atomic_test_and_set(lock, __ATOMIC_ACQUIRE))
+                  ;  // Busy-wait
+          }
+
+          void spin_unlock(volatile uint32_t *lock) {
+              __atomic_clear(lock, __ATOMIC_RELEASE);
+          }
+
+      **Rules**:
+      - Keep critical sections very short (microseconds)
+      - Never call blocking RTOS APIs while holding a spinlock
+      - Disable local interrupts before acquiring to prevent deadlock
+
+      ## Inter-Processor Communication
+
+      Common IPC mechanisms:
+
+      | Mechanism      | Description                          |
+      |----------------|--------------------------------------|
+      | Shared memory  | Direct read/write to common region   |
+      | Hardware mailbox | Interrupt-based notification       |
+      | RPMsg          | Standardized message passing (OpenAMP) |
+      | Virtio queues  | Shared ring buffers with doorbell    |
+
+      ## Cache Coherency
+
+      With shared memory, caches can cause stale data reads:
+
+          // Before writing shared memory
+          clean_dcache_by_address(shared_buf, size);
+
+          // Before reading shared memory
+          invalidate_dcache_by_address(shared_buf, size);
+
+      Or mark shared memory regions as non-cacheable in the MPU/MMU.
+
+      ## Lock-Free Data Structures
+
+      For high-performance IPC, lock-free queues avoid the overhead
+      of spinlocks for single-producer single-consumer (SPSC) patterns:
+
+          // Producer writes to head, consumer reads from tail
+          // No lock needed if only one producer and one consumer
+          // Use memory barriers to ensure ordering
+          __atomic_store_n(&queue->head, new_head, __ATOMIC_RELEASE);

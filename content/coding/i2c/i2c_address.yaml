@@ -25,3 +25,13 @@ hints:
   - "Make sure read is masked to 1 bit: (addr_7bit << 1) | (read & 1)."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t i2c_addr_byte(uint8_t addr_7bit, uint8_t read) {
+      return (addr_7bit << 1) | (read & 1);
+  }
+solution_explanation: |
+  The I2C address byte is formed by shifting the 7-bit address left by 1 to
+  occupy bits 7-1, then ORing the R/W bit (masked to 1 bit) into bit 0. This
+  produces the standard I2C address+direction byte format.

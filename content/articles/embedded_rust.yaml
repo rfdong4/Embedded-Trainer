@@ -1,0 +1,211 @@
+topic_id: embedded_rust
+articles:
+  - id: rust_for_embedded
+    title: "Rust for Embedded Systems"
+    estimated_minutes: 7
+    content: |
+      # Rust for Embedded Systems
+
+      Rust is a systems programming language that guarantees memory safety and
+      thread safety at compile time without a garbage collector, making it
+      well-suited for embedded development.
+
+      ## Why Rust for Embedded?
+
+      C has been the dominant embedded language for decades, but it allows
+      entire classes of bugs that Rust prevents at compile time:
+
+      - **Buffer overflows**: Rust enforces bounds checking
+      - **Use-after-free**: The ownership system prevents this entirely
+      - **Data races**: The type system prevents concurrent mutable access
+      - **Null pointer dereference**: Rust has no null; it uses Option<T>
+
+      All of this comes with zero runtime overhead -- Rust's safety checks happen
+      at compile time.
+
+      ## The no_std Ecosystem
+
+      Standard Rust programs use `std`, which requires an OS. Embedded Rust uses
+      `#![no_std]`, which provides only the `core` library:
+
+          #![no_std]
+          #![no_main]
+
+          use core::panic::PanicInfo;
+
+          #[panic_handler]
+          fn panic(_info: &PanicInfo) -> ! {
+              loop {}
+          }
+
+      ## The Embedded Stack
+
+      The Rust embedded ecosystem is layered:
+
+      ```
+      +-------------------+
+      | Application       |  Your code
+      +-------------------+
+      | Device drivers    |  Sensor/actuator drivers (use embedded-hal traits)
+      +-------------------+
+      | HAL crate         |  e.g., stm32f4xx-hal (implements embedded-hal)
+      +-------------------+
+      | PAC crate         |  e.g., stm32f4 (auto-generated from SVD)
+      +-------------------+
+      | cortex-m / riscv  |  Core support (startup, interrupts)
+      +-------------------+
+      ```
+
+      ### PAC (Peripheral Access Crate)
+
+      Auto-generated from SVD files using `svd2rust`. Provides:
+
+      - Type-safe register access (no magic numbers)
+      - Compile-time prevention of invalid register writes
+      - Zero-cost abstractions (compiles to the same code as C)
+
+      Example (STM32 PAC):
+
+          // C equivalent: GPIOA->MODER |= (1 << 10);
+          dp.GPIOA.moder.modify(|_, w| w.moder5().output());
+
+      ### HAL (Hardware Abstraction Layer)
+
+      Implements `embedded-hal` traits on top of PACs:
+
+          use embedded_hal::digital::v2::OutputPin;
+
+          let mut led = gpioa.pa5.into_push_pull_output();
+          led.set_high().unwrap();
+
+      ### embedded-hal Traits
+
+      Common traits that enable portable drivers:
+
+      - `OutputPin`, `InputPin` -- GPIO
+      - `Read`, `Write` -- SPI, I2C, UART
+      - `DelayMs`, `DelayUs` -- Timing
+      - `Pwm` -- PWM output
+
+      ## Unsafe in Embedded Rust
+
+      Hardware access inherently requires `unsafe` because the compiler cannot
+      verify that memory-mapped register addresses are valid:
+
+          // Reading a hardware register
+          let val = unsafe { core::ptr::read_volatile(0x4002_0000 as *const u32) };
+
+      PACs and HALs wrap this unsafe code in safe APIs, so application code
+      rarely needs `unsafe` directly.
+
+      ## Critical Sections
+
+          use cortex_m::interrupt;
+
+          interrupt::free(|cs| {
+              // Interrupts are disabled here
+              // cs is a CriticalSection token proving this
+              let shared = SHARED.borrow(cs).borrow();
+          });
+
+  - id: rust_ownership_embedded
+    title: "Ownership and RAII for Embedded Safety"
+    estimated_minutes: 6
+    content: |
+      # Ownership and RAII for Embedded Safety
+
+      Rust's ownership model is particularly powerful for embedded systems where
+      resource management bugs can be catastrophic.
+
+      ## Ownership Rules
+
+      Rust enforces three rules at compile time:
+
+      1. Each value has exactly one owner
+      2. When the owner goes out of scope, the value is dropped (freed)
+      3. Ownership can be transferred (moved) but not duplicated (for non-Copy types)
+
+      Example:
+
+          let buf = [0u8; 64];     // buf owns the array
+          let buf2 = buf;          // ownership moves to buf2
+          // buf is now invalid -- using it is a compile error
+
+      ## Borrowing
+
+      Instead of moving, you can borrow a value:
+
+      - **Immutable borrow** (`&T`): Multiple allowed simultaneously
+      - **Mutable borrow** (`&mut T`): Only one allowed, no immutable borrows
+
+          let mut data = [0u8; 64];
+          let r1 = &data;          // immutable borrow -- OK
+          let r2 = &data;          // another immutable borrow -- OK
+          // let r3 = &mut data;   // ERROR: can't mutably borrow while immutably borrowed
+
+      ## RAII (Resource Acquisition Is Initialization)
+
+      In Rust, resources are tied to object lifetimes. When an object is dropped,
+      its resources are automatically released:
+
+          struct SpiDevice {
+              cs_pin: OutputPin,
+          }
+
+          impl SpiDevice {
+              fn new(cs: OutputPin) -> Self {
+                  // Acquire: take ownership of the chip select pin
+                  SpiDevice { cs_pin: cs }
+              }
+          }
+
+          impl Drop for SpiDevice {
+              fn drop(&mut self) {
+                  // Release: deassert chip select when device is dropped
+                  self.cs_pin.set_high().ok();
+              }
+          }
+
+      This pattern is critical in embedded systems for:
+
+      - **Peripheral ownership**: Only one driver can own a peripheral at a time
+      - **Pin configuration**: A pin configured as SPI_MOSI cannot accidentally
+        be used as GPIO
+      - **DMA buffers**: The buffer cannot be freed while DMA is still using it
+
+      ## Typestate Pattern
+
+      Rust's type system can encode hardware states at compile time:
+
+          struct Pin<MODE> {
+              pin_number: u8,
+              _mode: PhantomData<MODE>,
+          }
+
+          struct Unconfigured;
+          struct Input;
+          struct Output;
+
+          impl Pin<Unconfigured> {
+              fn into_input(self) -> Pin<Input> { /* configure hardware */ }
+              fn into_output(self) -> Pin<Output> { /* configure hardware */ }
+          }
+
+          impl Pin<Output> {
+              fn set_high(&mut self) { /* ... */ }
+              fn set_low(&mut self) { /* ... */ }
+          }
+
+      Calling `set_high()` on an input pin is a **compile-time error**, not a
+      runtime bug. The typestate pattern moves hardware configuration mistakes
+      from runtime to compile time.
+
+      ## Comparison with C
+
+      | Concern              | C Approach              | Rust Approach             |
+      |----------------------|-------------------------|---------------------------|
+      | Double-free          | Discipline / tools      | Prevented by ownership    |
+      | Use-after-free       | Discipline / sanitizers | Prevented by borrow check |
+      | Data races           | Mutexes (manual)        | Type system enforced      |
+      | Resource cleanup     | Manual free() calls     | Automatic via Drop trait  |
+      | Invalid peripheral   | Runtime checks          | Compile-time typestate    |

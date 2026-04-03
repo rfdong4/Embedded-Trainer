@@ -1,0 +1,138 @@
+topic_id: riscv
+topic_name: "RISC-V Architecture"
+questions:
+  - id: riscv_q01
+    type: mcq
+    difficulty: beginner
+    text: "What type of instruction set architecture (ISA) is RISC-V?"
+    options:
+      - "A) CISC (Complex Instruction Set Computer)"
+      - "B) RISC (Reduced Instruction Set Computer)"
+      - "C) VLIW (Very Long Instruction Word)"
+      - "D) EPIC (Explicitly Parallel Instruction Computing)"
+    correct: "B"
+    explanation: "RISC-V is a Reduced Instruction Set Computer (RISC) architecture. It features a small set of simple, fixed-length instructions designed for efficient pipelining and hardware implementation."
+    tags: [riscv, isa, basics]
+    xp: 10
+
+  - id: riscv_q02
+    type: mcq
+    difficulty: beginner
+    text: "In RISC-V, what is the value of register x0?"
+    options:
+      - "A) Undefined at reset"
+      - "B) The program counter"
+      - "C) Always hardwired to zero"
+      - "D) The stack pointer"
+    correct: "C"
+    explanation: "Register x0 in RISC-V is hardwired to zero. Any write to x0 is discarded, and any read from x0 always returns 0. This simplifies instruction encoding by providing a constant zero source."
+    tags: [riscv, registers, x0]
+    xp: 10
+
+  - id: riscv_q03
+    type: mcq
+    difficulty: intermediate
+    text: "Which RISC-V CSR holds the address of the trap handler entry point?"
+    options:
+      - "A) mepc"
+      - "B) mcause"
+      - "C) mtvec"
+      - "D) mstatus"
+    correct: "C"
+    explanation: "The mtvec (Machine Trap-Vector Base-Address) CSR holds the base address of the trap handler. When a trap occurs, the processor jumps to the address specified in mtvec."
+    tags: [riscv, csr, mtvec, traps]
+    xp: 10
+
+  - id: riscv_q04
+    type: mcq
+    difficulty: intermediate
+    text: "What does the mcause CSR indicate after a trap?"
+    options:
+      - "A) The address that caused the trap"
+      - "B) The current privilege mode"
+      - "C) The cause of the trap (interrupt or exception code)"
+      - "D) The return address after the trap"
+    correct: "C"
+    explanation: "The mcause CSR indicates the cause of the trap. The most significant bit distinguishes interrupts (1) from exceptions (0), and the remaining bits hold the specific cause code."
+    tags: [riscv, csr, mcause, traps]
+    xp: 10
+
+  - id: riscv_q05
+    type: mcq
+    difficulty: intermediate
+    text: "Which three privilege modes are defined in the RISC-V privilege specification?"
+    options:
+      - "A) Kernel, User, Hypervisor"
+      - "B) Machine (M), Supervisor (S), User (U)"
+      - "C) Ring 0, Ring 1, Ring 3"
+      - "D) Privileged, Unprivileged, Debug"
+    correct: "B"
+    explanation: "RISC-V defines three privilege modes: Machine (M) mode is the highest privilege and always present, Supervisor (S) mode is used for OS kernels, and User (U) mode is the least privileged for applications."
+    tags: [riscv, privilege_modes]
+    xp: 10
+
+  - id: riscv_q06
+    type: true_false
+    difficulty: beginner
+    text: "In RISC-V, Machine mode (M-mode) is the only privilege level that is mandatory in all implementations."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "Machine mode is the only mandatory privilege level in RISC-V. Simple embedded implementations may only support M-mode, while more complex systems add Supervisor and User modes."
+    tags: [riscv, privilege_modes, m_mode]
+    xp: 10
+
+  - id: riscv_q07
+    type: mcq
+    difficulty: intermediate
+    text: "What is the standard width of a base RISC-V integer instruction?"
+    options:
+      - "A) 16 bits"
+      - "B) 24 bits"
+      - "C) 32 bits"
+      - "D) 64 bits"
+    correct: "C"
+    explanation: "The base RISC-V integer ISA uses fixed-length 32-bit instructions. The compressed extension (C) adds 16-bit instructions, but the base instruction width is always 32 bits."
+    tags: [riscv, instruction_encoding]
+    xp: 10
+
+  - id: riscv_q08
+    type: mcq
+    difficulty: advanced
+    text: "In a 32-bit RISC-V R-type instruction, which bit field specifies the destination register?"
+    options:
+      - "A) Bits [19:15]"
+      - "B) Bits [11:7]"
+      - "C) Bits [24:20]"
+      - "D) Bits [6:0]"
+    correct: "B"
+    explanation: "In an R-type RISC-V instruction, bits [11:7] specify the destination register (rd). Bits [19:15] are rs1, bits [24:20] are rs2, bits [6:0] are the opcode, and bits [31:25] and [14:12] are funct7 and funct3."
+    tags: [riscv, instruction_encoding, r_type]
+    xp: 10
+
+  - id: riscv_q09
+    type: mcq
+    difficulty: intermediate
+    text: "In the RISC-V calling convention, which registers are used to pass the first four integer function arguments?"
+    options:
+      - "A) x1-x4 (ra, sp, gp, tp)"
+      - "B) x10-x13 (a0-a3)"
+      - "C) x5-x8 (t0-t3)"
+      - "D) x18-x21 (s2-s5)"
+    correct: "B"
+    explanation: "The RISC-V calling convention uses registers a0-a7 (x10-x17) for passing function arguments. The first four arguments go in a0-a3 (x10-x13), and return values use a0-a1."
+    tags: [riscv, calling_convention, abi]
+    xp: 10
+
+  - id: riscv_q10
+    type: mcq
+    difficulty: advanced
+    text: "What is a key architectural difference between RISC-V and ARM Cortex-M regarding interrupt handling?"
+    options:
+      - "A) RISC-V has no interrupt support"
+      - "B) ARM Cortex-M uses a hardware NVIC with automatic context save, while RISC-V uses a simpler trap mechanism requiring software context save"
+      - "C) RISC-V supports more interrupt priority levels than ARM"
+      - "D) ARM does not support nested interrupts"
+    correct: "B"
+    explanation: "ARM Cortex-M features a hardware NVIC that automatically saves/restores registers on interrupt entry/exit. RISC-V uses a simpler trap model where the processor jumps to mtvec and software must save/restore context, though RISC-V extensions like CLIC add more hardware support."
+    tags: [riscv, arm, interrupts, comparison]
+    xp: 10

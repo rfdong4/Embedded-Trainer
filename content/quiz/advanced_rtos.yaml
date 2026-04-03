@@ -1,0 +1,138 @@
+topic_id: advanced_rtos
+topic_name: "Advanced RTOS"
+questions:
+  - id: advanced_rtos_q01
+    type: mcq
+    difficulty: beginner
+    text: "What is a memory pool in an RTOS context?"
+    options:
+      - "A) A region of memory reserved for the operating system kernel"
+      - "B) A pre-allocated set of fixed-size blocks that can be allocated and freed without heap fragmentation"
+      - "C) A cache for frequently accessed variables"
+      - "D) A DMA buffer for peripheral transfers"
+    correct: "B"
+    explanation: "A memory pool (or memory partition) is a collection of fixed-size blocks allocated from a static buffer. Since all blocks are the same size, allocation and deallocation are O(1) and fragmentation-free. This is critical in embedded systems where malloc/free can cause unpredictable fragmentation."
+    tags: [memory_pool, allocation, fragmentation]
+    xp: 10
+
+  - id: advanced_rtos_q02
+    type: mcq
+    difficulty: beginner
+    text: "What are event flags (event groups) used for in an RTOS?"
+    options:
+      - "A) To store error codes from ISRs"
+      - "B) To allow tasks to wait on one or more boolean conditions represented as bits in a group, synchronizing on any or all of them"
+      - "C) To configure GPIO pin directions"
+      - "D) To count the number of context switches"
+    correct: "B"
+    explanation: "Event flags are a group of bits where each bit represents a condition or event. A task can wait until any one bit is set (logical OR) or until all specified bits are set (logical AND). This provides flexible multi-event synchronization without needing multiple semaphores."
+    tags: [event_flags, event_groups, synchronization]
+    xp: 10
+
+  - id: advanced_rtos_q03
+    type: mcq
+    difficulty: beginner
+    text: "What is a software timer in an RTOS?"
+    options:
+      - "A) A hardware peripheral that generates interrupts at fixed intervals"
+      - "B) A kernel-managed timer that calls a user-defined callback function when it expires, without requiring a dedicated hardware timer"
+      - "C) A delay loop implemented in software"
+      - "D) A timestamp counter for measuring execution time"
+    correct: "B"
+    explanation: "RTOS software timers are managed by the kernel's timer service task. They use the system tick as their time base and invoke a callback when they expire. They can be one-shot or auto-reload. Unlike hardware timers, many software timers can be created without additional peripherals."
+    tags: [software_timer, callback, tick]
+    xp: 10
+
+  - id: advanced_rtos_q04
+    type: true_false
+    difficulty: intermediate
+    text: "Tickless idle mode allows an RTOS to stop the periodic tick interrupt during idle periods to reduce power consumption, programming the next wake-up based on the earliest pending event."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "In tickless (or tick-suppression) mode, when all tasks are blocked and the idle task runs, the RTOS calculates the time until the next scheduled event, programs a low-power timer to wake the system at that time, and enters a low-power sleep mode. This eliminates unnecessary tick interrupts that would wake the processor, significantly reducing power consumption."
+    tags: [tickless, low_power, idle, tick_suppression]
+    xp: 15
+
+  - id: advanced_rtos_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is priority inheritance and what problem does it solve?"
+    options:
+      - "A) It allows child tasks to inherit the priority of their parent task at creation time"
+      - "B) It temporarily raises the priority of a low-priority task holding a mutex to the priority of the highest-priority task waiting for that mutex, preventing priority inversion"
+      - "C) It automatically assigns priorities based on task stack size"
+      - "D) It ensures all tasks run at the same priority"
+    correct: "B"
+    explanation: "Priority inheritance is a protocol where a task holding a mutex has its priority temporarily boosted to match the highest-priority task that is blocked waiting for the same mutex. This prevents unbounded priority inversion, where a medium-priority task could preempt the low-priority mutex holder and indirectly delay the high-priority waiter."
+    tags: [priority_inheritance, priority_inversion, mutex]
+    xp: 15
+
+  - id: advanced_rtos_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What is the difference between the Priority Inheritance Protocol (PIP) and the Priority Ceiling Protocol (PCP)?"
+    options:
+      - "A) PIP is for hardware interrupts; PCP is for software interrupts"
+      - "B) PIP raises a task's priority only when contention occurs; PCP immediately raises priority to the ceiling when a mutex is acquired, preventing deadlock"
+      - "C) PIP is used in Linux; PCP is used only in FreeRTOS"
+      - "D) There is no difference; they are the same protocol"
+    correct: "B"
+    explanation: "PIP (Priority Inheritance Protocol) raises a task's priority reactively when a higher-priority task blocks on the mutex. PCP (Priority Ceiling Protocol) proactively raises the task's priority to the mutex's ceiling priority (the highest priority of any task that may use it) as soon as the mutex is acquired. PCP prevents deadlocks and chains of blocking but requires knowing all potential users at design time."
+    tags: [priority_ceiling, priority_inheritance, mutex, deadlock]
+    xp: 15
+
+  - id: advanced_rtos_q07
+    type: mcq
+    difficulty: intermediate
+    text: "What is the difference between Asymmetric Multiprocessing (AMP) and Symmetric Multiprocessing (SMP) in embedded systems?"
+    options:
+      - "A) AMP uses multiple cores of different types; SMP uses only identical cores"
+      - "B) In AMP each core runs its own OS instance or bare-metal code independently; in SMP a single OS instance manages all cores and can schedule any task on any core"
+      - "C) AMP is faster than SMP in all cases"
+      - "D) SMP requires at least four cores; AMP works with two"
+    correct: "B"
+    explanation: "In AMP, each core operates independently, often running different software or even different operating systems. Communication between cores uses shared memory or hardware mailboxes. In SMP, a single RTOS instance manages all cores, providing automatic load balancing by scheduling ready tasks on any available core. SMP requires careful locking (spinlocks) for shared kernel data structures."
+    tags: [amp, smp, multicore, scheduling]
+    xp: 15
+
+  - id: advanced_rtos_q08
+    type: mcq
+    difficulty: advanced
+    text: "What is a spinlock, and when is it appropriate to use one in an embedded RTOS?"
+    options:
+      - "A) A spinlock is a delay-based lock that sleeps for a fixed time before retrying"
+      - "B) A spinlock is a lock where a core busy-waits in a tight loop until the lock is released; it is appropriate for very short critical sections in multicore systems where blocking would be more expensive"
+      - "C) A spinlock is a type of semaphore used only in ISRs"
+      - "D) A spinlock is a hardware mutex provided by the DMA controller"
+    correct: "B"
+    explanation: "A spinlock is a low-level synchronization primitive where the waiting core repeatedly tests (spins on) a lock variable until it becomes available. Spinlocks are used in multicore systems for protecting short critical sections where the overhead of blocking and context switching would exceed the spin time. On single-core systems, spinlocks waste CPU cycles and should be replaced with interrupt disabling."
+    tags: [spinlock, multicore, critical_section, busy_wait]
+    xp: 25
+
+  - id: advanced_rtos_q09
+    type: mcq
+    difficulty: advanced
+    text: "Which mechanism is commonly used for inter-processor communication (IPC) between cores in an AMP multicore embedded system?"
+    options:
+      - "A) UART serial connection between cores"
+      - "B) Shared memory regions combined with hardware mailbox interrupts to signal new data"
+      - "C) SPI bus connecting the two cores"
+      - "D) A dedicated Ethernet link between cores"
+    correct: "B"
+    explanation: "In AMP systems, cores typically communicate through shared memory regions with proper cache coherency management. A hardware mailbox or inter-processor interrupt (IPI) mechanism signals the other core that new data is available in shared memory. Frameworks like OpenAMP and RPMsg standardize this pattern. This is much faster than using a serial peripheral for IPC."
+    tags: [ipc, shared_memory, mailbox, amp, multicore]
+    xp: 25
+
+  - id: advanced_rtos_q10
+    type: mcq
+    difficulty: advanced
+    text: "In RTOS memory management, what is the advantage of using multiple fixed-size memory pools with different block sizes over a general-purpose heap allocator?"
+    options:
+      - "A) It uses less total memory in all cases"
+      - "B) It eliminates external fragmentation, provides deterministic O(1) allocation time, and avoids the need for complex heap management"
+      - "C) It allows allocating blocks larger than available RAM"
+      - "D) It automatically defragments memory during idle time"
+    correct: "B"
+    explanation: "Multiple fixed-size pools (e.g., pools of 16, 32, 64, 128 byte blocks) eliminate external fragmentation since blocks within each pool are identical. Allocation is O(1) — just grab the next free block from the appropriate pool. There is no coalescing or splitting overhead. The trade-off is potential internal fragmentation (wasted space within a block) and the need to pre-define pool sizes at design time."
+    tags: [memory_pool, fragmentation, deterministic, allocation]
+    xp: 25

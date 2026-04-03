@@ -1,0 +1,166 @@
+topic_id: dma
+articles:
+  - id: dma_basics
+    title: "DMA Fundamentals: Offloading the CPU"
+    estimated_minutes: 6
+    content: |
+      # DMA Fundamentals: Offloading the CPU
+
+      Direct Memory Access (DMA) allows peripherals to transfer data to and from
+      memory without CPU involvement. This is critical in embedded systems where the
+      CPU must remain responsive while handling high-throughput data streams.
+
+      ## Why DMA?
+
+      Without DMA, the CPU must execute load/store instructions for every byte
+      transferred between a peripheral and memory. For a UART receiving at 115200 baud,
+      this is manageable. But for an ADC sampling at 1 MSPS or an SPI bus at 10 MHz,
+      the CPU would spend most of its cycles just moving data.
+
+      DMA frees the CPU by performing these transfers autonomously:
+
+          // Without DMA (CPU polling):
+          for (int i = 0; i < 1024; i++) {
+              while (!(ADC->SR & ADC_SR_EOC));  // wait for conversion
+              buffer[i] = ADC->DR;               // CPU reads each sample
+          }
+
+          // With DMA (CPU configures once):
+          DMA1_Channel1->CPAR = (uint32_t)&ADC->DR;     // source: ADC data register
+          DMA1_Channel1->CMAR = (uint32_t)buffer;        // destination: memory buffer
+          DMA1_Channel1->CNDTR = 1024;                   // number of transfers
+          DMA1_Channel1->CCR = DMA_CCR_EN | DMA_CCR_MINC | DMA_CCR_PSIZE_16 | DMA_CCR_MSIZE_16;
+
+      ## DMA Channel Configuration
+
+      A DMA channel requires several parameters:
+
+      - **Source address**: Where to read data (peripheral register or memory)
+      - **Destination address**: Where to write data
+      - **Transfer count**: Number of data items to transfer
+      - **Data width**: Byte (8-bit), half-word (16-bit), or word (32-bit)
+      - **Increment mode**: Whether to increment source/destination address after each transfer
+      - **Direction**: Peripheral-to-memory, memory-to-peripheral, or memory-to-memory
+      - **Priority**: Channel priority for bus arbitration
+
+      ## Transfer Modes
+
+      ### Normal Mode
+      The DMA transfers the configured number of items, then stops.
+      A transfer-complete interrupt signals the CPU.
+
+      ### Circular Mode
+      When the transfer count reaches zero, the DMA reloads the original count
+      and address, creating a continuous ring buffer:
+
+          DMA1_Channel1->CCR |= DMA_CCR_CIRC;  // enable circular mode
+
+      This is ideal for continuous ADC sampling or audio streaming.
+
+      ## Bus Arbitration
+
+      When both the CPU and DMA need the bus, an arbiter decides who goes first.
+      Most Cortex-M devices use a fixed-priority scheme where DMA has higher priority,
+      but the CPU is guaranteed at least half the bus bandwidth.
+
+      ## Interrupts
+
+      DMA controllers typically generate three types of interrupts:
+      - **Transfer complete (TC)**: All items transferred
+      - **Half-transfer (HT)**: Half the items transferred (useful for double buffering)
+      - **Transfer error (TE)**: A bus error occurred during transfer
+
+  - id: dma_zero_copy
+    title: "Zero-Copy and Scatter-Gather DMA"
+    estimated_minutes: 7
+    content: |
+      # Zero-Copy and Scatter-Gather DMA
+
+      Advanced DMA techniques minimize CPU involvement and memory copies for
+      maximum throughput in data-intensive embedded applications.
+
+      ## Zero-Copy Transfers
+
+      Zero-copy means data moves from source to destination without the CPU
+      copying it through an intermediate buffer. With DMA, data flows directly:
+
+          Peripheral Register  --DMA-->  Application Buffer
+
+      Without zero-copy, the typical flow is:
+
+          Peripheral Register  --CPU-->  Driver Buffer  --CPU-->  Application Buffer
+
+      The zero-copy approach saves CPU cycles and memory bandwidth, which is
+      critical for real-time systems.
+
+      ## Double Buffering
+
+      Double buffering uses two memory buffers to achieve continuous data flow:
+
+          // Buffer A and Buffer B
+          uint16_t buffer_a[256];
+          uint16_t buffer_b[256];
+
+          // DMA fills buffer_a while CPU processes buffer_b, then they swap
+
+      The DMA half-transfer and transfer-complete interrupts naturally support
+      this pattern with a single large circular buffer:
+
+          uint16_t big_buffer[512];  // treated as two halves
+
+          void DMA1_Channel1_IRQHandler(void) {
+              if (DMA1->ISR & DMA_ISR_HTIF1) {
+                  // First half complete - process big_buffer[0..255]
+                  DMA1->IFCR = DMA_IFCR_CHTIF1;
+              }
+              if (DMA1->ISR & DMA_ISR_TCIF1) {
+                  // Second half complete - process big_buffer[256..511]
+                  DMA1->IFCR = DMA_IFCR_CTCIF1;
+              }
+          }
+
+      ## Scatter-Gather DMA
+
+      Some advanced DMA controllers support scatter-gather (also called linked-list
+      mode). Instead of a single contiguous transfer, the DMA follows a chain of
+      descriptors, each defining a separate transfer:
+
+          typedef struct dma_descriptor {
+              uint32_t src_addr;      // source address
+              uint32_t dst_addr;      // destination address
+              uint32_t count;         // number of transfers
+              uint32_t control;       // channel config bits
+              struct dma_descriptor *next;  // pointer to next descriptor (NULL = stop)
+          } dma_descriptor_t;
+
+      This enables:
+      - **Scatter**: Writing data to multiple non-contiguous memory regions
+      - **Gather**: Reading from multiple non-contiguous regions into one output
+      - **Chained transfers**: Automatically starting the next transfer without CPU setup
+
+      ## Alignment Considerations
+
+      DMA transfers must respect the bus alignment requirements:
+
+      | Transfer Width | Required Alignment |
+      |---------------|-------------------|
+      | Byte (8-bit)  | Any address       |
+      | Half-word (16-bit) | 2-byte aligned |
+      | Word (32-bit) | 4-byte aligned    |
+
+      Unaligned transfers may cause a hard fault or silently corrupt data,
+      depending on the architecture. Always ensure buffers are properly aligned:
+
+          __attribute__((aligned(4))) uint8_t dma_buffer[256];
+
+      ## Cache Coherency
+
+      On Cortex-M7 and other processors with data caches, DMA and the CPU may
+      see different views of memory. Before starting a DMA read from memory,
+      clean (flush) the cache. After a DMA write to memory, invalidate the cache:
+
+          // Before DMA reads from buffer (memory -> peripheral)
+          SCB_CleanDCache_by_Addr(buffer, size);
+
+          // After DMA writes to buffer (peripheral -> memory)
+          SCB_InvalidateDCache_by_Addr(buffer, size);

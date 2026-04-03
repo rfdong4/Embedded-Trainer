@@ -1,0 +1,69 @@
+id: embedded_rust_resource_guard
+topic_id: embedded_rust
+title: "RAII-Style Resource Guard"
+difficulty: intermediate
+description: |
+  Simulate Rust's RAII (Resource Acquisition Is Initialization) pattern in C.
+
+  In Rust, resources are automatically released when their owner goes out of
+  scope via the Drop trait. Implement a resource guard that:
+
+  - guard_acquire: Sets *acquired = 1 and returns 1 (success) if *acquired is 0.
+    Returns 0 (failure) if already acquired.
+  - guard_release: Sets *acquired = 0 and returns 1 (success) if *acquired is 1.
+    Returns 0 (failure) if not currently acquired.
+
+  This simulates the RAII pattern where a resource (mutex, peripheral, DMA channel)
+  is acquired on construction and released on destruction.
+
+  Parameters:
+  - acquired: pointer to an int representing the resource state (0=free, 1=held)
+function_signature: |
+  int guard_acquire(int *acquired);
+  int guard_release(int *acquired);
+skeleton_code: |
+  #include <stdint.h>
+
+  /* Simulates Rust's RAII pattern:
+   * - In Rust, acquiring a resource returns an owned guard object
+   * - When the guard is dropped (goes out of scope), the resource is released
+   * - This prevents resource leaks at compile time */
+
+  int guard_acquire(int *acquired) {
+      // TODO: acquire the resource if free, return success/failure
+  }
+
+  int guard_release(int *acquired) {
+      // TODO: release the resource if held, return success/failure
+  }
+test_harness: "resource_guard_tests/test_main.c"
+expected_output: "resource_guard_tests/expected_output.txt"
+hints:
+  - "Check the current state before modifying it"
+  - "Return 0 for failure (already acquired or already released)"
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  /* Simulates Rust's RAII pattern:
+   * - In Rust, acquiring a resource returns an owned guard object
+   * - When the guard is dropped (goes out of scope), the resource is released
+   * - This prevents resource leaks at compile time */
+
+  int guard_acquire(int *acquired) {
+      if (*acquired) return 0;
+      *acquired = 1;
+      return 1;
+  }
+
+  int guard_release(int *acquired) {
+      if (!*acquired) return 0;
+      *acquired = 0;
+      return 1;
+  }
+solution_explanation: |
+  This simulates Rust's RAII pattern where resource lifetimes are tied to scope.
+  In Rust, a MutexGuard automatically unlocks the mutex when dropped. Here we
+  manually track the acquired state and enforce that acquire/release are paired.
+  In real Rust, the compiler enforces this automatically through ownership.

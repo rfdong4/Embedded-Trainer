@@ -1,0 +1,50 @@
+id: embedded_security_key_derivation
+topic_id: embedded_security
+title: "Simple Key Derivation"
+difficulty: intermediate
+description: |
+  Implement a simple key derivation function that derives a new key from a
+  master key and a context value using XOR and bit rotation.
+
+  For each byte of the output key:
+  1. XOR the corresponding master key byte with the context byte at the same
+     index (both arrays are the same length).
+  2. Rotate the result left by (i % 8) bits, where i is the byte index.
+
+  Left rotation of a byte by n: (val << n) | (val >> (8 - n))
+
+  Parameters:
+  - master_key: pointer to the master key bytes
+  - context: pointer to the context bytes
+  - output: pointer to the output buffer for the derived key
+  - len: number of bytes in each array
+function_signature: "void derive_key(const uint8_t *master_key, const uint8_t *context, uint8_t *output, uint32_t len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  void derive_key(const uint8_t *master_key, const uint8_t *context, uint8_t *output, uint32_t len) {
+      // TODO: implement
+  }
+test_harness: "key_derivation_tests/test_main.c"
+expected_output: "key_derivation_tests/expected_output.txt"
+hints:
+  - "XOR the master_key byte with the context byte first."
+  - "Then rotate the result left by (i % 8) bits using shift and OR."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  void derive_key(const uint8_t *master_key, const uint8_t *context, uint8_t *output, uint32_t len) {
+      for (uint32_t i = 0; i < len; i++) {
+          uint8_t val = master_key[i] ^ context[i];
+          uint8_t rot = i % 8;
+          output[i] = (uint8_t)((val << rot) | (val >> (8 - rot)));
+      }
+  }
+solution_explanation: |
+  For each byte index, the function XORs the master key byte with the context
+  byte to mix in the context. It then applies a left bit rotation by (i % 8)
+  positions. The rotation uses the standard formula: shift left by rot and OR
+  with shift right by (8 - rot). When rot is 0, the byte is unchanged since
+  shifting by 8 on a uint8_t wraps correctly after the XOR mixing.

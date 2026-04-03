@@ -30,3 +30,18 @@ hints:
   - "AND history with the mask. If the result equals the mask, all samples are HIGH. If 0, all LOW. Otherwise, unstable."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t gpio_debounce(uint8_t history, uint8_t num_samples) {
+      uint8_t mask = (1 << num_samples) - 1;
+      uint8_t samples = history & mask;
+      if (samples == mask) return 1;
+      if (samples == 0) return 0;
+      return 2;
+  }
+solution_explanation: |
+  A bitmask is created for the lowest num_samples bits. The history is ANDed
+  with this mask to isolate the relevant samples. If all masked bits are 1
+  the pin is stable HIGH; if all are 0 it is stable LOW; otherwise the pin
+  is bouncing and the function returns 2.

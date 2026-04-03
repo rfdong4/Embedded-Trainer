@@ -59,6 +59,9 @@ def check_achievements(
         "level_10": lambda: get_level(profile.total_xp)[0] >= 10,
         "50_questions": lambda: db.get_total_questions_answered(profile.id) >= 50,
         "10_challenges": lambda: db.get_total_challenges_passed(profile.id) >= 10,
+        "25_challenges": lambda: db.get_total_challenges_passed(profile.id) >= 25,
+        "100_questions": lambda: db.get_total_questions_answered(profile.id) >= 100,
+        "bug_hunter": lambda: len(db.get_completed_bug_hunts(profile.id)) >= 10,
     }
 
     for achievement_id, condition in checks.items():

@@ -1,0 +1,48 @@
+id: low_power_clock_gate
+topic_id: low_power
+title: "Implement Clock Gating Control"
+difficulty: beginner
+description: |
+  Implement two functions to control peripheral clock gating via a 32-bit
+  clock enable register. Each bit corresponds to one peripheral (bit 0 = peripheral 0, etc.).
+
+  1. clock_enable: Set the bit for the given peripheral to enable its clock.
+     Return the updated register value.
+  2. clock_disable: Clear the bit for the given peripheral to gate its clock.
+     Return the updated register value.
+
+  Parameters:
+  - clk_reg: current value of the clock enable register (uint32_t)
+  - peripheral: peripheral number 0-31 (uint8_t)
+function_signature: "uint32_t clock_enable(uint32_t clk_reg, uint8_t peripheral); uint32_t clock_disable(uint32_t clk_reg, uint8_t peripheral)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t clock_enable(uint32_t clk_reg, uint8_t peripheral) {
+      // TODO: implement
+  }
+
+  uint32_t clock_disable(uint32_t clk_reg, uint8_t peripheral) {
+      // TODO: implement
+  }
+test_harness: "clock_gate_tests/test_main.c"
+expected_output: "clock_gate_tests/expected_output.txt"
+hints:
+  - "Use OR with (1 << peripheral) to enable."
+  - "Use AND with ~(1 << peripheral) to disable."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t clock_enable(uint32_t clk_reg, uint8_t peripheral) {
+      return clk_reg | ((uint32_t)1 << peripheral);
+  }
+
+  uint32_t clock_disable(uint32_t clk_reg, uint8_t peripheral) {
+      return clk_reg & ~((uint32_t)1 << peripheral);
+  }
+solution_explanation: |
+  clock_enable uses bitwise OR with a shifted 1 to set the peripheral's bit.
+  clock_disable uses bitwise AND with an inverted mask to clear the bit.
+  The cast to uint32_t ensures correct shifting for bit positions above 15.

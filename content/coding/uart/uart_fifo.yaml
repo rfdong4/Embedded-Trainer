@@ -51,3 +51,43 @@ hints:
   - "Check cnt before push (full if cnt == FIFO_SIZE) and pop (empty if cnt == 0)."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define FIFO_SIZE 8
+
+  static uint8_t fifo_buf[FIFO_SIZE];
+  static int fifo_head;
+  static int fifo_tail;
+  static int fifo_cnt;
+
+  void uart_fifo_init(void) {
+      fifo_head = 0;
+      fifo_tail = 0;
+      fifo_cnt = 0;
+  }
+
+  int uart_fifo_push(uint8_t data) {
+      if (fifo_cnt == FIFO_SIZE) return -1;
+      fifo_buf[fifo_head] = data;
+      fifo_head = (fifo_head + 1) % FIFO_SIZE;
+      fifo_cnt++;
+      return 0;
+  }
+
+  int uart_fifo_pop(void) {
+      if (fifo_cnt == 0) return -1;
+      uint8_t data = fifo_buf[fifo_tail];
+      fifo_tail = (fifo_tail + 1) % FIFO_SIZE;
+      fifo_cnt--;
+      return data;
+  }
+
+  int uart_fifo_count(void) {
+      return fifo_cnt;
+  }
+solution_explanation: |
+  The FIFO uses a circular buffer with head (write) and tail (read) indices
+  and a count variable. Push writes at the head and advances it with modular
+  wrapping; pop reads from the tail and advances it similarly. The count
+  tracks occupancy to detect full and empty conditions.

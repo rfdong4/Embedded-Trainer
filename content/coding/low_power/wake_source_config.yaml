@@ -1,0 +1,61 @@
+id: low_power_wake_source_config
+topic_id: low_power
+title: "Configure Wake-Up Sources Bitmask"
+difficulty: beginner
+description: |
+  Implement a function that builds a wake-up source configuration bitmask
+  from individual enable flags.
+
+  Wake source bit assignments:
+  - Bit 0: External pin WKUP1
+  - Bit 1: External pin WKUP2
+  - Bit 2: RTC alarm
+  - Bit 3: RTC wakeup timer
+  - Bit 4: UART activity detect
+  - Bit 5: I2C address match
+  - Bit 6: Comparator output
+  - Bit 7: LPTIM (low-power timer)
+
+  Parameters: wkup1, wkup2, rtc_alarm, rtc_wakeup, uart_detect, i2c_match,
+  comp_out, lptim (all uint8_t, 0 or 1).
+
+  Return the 8-bit wake source configuration bitmask as a uint32_t.
+function_signature: "uint32_t configure_wake_sources(uint8_t wkup1, uint8_t wkup2, uint8_t rtc_alarm, uint8_t rtc_wakeup, uint8_t uart_detect, uint8_t i2c_match, uint8_t comp_out, uint8_t lptim)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t configure_wake_sources(uint8_t wkup1, uint8_t wkup2, uint8_t rtc_alarm,
+                                   uint8_t rtc_wakeup, uint8_t uart_detect,
+                                   uint8_t i2c_match, uint8_t comp_out,
+                                   uint8_t lptim) {
+      // TODO: implement
+  }
+test_harness: "wake_source_config_tests/test_main.c"
+expected_output: "wake_source_config_tests/expected_output.txt"
+hints:
+  - "Shift each parameter to its assigned bit position and OR them together."
+  - "Bit 0 needs no shift, bit 1 shifts left by 1, etc."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t configure_wake_sources(uint8_t wkup1, uint8_t wkup2, uint8_t rtc_alarm,
+                                   uint8_t rtc_wakeup, uint8_t uart_detect,
+                                   uint8_t i2c_match, uint8_t comp_out,
+                                   uint8_t lptim) {
+      uint32_t mask = 0;
+      mask |= ((uint32_t)wkup1 << 0);
+      mask |= ((uint32_t)wkup2 << 1);
+      mask |= ((uint32_t)rtc_alarm << 2);
+      mask |= ((uint32_t)rtc_wakeup << 3);
+      mask |= ((uint32_t)uart_detect << 4);
+      mask |= ((uint32_t)i2c_match << 5);
+      mask |= ((uint32_t)comp_out << 6);
+      mask |= ((uint32_t)lptim << 7);
+      return mask;
+  }
+solution_explanation: |
+  Each wake source flag is shifted to its assigned bit position and ORed into
+  the result. This is a standard pattern for building peripheral configuration
+  registers from individual boolean settings.

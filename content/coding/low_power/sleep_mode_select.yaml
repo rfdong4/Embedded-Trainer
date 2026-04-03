@@ -1,0 +1,61 @@
+id: low_power_sleep_mode_select
+topic_id: low_power
+title: "Select Appropriate Sleep Mode"
+difficulty: intermediate
+description: |
+  Implement a function that selects the most power-efficient sleep mode
+  based on system requirements.
+
+  Sleep modes (return values):
+  - 0: RUN (cannot sleep)
+  - 1: SLEEP (CPU stopped, peripherals active)
+  - 2: STOP (all clocks stopped, SRAM retained)
+  - 3: STANDBY (lowest power, SRAM lost)
+
+  Selection rules (apply in order):
+  - If peripherals_active is true and latency_us < 10, must stay in RUN (return 0)
+  - If peripherals_active is true, use SLEEP (return 1)
+  - If retain_sram is true, use STOP (return 2)
+  - Otherwise, use STANDBY (return 3)
+
+  Parameters:
+  - peripherals_active (uint8_t): 1 if peripherals need clocks
+  - retain_sram (uint8_t): 1 if SRAM contents must be preserved
+  - latency_us (uint32_t): maximum acceptable wake-up latency in microseconds
+function_signature: "uint8_t select_sleep_mode(uint8_t peripherals_active, uint8_t retain_sram, uint32_t latency_us)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint8_t select_sleep_mode(uint8_t peripherals_active, uint8_t retain_sram,
+                             uint32_t latency_us) {
+      // TODO: implement
+  }
+test_harness: "sleep_mode_select_tests/test_main.c"
+expected_output: "sleep_mode_select_tests/expected_output.txt"
+hints:
+  - "Check conditions in priority order: RUN first, then SLEEP, STOP, STANDBY."
+  - "peripherals_active with very low latency requirement means RUN."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t select_sleep_mode(uint8_t peripherals_active, uint8_t retain_sram,
+                             uint32_t latency_us) {
+      if (peripherals_active && latency_us < 10) {
+          return 0; /* RUN */
+      }
+      if (peripherals_active) {
+          return 1; /* SLEEP */
+      }
+      if (retain_sram) {
+          return 2; /* STOP */
+      }
+      return 3; /* STANDBY */
+  }
+solution_explanation: |
+  The function applies the selection rules in priority order. If peripherals
+  need clocks and the latency budget is very tight (< 10 us), the system
+  must stay in RUN. If peripherals need clocks but latency allows, SLEEP
+  mode stops only the CPU. If SRAM must be preserved, STOP mode is used.
+  Otherwise, STANDBY provides the lowest power at the cost of losing SRAM.

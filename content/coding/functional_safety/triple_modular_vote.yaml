@@ -1,0 +1,63 @@
+id: functional_safety_triple_modular_vote
+topic_id: functional_safety
+title: "Triple Modular Redundancy Voter"
+difficulty: beginner
+description: |
+  Implement a Triple Modular Redundancy (TMR) voter. Three redundant channels
+  produce outputs, and the voter selects the majority value.
+
+  - tmr_vote: Given three uint32_t inputs (a, b, c), return the value that
+    at least two of the three agree on. If all three disagree, return the
+    first value (a) as a fallback.
+  - tmr_vote_with_status: Same as tmr_vote but also sets a status flag:
+    0 = all three agree, 1 = two agree (one fault detected),
+    2 = all disagree (voter failure).
+
+  Use the provided TMR_Status enum.
+function_signature: "uint32_t tmr_vote(uint32_t a, uint32_t b, uint32_t c); uint32_t tmr_vote_with_status(uint32_t a, uint32_t b, uint32_t c, uint8_t *status)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t tmr_vote(uint32_t a, uint32_t b, uint32_t c) {
+      // TODO: return the majority value
+      // If all disagree, return a as fallback
+  }
+
+  uint32_t tmr_vote_with_status(uint32_t a, uint32_t b, uint32_t c, uint8_t *status) {
+      // TODO: return majority value and set status:
+      // 0 = all agree, 1 = two agree, 2 = all disagree
+  }
+test_harness: "triple_modular_vote_tests/test_main.c"
+expected_output: "triple_modular_vote_tests/expected_output.txt"
+hints:
+  - "Check if a == b, a == c, or b == c to find the majority."
+  - "If all three are equal, status is 0. If exactly two match, status is 1."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t tmr_vote(uint32_t a, uint32_t b, uint32_t c) {
+      if (a == b) return a;
+      if (a == c) return a;
+      if (b == c) return b;
+      return a;
+  }
+
+  uint32_t tmr_vote_with_status(uint32_t a, uint32_t b, uint32_t c, uint8_t *status) {
+      if (a == b && b == c) {
+          *status = 0;
+          return a;
+      }
+      if (a == b) { *status = 1; return a; }
+      if (a == c) { *status = 1; return a; }
+      if (b == c) { *status = 1; return b; }
+      *status = 2;
+      return a;
+  }
+solution_explanation: |
+  The TMR voter compares three inputs pairwise. If any two agree, that value is
+  the majority result. tmr_vote_with_status additionally reports whether all three
+  agreed (no fault), two agreed (single fault detected), or all disagreed
+  (voter failure — no reliable majority). The all-disagree case is a critical
+  failure that should trigger a safe-state transition.

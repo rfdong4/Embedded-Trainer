@@ -21,3 +21,14 @@ hints:
   - "Create an inverted mask with ~(1 << bit_pos)."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t clear_bit(uint8_t reg, uint8_t bit_pos) {
+      return reg & ~(1 << bit_pos);
+  }
+solution_explanation: |
+  The function creates a bitmask with (1 << bit_pos) and then inverts it with the
+  bitwise NOT operator, producing a mask with all bits set except the target bit.
+  ANDing the register with this inverted mask clears only the target bit while
+  preserving all others.

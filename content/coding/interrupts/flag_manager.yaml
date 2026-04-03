@@ -32,3 +32,21 @@ hints:
   - "These are the same bit manipulation patterns from earlier, applied to 32-bit values."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t set_flag(uint32_t flags, uint8_t flag_num) {
+      return flags | (1U << flag_num);
+  }
+
+  uint32_t clear_flag(uint32_t flags, uint8_t flag_num) {
+      return flags & ~(1U << flag_num);
+  }
+
+  uint8_t check_flag(uint32_t flags, uint8_t flag_num) {
+      return (flags >> flag_num) & 1;
+  }
+solution_explanation: |
+  set_flag uses bitwise OR with a shifted 1 to set the target bit. clear_flag
+  uses AND with the inverted mask to clear the target bit. check_flag shifts the
+  flags right by flag_num and masks with 1 to extract the single bit value.

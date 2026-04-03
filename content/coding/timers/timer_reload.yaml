@@ -24,3 +24,15 @@ hints:
   - "Then multiply by the period and divide by 1000000 to convert microseconds to ticks. Be careful about overflow in intermediate calculations."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint16_t timer_reload(uint32_t clock_freq, uint16_t prescaler, uint32_t desired_period_us) {
+      uint32_t timer_clk = clock_freq / prescaler;
+      return (uint16_t)((uint64_t)timer_clk * desired_period_us / 1000000ULL);
+  }
+solution_explanation: |
+  First compute the timer clock by dividing the system clock by the prescaler. Then
+  multiply by the desired period in microseconds and divide by 1,000,000 to convert
+  to timer ticks. A 64-bit intermediate is used to prevent overflow when the timer
+  clock and period are both large.

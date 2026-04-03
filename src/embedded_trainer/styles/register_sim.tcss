@@ -1,0 +1,39 @@
+#sim-layout {
+    height: 1fr;
+}
+
+#register-panel {
+    width: 1fr;
+    padding: 1;
+}
+
+#exercise-panel {
+    width: 1fr;
+    padding: 1;
+}
+
+#instructions {
+    height: 1fr;
+    border: solid $accent;
+    padding: 1;
+}
+
+#current-step {
+    margin-top: 1;
+    text-style: bold;
+}
+
+#step-feedback {
+    margin: 1 0;
+    padding: 1;
+}
+
+#sim-actions {
+    dock: bottom;
+    height: auto;
+    padding: 1;
+}
+
+#sim-actions Button {
+    margin-right: 1;
+}

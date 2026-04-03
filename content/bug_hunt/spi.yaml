@@ -1,0 +1,54 @@
+topic_id: spi
+challenges:
+  - id: bug_spi_cs_timing
+    title: "Chip Select Timing Violation"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      #define SPI_DR  (*(volatile uint32_t*)0x4001300C)
+      #define SPI_SR  (*(volatile uint32_t*)0x40013008)
+      #define GPIO_CS (*(volatile uint32_t*)0x40020014)
+
+      uint8_t spi_transfer(uint8_t data) {
+          GPIO_CS &= ~(1 << 4);  // CS low (select)
+          SPI_DR = data;
+          GPIO_CS |= (1 << 4);   // CS high (deselect)
+          while (!(SPI_SR & (1 << 0)));  // Wait for RXNE
+          return SPI_DR;
+      }
+    correct_answer: "B"
+    options:
+      - "A) Should check TXE before writing"
+      - "B) CS is deasserted before transfer completes — must wait for RXNE/BSY before raising CS"
+      - "C) SPI_DR should be uint8_t"
+      - "D) CS polarity is wrong"
+    explanation: "CS is raised immediately after writing to DR, but the SPI transfer hasn't completed yet. The slave needs CS held low for the entire transfer duration. Wait for the transfer to complete before deasserting CS."
+    xp: 15
+    tags: [chip_select, timing, spi_transfer]
+
+  - id: bug_spi_cpol_cpha
+    title: "Wrong Clock Polarity/Phase"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      // Sensor datasheet says: SPI Mode 3 (CPOL=1, CPHA=1)
+      #define SPI_CR1 (*(volatile uint32_t*)0x40013000)
+
+      void spi_init_for_sensor(void) {
+          SPI_CR1 = 0;
+          SPI_CR1 |= (1 << 0);  // CPHA = 1
+          // CPOL left at 0 (default)
+          SPI_CR1 |= (1 << 2);  // Master mode
+          SPI_CR1 |= (1 << 6);  // SPI enable
+      }
+    correct_answer: "C"
+    options:
+      - "A) Master mode bit is wrong"
+      - "B) SPI should be enabled before configuring"
+      - "C) CPOL not set — this configures Mode 1 (CPOL=0,CPHA=1) instead of Mode 3 (CPOL=1,CPHA=1)"
+      - "D) Missing baud rate configuration"
+    explanation: "The sensor requires SPI Mode 3 (CPOL=1, CPHA=1). The code only sets CPHA=1 (bit 0) but leaves CPOL=0 (bit 1), resulting in Mode 1. Add: SPI_CR1 |= (1 << 1) to set CPOL."
+    xp: 15
+    tags: [cpol, cpha, spi_mode]

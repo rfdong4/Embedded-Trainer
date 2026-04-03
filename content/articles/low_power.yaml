@@ -1,0 +1,154 @@
+topic_id: low_power
+articles:
+  - id: low_power_basics
+    title: "Low-Power Modes: Sleep, Stop, and Standby"
+    estimated_minutes: 6
+    content: |
+      # Low-Power Modes: Sleep, Stop, and Standby
+
+      Reducing power consumption is critical for battery-powered embedded systems.
+      Modern microcontrollers provide multiple low-power modes with different
+      trade-offs between power savings and wake-up latency.
+
+      ## Power Consumption in CMOS
+
+      Dynamic power in CMOS circuits follows:
+
+          P_dynamic = C * V^2 * f
+
+      Where C is switched capacitance, V is supply voltage, and f is clock frequency.
+      Low-power modes reduce power by lowering f (clock gating), reducing V (voltage
+      scaling), or both.
+
+      ## Common Low-Power Modes
+
+      ### Run Mode (Normal)
+      All clocks active, CPU executing code. Typical current: 10-100 mA.
+
+      ### Sleep Mode
+      CPU clock stopped, peripherals keep running. Entry via WFI or WFE instruction.
+      Any enabled interrupt wakes the CPU. Typical current: 1-10 mA.
+
+          // Enter sleep mode
+          __WFI();  // Wait For Interrupt
+
+      ### Stop Mode
+      All clocks stopped, voltage regulator in low-power mode. SRAM and registers
+      preserved. Only specific wake sources (EXTI, RTC) can wake the device.
+      Typical current: 1-50 uA.
+
+          // Enter stop mode (STM32 example)
+          PWR->CR |= PWR_CR_LPDS;           // low-power regulator in stop
+          SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk; // enable deep sleep
+          __WFI();
+
+      ### Standby Mode
+      Voltage regulator off, SRAM contents lost. Only wake-up pins and RTC
+      can wake the device. On wake, the device resets. Typical current: 1-5 uA.
+
+          // Enter standby mode (STM32 example)
+          PWR->CR |= PWR_CR_PDDS;            // power-down deep sleep
+          SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+          __WFI();
+
+      ## Clock Gating
+
+      Even in Run mode, you can reduce power by disabling clocks to unused
+      peripherals. Each peripheral has a clock enable bit:
+
+          // Enable GPIOA clock, disable GPIOB clock
+          RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+          RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOBEN;
+
+      Always disable peripheral clocks before entering low-power modes for
+      maximum power savings.
+
+      ## Wake-Up Sources
+
+      | Mode    | Wake Sources                          | State Preserved |
+      |---------|---------------------------------------|-----------------|
+      | Sleep   | Any interrupt                         | Everything      |
+      | Stop    | EXTI lines, RTC alarm, UART wake      | SRAM + registers|
+      | Standby | WKUP pins, RTC alarm, IWDG reset      | Backup domain   |
+
+      ## Wake-Up Latency
+
+      Deeper sleep modes save more power but take longer to wake up:
+      - Sleep: ~1 us (just restart CPU clock)
+      - Stop: ~5-10 us (restart oscillators, wait for PLL lock)
+      - Standby: ~ms (full reset sequence)
+
+  - id: low_power_design
+    title: "Designing for Low Power: Duty Cycling and Power Budgets"
+    estimated_minutes: 5
+    content: |
+      # Designing for Low Power: Duty Cycling and Power Budgets
+
+      Achieving long battery life requires careful system design beyond just
+      selecting a low-power mode.
+
+      ## Duty Cycling
+
+      Most embedded systems do not need to run continuously. A duty-cycled design
+      alternates between active and sleep periods:
+
+          while (1) {
+              // Active phase: read sensor, transmit data
+              read_sensor();
+              transmit_data();
+
+              // Sleep phase: enter low-power mode for 10 seconds
+              rtc_set_alarm(10);
+              enter_stop_mode();
+          }
+
+      The average current for a duty-cycled system:
+
+          I_avg = (t_active * I_active + t_sleep * I_sleep) / (t_active + t_sleep)
+
+      ### Example
+      - Active: 50 ms at 15 mA
+      - Sleep: 9.95 s at 3 uA
+
+          I_avg = (0.05 * 15000 + 9.95 * 3) / 10 = 78 uA
+
+      With a 250 mAh coin cell: 250000 / 78 = 3205 hours = 133 days.
+
+      ## Power Budget Analysis
+
+      List every component and its current in each operating mode:
+
+          | Component      | Active (mA) | Sleep (uA) |
+          |---------------|-------------|------------|
+          | MCU core       | 8.0         | 2.0        |
+          | Radio (TX)     | 12.0        | 0.5        |
+          | Sensor         | 0.5         | 0.1        |
+          | Voltage reg    | 0.05        | 0.05       |
+          | Total          | 20.55 mA    | 2.65 uA    |
+
+      ## Peripheral Power Management
+
+      - **Disable unused peripherals**: Clock gate peripherals not in use
+      - **Reduce clock speed**: Use a slower clock when high performance is not needed
+      - **Use low-power peripherals**: LPUART, LPTIM consume less than standard versions
+      - **GPIO configuration**: Set unused pins to analog mode to prevent leakage
+
+          // Set unused pins to analog to minimize leakage current
+          GPIOB->MODER = 0xFFFFFFFF;  // all pins analog mode
+
+      ## Voltage Scaling
+
+      Many MCUs support dynamic voltage scaling. Lower core voltage reduces
+      power quadratically but limits maximum clock frequency:
+
+          // STM32L4 voltage range selection
+          PWR->CR1 &= ~PWR_CR1_VOS;
+          PWR->CR1 |= PWR_CR1_VOS_1;  // Range 2: lower voltage, max 26 MHz
+
+      ## Measuring Power
+
+      Use a current-sense amplifier or dedicated power analyzer to measure
+      actual consumption. Key measurements:
+      - Peak current (for battery internal resistance calculations)
+      - Average current (for battery life estimation)
+      - Sleep current (verify all peripherals are properly shut down)

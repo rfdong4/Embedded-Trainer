@@ -1,0 +1,49 @@
+id: embedded_security_hash_verify
+topic_id: embedded_security
+title: "Verify a Hash Digest"
+difficulty: beginner
+description: |
+  Implement a function that verifies a computed hash against an expected hash.
+
+  Given two byte arrays (the computed hash and the expected hash) and their
+  length, return 1 if they match exactly, or 0 if they differ.
+
+  This is a fundamental building block for secure boot: after hashing a firmware
+  image, you compare the result to the expected digest stored alongside it.
+
+  Parameters:
+  - computed: pointer to the computed hash bytes
+  - expected: pointer to the expected hash bytes
+  - len: number of bytes in each hash
+
+  Return 1 if all bytes match, 0 otherwise.
+function_signature: "int hash_verify(const uint8_t *computed, const uint8_t *expected, uint32_t len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int hash_verify(const uint8_t *computed, const uint8_t *expected, uint32_t len) {
+      // TODO: implement
+  }
+test_harness: "hash_verify_tests/test_main.c"
+expected_output: "hash_verify_tests/expected_output.txt"
+hints:
+  - "Compare each byte at the same index in both arrays."
+  - "If any byte differs, the hashes do not match."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int hash_verify(const uint8_t *computed, const uint8_t *expected, uint32_t len) {
+      for (uint32_t i = 0; i < len; i++) {
+          if (computed[i] != expected[i]) {
+              return 0;
+          }
+      }
+      return 1;
+  }
+solution_explanation: |
+  The function iterates through each byte of both hash arrays and returns 0
+  immediately if any mismatch is found. If all bytes match, it returns 1.
+  Note: this simple version is NOT constant-time and would be vulnerable to
+  timing attacks in a real system (see the secure_compare challenge).

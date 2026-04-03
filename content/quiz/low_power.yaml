@@ -1,0 +1,134 @@
+topic_id: low_power
+topic_name: "Low-Power Modes"
+questions:
+  - id: low_power_q01
+    type: mcq
+    difficulty: beginner
+    text: "What is the primary purpose of low-power modes in a microcontroller?"
+    options:
+      - "A) To increase processing speed"
+      - "B) To reduce energy consumption when full performance is not needed"
+      - "C) To increase memory capacity"
+      - "D) To improve wireless range"
+    correct: "B"
+    explanation: "Low-power modes reduce energy consumption by disabling or slowing clocks, peripherals, and voltage regulators when the microcontroller does not need full processing capability. This is critical for battery-powered embedded systems."
+    tags: [low_power, basics]
+    xp: 10
+
+  - id: low_power_q02
+    type: true_false
+    difficulty: beginner
+    text: "The WFI (Wait For Interrupt) instruction causes the processor to enter a low-power state until an interrupt occurs."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "WFI (Wait For Interrupt) is an ARM instruction that puts the processor into a low-power state. The processor stops executing instructions and waits until an enabled interrupt is asserted, at which point it wakes up and services the interrupt."
+    tags: [low_power, wfi, arm]
+    xp: 10
+
+  - id: low_power_q03
+    type: mcq
+    difficulty: beginner
+    text: "What is clock gating?"
+    options:
+      - "A) Increasing the clock frequency to a peripheral"
+      - "B) Disabling the clock signal to unused peripherals to save power"
+      - "C) Adding a gate circuit to the crystal oscillator"
+      - "D) Switching between internal and external clock sources"
+    correct: "B"
+    explanation: "Clock gating disables the clock signal to peripheral modules that are not in use. Since dynamic power consumption in CMOS circuits is proportional to clock frequency, stopping the clock to idle peripherals significantly reduces power consumption."
+    tags: [low_power, clock_gating]
+    xp: 10
+
+  - id: low_power_q04
+    type: mcq
+    difficulty: beginner
+    text: "Which of the following is typically the lowest-power mode on an ARM Cortex-M microcontroller?"
+    options:
+      - "A) Run mode"
+      - "B) Sleep mode"
+      - "C) Stop mode"
+      - "D) Standby mode"
+    correct: "D"
+    explanation: "Standby mode is typically the lowest-power mode. In standby, the voltage regulator is disabled, SRAM and register contents are lost, and only the RTC and wake-up pins remain powered. Sleep mode only stops the CPU clock, and Stop mode halts all clocks but retains SRAM."
+    tags: [low_power, standby, modes]
+    xp: 10
+
+  - id: low_power_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is the difference between WFI and WFE on ARM Cortex-M?"
+    options:
+      - "A) WFI waits for interrupts, WFE waits for events including SEV signals"
+      - "B) WFI uses more power than WFE"
+      - "C) WFE disables all interrupts while WFI does not"
+      - "D) There is no difference; they are aliases"
+    correct: "A"
+    explanation: "WFI (Wait For Interrupt) wakes only on a pending interrupt. WFE (Wait For Event) can also wake on an event, such as a Send Event (SEV) instruction from another core, making it useful in multi-core synchronization. Both put the core in a low-power state."
+    tags: [low_power, wfi, wfe, arm]
+    xp: 15
+
+  - id: low_power_q06
+    type: mcq
+    difficulty: intermediate
+    text: "In Stop mode on an STM32, which of the following is preserved?"
+    options:
+      - "A) Only backup domain registers"
+      - "B) SRAM and register contents"
+      - "C) Nothing; all state is lost"
+      - "D) Only the program counter"
+    correct: "B"
+    explanation: "In Stop mode, all clocks are stopped but the voltage regulator remains on (possibly in low-power mode), so SRAM and register contents are preserved. This is a key advantage over Standby mode, which loses SRAM contents but achieves lower current draw."
+    tags: [low_power, stop_mode, sram]
+    xp: 15
+
+  - id: low_power_q07
+    type: true_false
+    difficulty: intermediate
+    text: "A microcontroller in sleep mode can be woken up by any enabled interrupt."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "In basic sleep mode, only the CPU clock is stopped. All peripheral clocks continue to run, and any enabled interrupt can wake the processor. This makes sleep mode the quickest to enter and exit, with minimal wake-up latency."
+    tags: [low_power, sleep, interrupts]
+    xp: 15
+
+  - id: low_power_q08
+    type: mcq
+    difficulty: intermediate
+    text: "What is a wake-up source?"
+    options:
+      - "A) A voltage regulator that powers on the CPU"
+      - "B) An event or signal that brings the microcontroller out of a low-power mode"
+      - "C) A special clock oscillator used only during startup"
+      - "D) A debug probe connection"
+    correct: "B"
+    explanation: "A wake-up source is any event that can bring the MCU out of a low-power mode. Common wake-up sources include external pin interrupts (EXTI), RTC alarms, UART activity detection, watchdog timeout, and comparator output. Different low-power modes support different wake-up sources."
+    tags: [low_power, wake_sources]
+    xp: 15
+
+  - id: low_power_q09
+    type: mcq
+    difficulty: advanced
+    text: "What is the relationship between dynamic power consumption and clock frequency in CMOS circuits?"
+    options:
+      - "A) P = C * V * f"
+      - "B) P = C * V^2 * f"
+      - "C) P = C * V^2 / f"
+      - "D) P = C^2 * V * f"
+    correct: "B"
+    explanation: "Dynamic power in CMOS is P = C * V^2 * f, where C is the switched capacitance, V is the supply voltage, and f is the clock frequency. This shows that reducing voltage has a quadratic effect on power, while reducing frequency has a linear effect."
+    tags: [low_power, cmos, power_equation]
+    xp: 20
+
+  - id: low_power_q10
+    type: mcq
+    difficulty: advanced
+    text: "A sensor node wakes every 10 seconds, runs for 50 ms at 5 mA, then sleeps at 2 uA. What is the approximate average current?"
+    options:
+      - "A) 2.5 mA"
+      - "B) 27 uA"
+      - "C) 5 mA"
+      - "D) 502 uA"
+    correct: "B"
+    explanation: "Average current = (active_time * active_current + sleep_time * sleep_current) / total_time = (0.05 * 5000 + 9.95 * 2) / 10 = (250 + 19.9) / 10 = 26.99 uA, approximately 27 uA. The sleep current dominates the total time, so the average is very low."
+    tags: [low_power, duty_cycle, power_budget]
+    xp: 20

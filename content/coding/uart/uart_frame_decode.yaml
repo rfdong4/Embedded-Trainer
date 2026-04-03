@@ -31,3 +31,27 @@ hints:
   - "Count 1-bits in the data byte. The parity bit should make the total count even."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t uart_decode_frame(uint16_t frame) {
+      // Check start bit
+      if (frame & 1) return 0xFF;
+      // Check stop bit
+      if (!(frame & (1 << 10))) return 0xFF;
+      // Extract data and parity
+      uint8_t data = (frame >> 1) & 0xFF;
+      uint8_t parity = (frame >> 9) & 1;
+      // Verify even parity
+      uint8_t p = data;
+      p ^= (p >> 4);
+      p ^= (p >> 2);
+      p ^= (p >> 1);
+      if ((p & 1) != parity) return 0xFF;
+      return data;
+  }
+solution_explanation: |
+  The decoder validates the start bit (must be 0) and stop bit (must be 1),
+  then extracts the 8 data bits from bits 1-8 and the parity bit from bit 9.
+  Even parity is verified by XOR-folding the data and comparing with the
+  parity bit. If any check fails, 0xFF is returned as an error indicator.

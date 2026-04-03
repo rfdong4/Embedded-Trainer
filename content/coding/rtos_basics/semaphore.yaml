@@ -38,3 +38,36 @@ hints:
   - "sem_signal: if count < max_count, increment and return 1; otherwise return 0."
 xp: 35
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t count;
+      uint8_t max_count;
+  } Semaphore;
+
+  void sem_init(Semaphore *sem, uint8_t initial, uint8_t max_val) {
+      sem->count = initial;
+      sem->max_count = max_val;
+  }
+
+  uint8_t sem_wait(Semaphore *sem) {
+      if (sem->count > 0) {
+          sem->count--;
+          return 1;
+      }
+      return 0;
+  }
+
+  uint8_t sem_signal(Semaphore *sem) {
+      if (sem->count < sem->max_count) {
+          sem->count++;
+          return 1;
+      }
+      return 0;
+  }
+solution_explanation: |
+  sem_init sets the count and maximum. sem_wait decrements the count if it is
+  above zero (acquiring a resource), returning 1 on success. sem_signal increments
+  the count if below max (releasing a resource), returning 1 on success. Both
+  return 0 when the operation cannot be performed.

@@ -22,3 +22,17 @@ hints:
   - "If required > count, there aren't enough samples, so return 0."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t debounce(uint8_t *samples, uint8_t count, uint8_t required) {
+      if (required > count) return 0;
+      for (uint8_t i = count - required; i < count; i++) {
+          if (samples[i] != 1) return 0;
+      }
+      return 1;
+  }
+solution_explanation: |
+  The function checks the last 'required' samples in the array. If all of them
+  are 1, the button press is considered stable and the function returns 1. If
+  required exceeds count, there are not enough samples so it returns 0.

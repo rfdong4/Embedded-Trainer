@@ -1,0 +1,151 @@
+topic_id: functional_safety
+articles:
+  - id: iso_26262_basics
+    title: "ISO 26262 and Functional Safety Basics"
+    estimated_minutes: 7
+    content: |
+      # ISO 26262 and Functional Safety Basics
+
+      Functional safety ensures that a system does not cause unreasonable
+      risk due to malfunction of electrical and electronic components.
+
+      ## What is ISO 26262?
+
+      ISO 26262 is the international standard for functional safety of
+      electrical/electronic systems in road vehicles. It is derived from
+      the generic standard IEC 61508.
+
+      Key concepts:
+      - **Item**: The system or combination of systems being analyzed
+      - **Hazard**: A potential source of harm
+      - **Risk**: Combination of severity, exposure, and controllability
+      - **ASIL**: Automotive Safety Integrity Level
+
+      ## ASIL Levels
+
+      ASILs classify the necessary safety requirements:
+
+          QM   - Quality Management (no safety requirement)
+          ASIL A - Lowest safety integrity
+          ASIL B - Moderate safety integrity
+          ASIL C - High safety integrity
+          ASIL D - Highest safety integrity (e.g., steering, braking)
+
+      ASIL is determined by three factors:
+      - **Severity** (S1-S3): How bad is the injury?
+      - **Exposure** (E1-E4): How often does the situation occur?
+      - **Controllability** (C1-C3): Can the driver avoid the hazard?
+
+      ## IEC 61508 and SIL Levels
+
+      IEC 61508 is the parent standard for all industries. It defines
+      Safety Integrity Levels (SIL 1-4):
+
+          SIL 1 - Lowest (e.g., industrial alarms)
+          SIL 2 - Moderate (e.g., emergency shutdown)
+          SIL 3 - High (e.g., safety instrumented systems)
+          SIL 4 - Highest (e.g., nuclear protection)
+
+      ## V-Model Development
+
+      ISO 26262 follows a V-model lifecycle:
+      - Left side: Requirements and design (top-down)
+      - Right side: Testing and validation (bottom-up)
+      - Each design phase has a corresponding test phase
+
+      ## FMEA: Failure Mode and Effects Analysis
+
+      FMEA is a systematic technique to analyze each potential failure:
+      1. Identify all failure modes of each component
+      2. Determine the effect of each failure on the system
+      3. Assess severity, occurrence probability, and detectability
+      4. Define mitigation actions for high-risk failures
+
+  - id: safety_mechanisms
+    title: "Safety Mechanisms in Embedded Systems"
+    estimated_minutes: 6
+    content: |
+      # Safety Mechanisms in Embedded Systems
+
+      Safety mechanisms detect, prevent, or mitigate hardware and
+      software faults to maintain safe operation.
+
+      ## Watchdog Timers
+
+      A watchdog timer must be periodically serviced (kicked). If the
+      software hangs, the watchdog expires and resets the system.
+
+          void watchdog_init(uint32_t timeout_ms);
+          void watchdog_kick(void);  // Must call before timeout
+
+          // Windowed watchdog: must kick within a time window
+          // Too early OR too late = reset
+          void windowed_watchdog_kick(void);
+
+      **Window watchdog**: Rejects kicks that are too early, detecting
+      both hangs and run-away (too-fast) execution.
+
+      ## Redundancy Patterns
+
+      **Dual Modular Redundancy (DMR)**: Two channels with comparison.
+      Detects faults but cannot determine which channel failed.
+
+      **Triple Modular Redundancy (TMR)**: Three channels with majority
+      voting. Masks single faults — the correct result is selected
+      even if one channel fails.
+
+          // TMR voter
+          uint32_t tmr_vote(uint32_t a, uint32_t b, uint32_t c) {
+              if (a == b) return a;
+              if (a == c) return a;
+              return b;  // b == c (or all disagree, return majority)
+          }
+
+      ## Memory Protection Unit (MPU)
+
+      The MPU divides memory into regions with access permissions:
+
+          Region 0: Flash (Read-Only, Execute)
+          Region 1: Task A stack (Read-Write, No Execute)
+          Region 2: Task B stack (Read-Write, No Execute)
+          Region 3: Peripherals (Read-Write, No Execute, Device memory)
+
+      Benefits:
+      - Catches wild pointers at runtime
+      - Isolates safety-critical from non-safety code
+      - Detects stack overflows immediately via MemManage fault
+
+      ## CRC Validation
+
+      CRC (Cyclic Redundancy Check) detects data corruption:
+
+          // Verify flash integrity at startup
+          uint32_t computed = crc32(flash_start, flash_size);
+          if (computed != stored_crc) {
+              enter_safe_state();  // Flash is corrupted
+          }
+
+      Common uses: flash integrity, RAM tests, communication checks.
+
+      ## Stack Canaries
+
+      Place a known sentinel value at the stack boundary:
+
+          #define STACK_CANARY 0xDEADBEEF
+          stack[0] = STACK_CANARY;  // Bottom of stack
+
+          // Periodically check
+          if (stack[0] != STACK_CANARY) {
+              // Stack overflow detected!
+              enter_safe_state();
+          }
+
+      ## Safe State Design
+
+      Every safety function must define a safe state:
+      - Motor controller: stop motor, apply brake
+      - Airbag: do NOT deploy (fail-silent)
+      - Steering assist: maintain reduced-assist straight-ahead
+
+      The **Fault Tolerant Time Interval (FTTI)** is the maximum time
+      from fault occurrence to reaching the safe state.

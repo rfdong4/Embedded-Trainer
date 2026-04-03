@@ -1,0 +1,35 @@
+topic_id: uart
+exercises:
+  - id: uart_cr1_config
+    title: "UART Control Register Configuration"
+    difficulty: intermediate
+    register_name: USART1_CR1
+    address: "0x4001_1000"
+    initial_value: 0
+    bit_width: 32
+    description: |
+      ## USART CR1 (Control Register 1)
+
+      Key bits:
+      - **Bit 0** (UE): USART enable
+      - **Bit 2** (RE): Receiver enable
+      - **Bit 3** (TE): Transmitter enable
+      - **Bit 5** (RXNEIE): RX not empty interrupt enable
+      - **Bit 6** (TCIE): Transmission complete interrupt enable
+      - **Bit 7** (TXEIE): TX empty interrupt enable
+      - **Bit 12** (M): Word length (0=8 bits, 1=9 bits)
+      - **Bit 13** (UE): USART enable (on some families this is bit 13)
+    xp: 20
+    steps:
+      - instruction: "Enable transmitter and receiver (set bits 2 and 3)"
+        expected_value: 0x0000000C
+        hint: "Use: reg |= (1 << 2) | (1 << 3)"
+        explanation: "TE and RE enable the TX and RX hardware."
+      - instruction: "Enable RX interrupt (set bit 5, RXNEIE)"
+        expected_value: 0x0000002C
+        hint: "Use: reg |= (1 << 5)"
+        explanation: "RXNEIE triggers an interrupt when data arrives."
+      - instruction: "Enable the USART (set bit 0, UE)"
+        expected_value: 0x0000002D
+        hint: "Use: reg |= (1 << 0)"
+        explanation: "UE must be set last after all configuration is done."

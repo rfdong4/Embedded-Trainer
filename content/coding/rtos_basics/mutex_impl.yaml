@@ -40,3 +40,36 @@ hints:
   - "mutex_lock should check if state is 0, set it to 1, and return 0; otherwise return -1."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  static int mutex_state;
+
+  void mutex_init(void) {
+      mutex_state = 0;
+  }
+
+  int mutex_lock(void) {
+      if (mutex_state == 0) {
+          mutex_state = 1;
+          return 0;
+      }
+      return -1;
+  }
+
+  int mutex_unlock(void) {
+      if (mutex_state == 1) {
+          mutex_state = 0;
+          return 0;
+      }
+      return -1;
+  }
+
+  int mutex_is_locked(void) {
+      return mutex_state;
+  }
+solution_explanation: |
+  The mutex uses a static integer (0=unlocked, 1=locked). mutex_lock checks
+  if unlocked before acquiring (returning 0 on success, -1 if already locked).
+  mutex_unlock checks if locked before releasing (returning 0 on success, -1
+  if already unlocked). mutex_is_locked simply returns the state.

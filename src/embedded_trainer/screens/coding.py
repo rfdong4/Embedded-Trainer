@@ -119,6 +119,7 @@ class CodingScreen(Screen):
                 with Horizontal(id="code-actions"):
                     yield Button("Run Tests [Ctrl+R]", id="btn-run", variant="success")
                     yield Button("Hint", id="btn-hint", variant="warning")
+                    yield Button("Solution", id="btn-solution", variant="default")
                     yield Button("Reset", id="btn-reset", variant="error")
 
             with Vertical(id="info-panel"):
@@ -146,6 +147,8 @@ class CodingScreen(Screen):
             self.action_run_tests()
         elif event.button.id == "btn-hint":
             self._show_hint()
+        elif event.button.id == "btn-solution":
+            self._show_solution()
         elif event.button.id == "btn-reset":
             self._reset_code()
         elif event.button.id == "btn-back":
@@ -212,6 +215,26 @@ class CodingScreen(Screen):
             hints_panel.scroll_end(animate=False)
         else:
             self.notify("No more hints available.", timeout=2)
+
+    def _show_solution(self):
+        if not self.challenge:
+            return
+        if not self.challenge.solution:
+            self.notify("No solution available for this challenge.", timeout=2)
+            return
+
+        desc_panel = self.query_one("#challenge-description", VerticalScroll)
+        desc_panel.remove_children()
+
+        solution_md = (
+            f"## Solution\n\n"
+            f"```c\n{self.challenge.solution}\n```\n\n"
+        )
+        if self.challenge.solution_explanation:
+            solution_md += f"## Explanation\n\n{self.challenge.solution_explanation}"
+
+        desc_panel.mount(Markdown(solution_md))
+        desc_panel.scroll_home(animate=False)
 
     def _reset_code(self):
         if not self.challenge:

@@ -23,3 +23,13 @@ hints:
   - "Cast to uint32_t before multiplying to avoid overflow: (uint32_t)period * duty_percent / 100."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint16_t pwm_compare(uint16_t period, uint8_t duty_percent) {
+      return (uint16_t)((uint32_t)period * duty_percent / 100);
+  }
+solution_explanation: |
+  Multiply the period by the duty percentage, then divide by 100 to get the compare
+  value. The period is cast to uint32_t before multiplication to avoid 16-bit overflow
+  when period is large (e.g., 65535).

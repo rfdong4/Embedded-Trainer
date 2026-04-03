@@ -1,0 +1,134 @@
+topic_id: wireless
+topic_name: "Wireless Protocols"
+questions:
+  - id: wireless_q01
+    type: mcq
+    difficulty: beginner
+    text: "In BLE (Bluetooth Low Energy), what is the purpose of advertising packets?"
+    options:
+      - "A) To transfer large files between devices"
+      - "B) To broadcast the device's presence and connectable information to nearby scanners"
+      - "C) To encrypt the data channel after pairing"
+      - "D) To synchronize clocks between connected devices"
+    correct: "B"
+    explanation: "BLE advertising packets are broadcast on three designated advertising channels (37, 38, 39). They announce the device's presence, include basic information (name, services), and indicate whether the device is connectable. Scanners can discover and initiate connections based on these packets."
+    tags: [ble, advertising, discovery]
+    xp: 10
+
+  - id: wireless_q02
+    type: mcq
+    difficulty: beginner
+    text: "What does GATT stand for in BLE?"
+    options:
+      - "A) General Access Transfer Technology"
+      - "B) Generic Attribute Profile"
+      - "C) Global Adaptive Timing Table"
+      - "D) Generic Application Transport Type"
+    correct: "B"
+    explanation: "GATT (Generic Attribute Profile) defines the framework for data exchange in BLE. It organizes data into Services and Characteristics, where each Characteristic holds a value and optional descriptors. All BLE data transfer after connection uses the GATT client-server model."
+    tags: [ble, gatt, profile]
+    xp: 10
+
+  - id: wireless_q03
+    type: true_false
+    difficulty: beginner
+    text: "LoRa achieves long range by using a low data rate and spread-spectrum modulation."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "LoRa (Long Range) uses Chirp Spread Spectrum (CSS) modulation, which spreads the signal over a wide bandwidth. The spreading factor controls the trade-off between range and data rate: higher spreading factors provide longer range but lower data rates, typically from 0.3 to 27 kbps."
+    tags: [lora, spread_spectrum, modulation]
+    xp: 10
+
+  - id: wireless_q04
+    type: mcq
+    difficulty: beginner
+    text: "How many advertising channels does BLE use?"
+    options:
+      - "A) 1"
+      - "B) 3"
+      - "C) 16"
+      - "D) 37"
+    correct: "B"
+    explanation: "BLE uses 3 advertising channels (channels 37, 38, and 39) which are spaced apart to minimize interference with Wi-Fi channels. The remaining 37 channels (0-36) are used as data channels for connected communication."
+    tags: [ble, channels, advertising]
+    xp: 10
+
+  - id: wireless_q05
+    type: mcq
+    difficulty: intermediate
+    text: "In LoRa, what happens when the Spreading Factor (SF) is increased from SF7 to SF12?"
+    options:
+      - "A) Data rate increases and range decreases"
+      - "B) Data rate decreases and range increases"
+      - "C) Both data rate and range increase"
+      - "D) Both data rate and range decrease"
+    correct: "B"
+    explanation: "A higher spreading factor spreads each symbol over more chirps, making it easier to decode at lower signal-to-noise ratios (longer range). However, each symbol takes longer to transmit, reducing the effective data rate. SF12 has about 20 dB more link budget than SF7 but is roughly 64x slower."
+    tags: [lora, spreading_factor, link_budget]
+    xp: 15
+
+  - id: wireless_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What is the role of the Thread protocol in IoT mesh networking?"
+    options:
+      - "A) It provides a cellular-based wide-area network for sensors"
+      - "B) It creates an IPv6-based mesh network using IEEE 802.15.4 radios for reliable, low-power device communication"
+      - "C) It replaces Wi-Fi for high-bandwidth video streaming"
+      - "D) It is a proprietary Bluetooth extension for audio devices"
+    correct: "B"
+    explanation: "Thread is an IPv6-based mesh networking protocol built on IEEE 802.15.4 (the same physical layer as Zigbee). It provides reliable, self-healing mesh networks with no single point of failure. Matter uses Thread as one of its transport layers for smart home devices."
+    tags: [thread, mesh, ipv6, ieee802154]
+    xp: 15
+
+  - id: wireless_q07
+    type: mcq
+    difficulty: intermediate
+    text: "In a Zigbee network, what is the role of the Coordinator?"
+    options:
+      - "A) It relays packets but cannot originate them"
+      - "B) It forms the network, assigns addresses, and manages the PAN (Personal Area Network)"
+      - "C) It is an end device that sleeps most of the time"
+      - "D) It provides internet connectivity via a cellular modem"
+    correct: "B"
+    explanation: "The Zigbee Coordinator is the device that starts the network, selects the channel and PAN ID, and allows other devices (routers and end devices) to join. Each Zigbee network has exactly one coordinator, which also participates in routing."
+    tags: [zigbee, coordinator, pan, network_topology]
+    xp: 15
+
+  - id: wireless_q08
+    type: true_false
+    difficulty: intermediate
+    text: "BLE uses adaptive frequency hopping on its data channels to mitigate interference from other 2.4 GHz devices."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "After establishing a connection, BLE hops between data channels using an adaptive frequency hopping (AFH) algorithm. Channels with detected interference (e.g., from Wi-Fi) are temporarily removed from the hopping sequence, improving reliability in crowded RF environments."
+    tags: [ble, frequency_hopping, interference]
+    xp: 15
+
+  - id: wireless_q09
+    type: mcq
+    difficulty: advanced
+    text: "What is the approximate receiver sensitivity improvement when doubling the LoRa bandwidth from 125 kHz to 250 kHz, assuming the same spreading factor?"
+    options:
+      - "A) Sensitivity improves by 3 dB (better range)"
+      - "B) Sensitivity degrades by approximately 3 dB (shorter range)"
+      - "C) Sensitivity is unchanged"
+      - "D) Sensitivity improves by 6 dB"
+    correct: "B"
+    explanation: "Receiver sensitivity is proportional to the noise floor, which increases with bandwidth. Doubling the bandwidth doubles the noise power, degrading sensitivity by approximately 10*log10(2) = 3 dB. This means higher bandwidth reduces range but increases data rate."
+    tags: [lora, bandwidth, sensitivity, rf_fundamentals]
+    xp: 20
+
+  - id: wireless_q10
+    type: mcq
+    difficulty: advanced
+    text: "In a BLE connection, the Connection Interval defines the time between two consecutive connection events. What is the minimum allowed connection interval per the BLE specification?"
+    options:
+      - "A) 1.25 ms"
+      - "B) 7.5 ms"
+      - "C) 20 ms"
+      - "D) 100 ms"
+    correct: "B"
+    explanation: "The BLE specification defines the connection interval in multiples of 1.25 ms, with a minimum of 7.5 ms (6 units) and a maximum of 4 seconds. Shorter intervals allow higher throughput and lower latency but increase power consumption."
+    tags: [ble, connection_interval, timing, power]
+    xp: 20

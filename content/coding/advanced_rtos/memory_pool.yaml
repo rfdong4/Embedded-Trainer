@@ -1,0 +1,87 @@
+id: advanced_rtos_memory_pool
+topic_id: advanced_rtos
+title: "Fixed-Size Memory Pool"
+difficulty: intermediate
+description: |
+  Implement a fixed-size memory pool allocator. The pool manages a fixed
+  number of equal-sized blocks from a pre-allocated buffer.
+
+  Implement three functions:
+  - `pool_init`: Initialize the pool with a buffer, block size, and block count
+  - `pool_alloc`: Allocate one block, return its pointer (or NULL if full)
+  - `pool_free`: Return a block to the pool
+
+  The pool struct is provided. Track which blocks are in use with a bitmask.
+function_signature: "void pool_init(MemPool *pool, uint8_t *buffer, uint32_t block_size, uint32_t block_count); void *pool_alloc(MemPool *pool); void pool_free(MemPool *pool, void *block)"
+skeleton_code: |
+  #include <stdint.h>
+  #include <stddef.h>
+
+  typedef struct {
+      uint8_t *buffer;
+      uint32_t block_size;
+      uint32_t block_count;
+      uint32_t used_mask;  /* Bitmask: bit N = block N in use */
+  } MemPool;
+
+  void pool_init(MemPool *pool, uint8_t *buffer, uint32_t block_size, uint32_t block_count) {
+      // TODO: implement
+  }
+
+  void *pool_alloc(MemPool *pool) {
+      // TODO: return pointer to free block, or NULL
+  }
+
+  void pool_free(MemPool *pool, void *block) {
+      // TODO: mark block as free
+  }
+test_harness: "memory_pool_tests/test_main.c"
+expected_output: "memory_pool_tests/expected_output.txt"
+hints:
+  - "In pool_alloc, scan the used_mask for the first zero bit to find a free block."
+  - "To get the block pointer: buffer + (index * block_size)."
+  - "In pool_free, calculate the index from the pointer offset and clear the bit."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+  #include <stddef.h>
+
+  typedef struct {
+      uint8_t *buffer;
+      uint32_t block_size;
+      uint32_t block_count;
+      uint32_t used_mask;
+  } MemPool;
+
+  void pool_init(MemPool *pool, uint8_t *buffer, uint32_t block_size, uint32_t block_count) {
+      pool->buffer = buffer;
+      pool->block_size = block_size;
+      pool->block_count = block_count;
+      pool->used_mask = 0;
+  }
+
+  void *pool_alloc(MemPool *pool) {
+      for (uint32_t i = 0; i < pool->block_count; i++) {
+          if (!(pool->used_mask & (1u << i))) {
+              pool->used_mask |= (1u << i);
+              return pool->buffer + (i * pool->block_size);
+          }
+      }
+      return NULL;
+  }
+
+  void pool_free(MemPool *pool, void *block) {
+      uint8_t *ptr = (uint8_t *)block;
+      uint32_t offset = ptr - pool->buffer;
+      uint32_t index = offset / pool->block_size;
+      if (index < pool->block_count) {
+          pool->used_mask &= ~(1u << index);
+      }
+  }
+solution_explanation: |
+  The pool tracks block usage with a bitmask. pool_alloc scans for the
+  first zero bit (free block), sets it, and returns the block address.
+  pool_free calculates the block index from the pointer offset and clears
+  the corresponding bit. This O(n) scan is acceptable for small pools
+  typical in embedded systems (usually <= 32 blocks).

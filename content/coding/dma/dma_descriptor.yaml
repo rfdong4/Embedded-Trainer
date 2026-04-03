@@ -1,0 +1,73 @@
+id: dma_dma_descriptor
+topic_id: dma
+title: "Build a DMA Descriptor Structure"
+difficulty: intermediate
+description: |
+  Implement a function that initializes a DMA descriptor structure used
+  in linked-list (scatter-gather) DMA transfers.
+
+  The dma_descriptor_t struct has:
+  - src_addr (uint32_t): source address
+  - dst_addr (uint32_t): destination address
+  - count (uint32_t): number of transfers
+  - control (uint32_t): control register value
+  - next (pointer to next descriptor, or 0 for end of chain)
+
+  Implement build_descriptor that fills in all fields.
+  The control field should be built as:
+    bit 0: enable (always set to 1)
+    bits 2-1: transfer width (0=byte, 1=halfword, 2=word)
+    bit 3: source increment (1=increment, 0=fixed)
+    bit 4: destination increment (1=increment, 0=fixed)
+
+  Parameters: desc pointer, src, dst, count, width (0/1/2), src_inc (0/1), dst_inc (0/1), next pointer.
+function_signature: "void build_descriptor(dma_descriptor_t *desc, uint32_t src, uint32_t dst, uint32_t count, uint8_t width, uint8_t src_inc, uint8_t dst_inc, uint32_t next)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t src_addr;
+      uint32_t dst_addr;
+      uint32_t count;
+      uint32_t control;
+      uint32_t next;
+  } dma_descriptor_t;
+
+  void build_descriptor(dma_descriptor_t *desc, uint32_t src, uint32_t dst,
+                         uint32_t count, uint8_t width, uint8_t src_inc,
+                         uint8_t dst_inc, uint32_t next) {
+      // TODO: implement
+  }
+test_harness: "dma_descriptor_tests/test_main.c"
+expected_output: "dma_descriptor_tests/expected_output.txt"
+hints:
+  - "Set the enable bit (bit 0) always to 1."
+  - "Shift the width value left by 1 to place it in bits 2:1."
+  - "Use bit 3 for source increment and bit 4 for destination increment."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t src_addr;
+      uint32_t dst_addr;
+      uint32_t count;
+      uint32_t control;
+      uint32_t next;
+  } dma_descriptor_t;
+
+  void build_descriptor(dma_descriptor_t *desc, uint32_t src, uint32_t dst,
+                         uint32_t count, uint8_t width, uint8_t src_inc,
+                         uint8_t dst_inc, uint32_t next) {
+      desc->src_addr = src;
+      desc->dst_addr = dst;
+      desc->count = count;
+      desc->control = 1 | ((uint32_t)width << 1) | ((uint32_t)src_inc << 3) | ((uint32_t)dst_inc << 4);
+      desc->next = next;
+  }
+solution_explanation: |
+  The function populates all descriptor fields. The control word is built by
+  ORing together the enable bit (always 1), the width shifted to bits 2:1,
+  and the increment flags at bits 3 and 4. This mirrors how real DMA
+  controllers encode channel configuration in a control register.

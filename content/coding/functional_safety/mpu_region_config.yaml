@@ -1,0 +1,91 @@
+id: functional_safety_mpu_region_config
+topic_id: functional_safety
+title: "MPU Region Configuration"
+difficulty: intermediate
+description: |
+  Implement functions to configure Memory Protection Unit (MPU) regions.
+  The MPU divides memory into regions, each with a base address, size, and
+  access permissions encoded as a bitmask.
+
+  - mpu_region_init: Initialize a region with base address, size, and permissions.
+    The base address must be aligned to the region size (base % size == 0).
+    Return 1 on success, 0 if alignment is invalid.
+  - mpu_check_access: Given a region and a requested permission mask, return 1
+    if ALL requested permissions are granted, 0 otherwise.
+  - mpu_contains_address: Return 1 if the given address falls within the region
+    (base <= addr < base + size), 0 otherwise.
+
+  Permission bits:
+    MPU_READ    = 0x01
+    MPU_WRITE   = 0x02
+    MPU_EXECUTE = 0x04
+function_signature: "uint8_t mpu_region_init(MPU_Region *region, uint32_t base, uint32_t size, uint8_t permissions); uint8_t mpu_check_access(const MPU_Region *region, uint8_t requested); uint8_t mpu_contains_address(const MPU_Region *region, uint32_t addr)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define MPU_READ    0x01
+  #define MPU_WRITE   0x02
+  #define MPU_EXECUTE 0x04
+
+  typedef struct {
+      uint32_t base_address;
+      uint32_t size;
+      uint8_t permissions;
+  } MPU_Region;
+
+  uint8_t mpu_region_init(MPU_Region *region, uint32_t base, uint32_t size, uint8_t permissions) {
+      // TODO: validate alignment (base % size == 0), initialize fields
+      // Return 1 on success, 0 on invalid alignment
+  }
+
+  uint8_t mpu_check_access(const MPU_Region *region, uint8_t requested) {
+      // TODO: return 1 if all requested permission bits are set in region
+  }
+
+  uint8_t mpu_contains_address(const MPU_Region *region, uint32_t addr) {
+      // TODO: return 1 if addr is within [base, base+size)
+  }
+test_harness: "mpu_region_config_tests/test_main.c"
+expected_output: "mpu_region_config_tests/expected_output.txt"
+hints:
+  - "For alignment check: base % size == 0. If size is 0, treat as invalid."
+  - "For access check: (region->permissions & requested) == requested."
+  - "For contains: addr >= base && addr < base + size."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define MPU_READ    0x01
+  #define MPU_WRITE   0x02
+  #define MPU_EXECUTE 0x04
+
+  typedef struct {
+      uint32_t base_address;
+      uint32_t size;
+      uint8_t permissions;
+  } MPU_Region;
+
+  uint8_t mpu_region_init(MPU_Region *region, uint32_t base, uint32_t size, uint8_t permissions) {
+      if (size == 0 || (base % size) != 0) {
+          return 0;
+      }
+      region->base_address = base;
+      region->size = size;
+      region->permissions = permissions;
+      return 1;
+  }
+
+  uint8_t mpu_check_access(const MPU_Region *region, uint8_t requested) {
+      return (region->permissions & requested) == requested ? 1 : 0;
+  }
+
+  uint8_t mpu_contains_address(const MPU_Region *region, uint32_t addr) {
+      return (addr >= region->base_address && addr < region->base_address + region->size) ? 1 : 0;
+  }
+solution_explanation: |
+  mpu_region_init validates that the base address is aligned to the region size
+  (a hardware requirement of real MPUs). mpu_check_access uses bitwise AND to
+  verify that all requested permission bits are present in the region's permission
+  mask. mpu_contains_address checks if the address falls within the half-open
+  interval [base, base + size).

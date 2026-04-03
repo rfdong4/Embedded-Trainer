@@ -22,3 +22,13 @@ hints:
   - "This is a one-line solution using the XOR operator."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t toggle_pattern(uint32_t port_reg, uint32_t pattern) {
+      return port_reg ^ pattern;
+  }
+solution_explanation: |
+  XOR is the ideal operator for toggling bits: every bit that is 1 in the
+  pattern gets flipped in the port register, while bits that are 0 in the
+  pattern remain unchanged.

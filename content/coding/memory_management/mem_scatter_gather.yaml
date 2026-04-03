@@ -44,3 +44,36 @@ hints:
   - "Use memcpy(dst + dst_offset, src + desc[i].src_offset, desc[i].length) for each descriptor."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+  #include <string.h>
+
+  typedef struct {
+      uint32_t src_offset;
+      uint32_t length;
+  } SG_Descriptor;
+
+  uint32_t sg_copy(const uint8_t *src, uint8_t *dst,
+                   const SG_Descriptor *desc, uint32_t num_desc) {
+      uint32_t dst_offset = 0;
+      for (uint32_t i = 0; i < num_desc; i++) {
+          if (desc[i].length > 0) {
+              memcpy(dst + dst_offset, src + desc[i].src_offset, desc[i].length);
+              dst_offset += desc[i].length;
+          }
+      }
+      return dst_offset;
+  }
+
+  uint32_t sg_total_length(const SG_Descriptor *desc, uint32_t num_desc) {
+      uint32_t total = 0;
+      for (uint32_t i = 0; i < num_desc; i++) {
+          total += desc[i].length;
+      }
+      return total;
+  }
+solution_explanation: |
+  sg_copy iterates through each descriptor, using memcpy to copy desc[i].length bytes from
+  the source at the specified offset into the destination buffer sequentially. A running
+  dst_offset tracks where to write next. Zero-length descriptors are skipped. sg_total_length
+  simply sums all descriptor lengths to report the total bytes that would be copied.

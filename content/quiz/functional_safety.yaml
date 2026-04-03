@@ -1,0 +1,138 @@
+topic_id: functional_safety
+topic_name: "Functional Safety"
+questions:
+  - id: functional_safety_q01
+    type: mcq
+    difficulty: beginner
+    text: "What is ISO 26262?"
+    options:
+      - "A) A standard for automotive functional safety"
+      - "B) A standard for industrial communication protocols"
+      - "C) A standard for software coding style"
+      - "D) A standard for PCB layout guidelines"
+    correct: "A"
+    explanation: "ISO 26262 is an international standard for functional safety of electrical and electronic systems in road vehicles. It defines a safety lifecycle and Automotive Safety Integrity Levels (ASIL A through D) to classify safety requirements."
+    tags: [iso_26262, standards, automotive]
+    xp: 10
+
+  - id: functional_safety_q02
+    type: mcq
+    difficulty: beginner
+    text: "Which ASIL level in ISO 26262 represents the highest safety integrity requirement?"
+    options:
+      - "A) ASIL A"
+      - "B) ASIL B"
+      - "C) ASIL C"
+      - "D) ASIL D"
+    correct: "D"
+    explanation: "ASIL D is the highest Automotive Safety Integrity Level. ASIL levels range from A (lowest) to D (highest), with QM (Quality Management) indicating no safety requirement. ASIL D requires the most rigorous development process, testing, and documentation."
+    tags: [asil, iso_26262, safety_levels]
+    xp: 10
+
+  - id: functional_safety_q03
+    type: mcq
+    difficulty: beginner
+    text: "What is the purpose of a watchdog timer in an embedded system?"
+    options:
+      - "A) To measure elapsed time for application logic"
+      - "B) To detect software hangs and reset the system if the software fails to periodically service (kick) the watchdog"
+      - "C) To generate PWM signals for motor control"
+      - "D) To count the number of interrupts received"
+    correct: "B"
+    explanation: "A watchdog timer is a hardware or software mechanism that must be periodically 'kicked' (serviced) by the application. If the software hangs or enters an unexpected state and fails to service the watchdog within its timeout period, the watchdog triggers a system reset to recover."
+    tags: [watchdog, fault_detection, reset]
+    xp: 10
+
+  - id: functional_safety_q04
+    type: mcq
+    difficulty: beginner
+    text: "What standard does IEC 61508 apply to?"
+    options:
+      - "A) Automotive electronics only"
+      - "B) Functional safety of electrical/electronic/programmable electronic safety-related systems across all industries"
+      - "C) Consumer electronics testing"
+      - "D) Wireless communication protocols"
+    correct: "B"
+    explanation: "IEC 61508 is the parent standard for functional safety of E/E/PE (Electrical/Electronic/Programmable Electronic) safety-related systems. It applies across all industries and defines Safety Integrity Levels (SIL 1-4). Domain-specific standards like ISO 26262 (automotive) and IEC 62304 (medical) are derived from it."
+    tags: [iec_61508, sil, standards]
+    xp: 10
+
+  - id: functional_safety_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What is Triple Modular Redundancy (TMR)?"
+    options:
+      - "A) Using three different programming languages for the same module"
+      - "B) Running three identical modules in parallel and using a majority voter to select the correct output"
+      - "C) Storing three copies of the program in different memory banks"
+      - "D) Dividing a task into three sequential phases"
+    correct: "B"
+    explanation: "TMR uses three identical processing channels running in parallel. A majority voter compares all three outputs and selects the value agreed upon by at least two of the three. This masks single-point failures: if one channel fails, the other two still produce the correct result."
+    tags: [tmr, redundancy, voting, fault_tolerance]
+    xp: 15
+
+  - id: functional_safety_q06
+    type: mcq
+    difficulty: intermediate
+    text: "What is the primary purpose of a Memory Protection Unit (MPU) in a safety-critical embedded system?"
+    options:
+      - "A) To encrypt data stored in memory"
+      - "B) To prevent tasks from accessing memory regions they are not authorized to use, catching wild pointers and buffer overflows"
+      - "C) To compress memory contents to save space"
+      - "D) To speed up memory access by caching"
+    correct: "B"
+    explanation: "An MPU partitions memory into regions with configurable access permissions (read/write/execute) and size. In safety-critical systems, the MPU prevents one task from corrupting another task's stack or data, catches wild pointer dereferences, and enforces memory isolation between safety and non-safety code."
+    tags: [mpu, memory_protection, isolation, fault_containment]
+    xp: 15
+
+  - id: functional_safety_q07
+    type: true_false
+    difficulty: intermediate
+    text: "A stack canary (sentinel value) placed at the end of a task's stack can detect stack overflow by checking whether the sentinel value has been overwritten."
+    options: ["True", "False"]
+    correct: "True"
+    explanation: "A stack canary is a known sentinel value placed at the boundary of the stack. During runtime, software periodically checks whether this value has been modified. If the stack grows beyond its allocated size and overwrites the canary, the corruption is detected. This is a common technique in RTOSes like FreeRTOS (configCHECK_FOR_STACK_OVERFLOW)."
+    tags: [stack_canary, stack_overflow, fault_detection]
+    xp: 15
+
+  - id: functional_safety_q08
+    type: mcq
+    difficulty: intermediate
+    text: "What does CRC stand for, and what is its purpose in functional safety?"
+    options:
+      - "A) Central Register Control — controls access to CPU registers"
+      - "B) Cyclic Redundancy Check — detects accidental changes or corruption in data"
+      - "C) Clock Rate Configuration — sets the system clock frequency"
+      - "D) Critical Region Counter — counts entries into critical sections"
+    correct: "B"
+    explanation: "CRC (Cyclic Redundancy Check) is an error-detecting code computed over a block of data. The sender computes a CRC and appends it; the receiver recomputes and compares. Any data corruption (bit flips, missing bytes) is detected with high probability. CRC-32 is widely used for flash integrity checks, communication protocols, and safety-relevant data validation."
+    tags: [crc, data_integrity, error_detection]
+    xp: 15
+
+  - id: functional_safety_q09
+    type: mcq
+    difficulty: advanced
+    text: "What is FMEA and how is it used in functional safety?"
+    options:
+      - "A) Failure Mode and Effects Analysis — a systematic technique to identify potential failure modes, their causes, and effects on the system"
+      - "B) Functional Memory Error Algorithm — an algorithm for correcting memory bit flips"
+      - "C) Fast Mode Enable Accelerator — a hardware feature for boosting clock speed"
+      - "D) Flash Memory Erase Algorithm — a procedure for erasing flash sectors"
+    correct: "A"
+    explanation: "FMEA (Failure Mode and Effects Analysis) is a bottom-up analysis technique used in safety engineering. For each component or function, analysts identify how it can fail (failure modes), what causes the failure, and what effect it has on the system. This drives safety requirements, detection mechanisms, and mitigation strategies required by standards like ISO 26262."
+    tags: [fmea, safety_analysis, risk_assessment]
+    xp: 25
+
+  - id: functional_safety_q10
+    type: mcq
+    difficulty: advanced
+    text: "In ISO 26262, what is a 'safe state' and why is it important?"
+    options:
+      - "A) A state where the processor runs at minimum clock speed to save power"
+      - "B) A state where the system is in a condition that avoids unreasonable risk, which may involve shutting down, limiting functionality, or switching to a degraded mode"
+      - "C) A state where all interrupts are disabled"
+      - "D) A state where the system passes all self-test routines"
+    correct: "B"
+    explanation: "A safe state is an operating mode where the system does not pose an unreasonable risk. For a steer-by-wire system, the safe state might be maintaining straight-ahead steering with reduced assist. For an airbag, the safe state is not deploying. Defining and transitioning to safe states is fundamental to ISO 26262 safety concepts. The Fault Tolerant Time Interval (FTTI) defines how quickly the system must reach a safe state after detecting a fault."
+    tags: [safe_state, iso_26262, fault_handling, ftti]
+    xp: 25

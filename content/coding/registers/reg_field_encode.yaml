@@ -29,3 +29,22 @@ hints:
   - "For each field: result |= (masked_value << start_bit)."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t encode_register(const uint8_t* fields, uint8_t num_fields) {
+      uint32_t result = 0;
+      for (uint8_t i = 0; i < num_fields; i++) {
+          uint8_t start_bit = fields[i * 3 + 0];
+          uint8_t width = fields[i * 3 + 1];
+          uint8_t value = fields[i * 3 + 2];
+          uint32_t mask = (1U << width) - 1;
+          result |= ((uint32_t)(value & mask)) << start_bit;
+      }
+      return result;
+  }
+solution_explanation: |
+  For each field descriptor, the function extracts the start bit, width, and
+  value. It creates a bitmask of the specified width, masks the value to discard
+  excess bits, shifts the masked value to the correct position, and ORs it into
+  the accumulating result register.

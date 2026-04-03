@@ -27,3 +27,28 @@ hints:
   - "Count the number of 1-bits in data. If odd, set the parity bit (bit 9) to 1."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint16_t uart_build_frame(uint8_t data) {
+      uint16_t frame = 0;
+      // Bit 0 is start bit (0), already 0
+      // Bits 1-8 are data
+      frame |= ((uint16_t)data << 1);
+      // Bit 9 is even parity
+      uint8_t p = data;
+      p ^= (p >> 4);
+      p ^= (p >> 2);
+      p ^= (p >> 1);
+      if (p & 1) {
+          frame |= (1 << 9);
+      }
+      // Bit 10 is stop bit (1)
+      frame |= (1 << 10);
+      return frame;
+  }
+solution_explanation: |
+  The frame is built by placing the data byte at bits 1-8 (shifted left by 1),
+  computing even parity via XOR folding, and setting the parity bit at bit 9
+  if the data has an odd number of 1-bits. The stop bit is always set at
+  bit 10.

@@ -1,0 +1,77 @@
+id: riscv_instruction_decode
+topic_id: riscv
+title: "Decode a RISC-V R-type Instruction"
+difficulty: advanced
+description: |
+  Implement a function to decode a 32-bit RISC-V R-type instruction into its
+  component fields.
+
+  R-type instruction layout (bits):
+  [31:25] funct7 | [24:20] rs2 | [19:15] rs1 | [14:12] funct3 | [11:7] rd | [6:0] opcode
+
+  Fill in the provided DecodedInstr struct with the extracted fields.
+
+  Parameters:
+  - instr: 32-bit instruction word
+  - decoded: pointer to DecodedInstr struct to fill
+
+  The struct is defined as:
+  typedef struct {
+      uint8_t opcode;   // bits [6:0]
+      uint8_t rd;       // bits [11:7]
+      uint8_t funct3;   // bits [14:12]
+      uint8_t rs1;      // bits [19:15]
+      uint8_t rs2;      // bits [24:20]
+      uint8_t funct7;   // bits [31:25]
+  } DecodedInstr;
+function_signature: "void decode_r_type(uint32_t instr, DecodedInstr *decoded)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t opcode;
+      uint8_t rd;
+      uint8_t funct3;
+      uint8_t rs1;
+      uint8_t rs2;
+      uint8_t funct7;
+  } DecodedInstr;
+
+  void decode_r_type(uint32_t instr, DecodedInstr *decoded) {
+      // TODO: extract each field using shifts and masks
+  }
+test_harness: "instruction_decode_tests/test_main.c"
+expected_output: "instruction_decode_tests/expected_output.txt"
+hints:
+  - "opcode = instr & 0x7F (7 bits)"
+  - "rd = (instr >> 7) & 0x1F (5 bits)"
+  - "funct3 = (instr >> 12) & 0x7 (3 bits)"
+  - "rs1 = (instr >> 15) & 0x1F, rs2 = (instr >> 20) & 0x1F, funct7 = (instr >> 25) & 0x7F"
+xp: 50
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint8_t opcode;
+      uint8_t rd;
+      uint8_t funct3;
+      uint8_t rs1;
+      uint8_t rs2;
+      uint8_t funct7;
+  } DecodedInstr;
+
+  void decode_r_type(uint32_t instr, DecodedInstr *decoded) {
+      decoded->opcode = instr & 0x7F;
+      decoded->rd     = (instr >> 7) & 0x1F;
+      decoded->funct3 = (instr >> 12) & 0x7;
+      decoded->rs1    = (instr >> 15) & 0x1F;
+      decoded->rs2    = (instr >> 20) & 0x1F;
+      decoded->funct7 = (instr >> 25) & 0x7F;
+  }
+solution_explanation: |
+  Each field is extracted by right-shifting the instruction to align the field
+  with bit 0, then masking with the appropriate number of bits. The R-type
+  format is the most regular RISC-V format, used for register-register
+  operations like ADD (opcode=0x33, funct3=0x0, funct7=0x00) and SUB
+  (opcode=0x33, funct3=0x0, funct7=0x20).

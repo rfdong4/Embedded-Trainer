@@ -26,11 +26,13 @@ class TopicSelectScreen(Screen):
             "quiz": "Select a Topic - Quiz Mode",
             "coding": "Select a Topic - Coding Mode",
             "learn": "Select a Topic - Learn Mode",
+            "bug_hunt": "Select a Topic - Bug Hunt",
         }
         yield Label(titles.get(self.mode, "Select a Topic"), classes="section-title")
 
         from embedded_trainer.core.content_loader import (
             load_articles,
+            load_bug_hunt_challenges,
             load_coding_challenges,
             load_quiz_questions,
             load_topics,
@@ -52,6 +54,14 @@ class TopicSelectScreen(Screen):
             elif self.mode == "learn":
                 count = len(load_articles(tid))
                 info = f"  [{difficulty}] {count} articles"
+            elif self.mode == "bug_hunt":
+                count = len(load_bug_hunt_challenges(tid))
+                if count == 0:
+                    continue
+                completed_bugs = self.app.db.get_completed_bug_hunts(self.app.user_profile.id)
+                topic_bugs = load_bug_hunt_challenges(tid)
+                done = sum(1 for b in topic_bugs if b.id in completed_bugs)
+                info = f"  [{difficulty}] {count} bugs, {done} found"
             else:
                 count = len(load_coding_challenges(tid))
                 completed = progress.coding_completed if progress else 0
@@ -78,6 +88,9 @@ class TopicSelectScreen(Screen):
             topic_name = next((t["name"] for t in topics if t["id"] == topic_id), topic_id)
             from embedded_trainer.screens.learn import ArticleListScreen
             self.app.push_screen(ArticleListScreen(topic_id=topic_id, topic_name=topic_name))
+        elif self.mode == "bug_hunt":
+            from embedded_trainer.screens.bug_hunt import BugHuntSelectScreen
+            self.app.push_screen(BugHuntSelectScreen(topic_id=topic_id))
         else:
             from embedded_trainer.screens.coding import CodingSelectScreen
             self.app.push_screen(CodingSelectScreen(topic_id=topic_id))

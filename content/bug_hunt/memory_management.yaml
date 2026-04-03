@@ -1,0 +1,94 @@
+topic_id: memory_management
+challenges:
+  - id: bug_stack_overflow
+    title: "Unbounded Stack Allocation"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      void process_sensor_data(uint32_t *data, uint32_t count) {
+          uint32_t buffer[1024];  // 4KB on stack
+          for (uint32_t i = 0; i < count && i < 1024; i++) {
+              buffer[i] = data[i] * 2;
+          }
+          // process buffer...
+      }
+    correct_answer: "B"
+    options:
+      - "A) The loop condition is wrong"
+      - "B) 4KB stack allocation is dangerous on embedded — typical stack is 1-4KB total"
+      - "C) buffer should be volatile"
+      - "D) data pointer is not const"
+    explanation: "Embedded systems typically have 1-4KB of stack. A local 4KB array will likely overflow the stack, corrupting memory. Use a static buffer, heap allocation, or process data in smaller chunks."
+    xp: 15
+    tags: [stack, overflow, allocation]
+
+  - id: bug_dangling_pointer
+    title: "Returning Local Array"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      uint8_t* get_mac_address(void) {
+          uint8_t mac[6] = {0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E};
+          return mac;
+      }
+    correct_answer: "A"
+    options:
+      - "A) Returning pointer to local stack variable — it's invalid after the function returns"
+      - "B) MAC address format is wrong"
+      - "C) Should return uint16_t*"
+      - "D) Array size should be 8"
+    explanation: "The mac array is allocated on the stack and is destroyed when get_mac_address returns. The returned pointer is dangling. Use a static array or pass a buffer as a parameter."
+    xp: 10
+    tags: [dangling_pointer, stack, local_variable]
+
+  - id: bug_unaligned_access
+    title: "Unaligned Memory Access"
+    difficulty: advanced
+    buggy_code: |
+      #include <stdint.h>
+
+      uint32_t read_sensor_value(uint8_t *buffer, uint32_t offset) {
+          return *(uint32_t*)(buffer + offset);
+      }
+      // Called with: read_sensor_value(buf, 3);  // offset 3 = unaligned!
+    correct_answer: "C"
+    options:
+      - "A) Missing bounds check on offset"
+      - "B) Should cast to uint8_t* instead"
+      - "C) Casting to uint32_t* at an unaligned address causes a HardFault on Cortex-M0/M0+"
+      - "D) buffer should be const"
+    explanation: "On ARM Cortex-M0/M0+, unaligned 32-bit memory accesses cause a HardFault. Casting buffer+3 to uint32_t* creates a misaligned pointer. Use memcpy or byte-by-byte assembly to safely read from unaligned addresses."
+    xp: 20
+    tags: [alignment, hardfault, pointer_cast]
+
+  - id: bug_malloc_no_check
+    title: "Unchecked malloc Return"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+      #include <stdlib.h>
+
+      typedef struct {
+          uint32_t timestamp;
+          uint16_t sensor_id;
+          int16_t value;
+      } SensorReading;
+
+      void log_reading(uint16_t id, int16_t value) {
+          SensorReading *reading = malloc(sizeof(SensorReading));
+          reading->timestamp = get_tick();
+          reading->sensor_id = id;
+          reading->value = value;
+          store_reading(reading);
+      }
+    correct_answer: "B"
+    options:
+      - "A) struct packing is wrong"
+      - "B) malloc return is not checked for NULL — on embedded, heap exhaustion is common"
+      - "C) Should use calloc instead"
+      - "D) reading is never freed"
+    explanation: "On embedded systems with limited heap (often 2-16KB), malloc can easily return NULL. Dereferencing NULL causes a HardFault. Always check: if (reading == NULL) return; Many embedded codebases avoid dynamic allocation entirely."
+    xp: 15
+    tags: [malloc, null_check, heap]

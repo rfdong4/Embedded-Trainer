@@ -29,3 +29,14 @@ hints:
   - "For valid modes (0-3), the config byte is simply the mode value itself with CPOL in bit 1 and CPHA in bit 0."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t spi_mode_to_config(uint8_t mode) {
+      if (mode > 3) return 0xFF;
+      return mode;
+  }
+solution_explanation: |
+  Since SPI modes 0-3 directly encode CPOL in bit 1 and CPHA in bit 0, the
+  config byte is simply the mode number itself. For invalid modes (> 3), the
+  function returns 0xFF as an error indicator.

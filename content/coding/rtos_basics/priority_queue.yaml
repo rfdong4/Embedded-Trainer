@@ -23,3 +23,21 @@ hints:
   - "Shift elements right from the end to make room, then insert."
 xp: 35
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  void pq_insert(uint8_t *queue, uint8_t *size, uint8_t priority, uint8_t max_size) {
+      if (*size >= max_size) return;
+      uint8_t i = *size;
+      while (i > 0 && queue[i - 1] > priority) {
+          queue[i] = queue[i - 1];
+          i--;
+      }
+      queue[i] = priority;
+      (*size)++;
+  }
+solution_explanation: |
+  The function performs an insertion-sort-style insert into the sorted array.
+  Starting from the end, it shifts elements right while they are greater than
+  the new priority value, then places the value at the correct position. If
+  the queue is full, the insertion is skipped.

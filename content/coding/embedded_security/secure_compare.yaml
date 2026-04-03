@@ -1,0 +1,52 @@
+id: embedded_security_secure_compare
+topic_id: embedded_security
+title: "Constant-Time Comparison"
+difficulty: intermediate
+description: |
+  Implement a constant-time comparison function that compares two byte arrays
+  without leaking timing information about where they differ.
+
+  A naive comparison (like memcmp) returns early on the first mismatch. An
+  attacker can measure execution time to determine how many bytes matched,
+  enabling a byte-by-byte attack on MACs or passwords.
+
+  Your implementation must:
+  - Compare ALL bytes regardless of mismatches (no early return)
+  - Return 1 if the arrays are identical, 0 if they differ
+
+  Parameters:
+  - a: pointer to first byte array
+  - b: pointer to second byte array
+  - len: number of bytes to compare
+
+  Return 1 if all bytes match, 0 otherwise.
+function_signature: "int secure_compare(const uint8_t *a, const uint8_t *b, uint32_t len)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int secure_compare(const uint8_t *a, const uint8_t *b, uint32_t len) {
+      // TODO: implement constant-time comparison
+  }
+test_harness: "secure_compare_tests/test_main.c"
+expected_output: "secure_compare_tests/expected_output.txt"
+hints:
+  - "XOR each pair of bytes and accumulate the result with OR."
+  - "After the loop, if the accumulator is 0, all bytes matched."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int secure_compare(const uint8_t *a, const uint8_t *b, uint32_t len) {
+      uint8_t diff = 0;
+      for (uint32_t i = 0; i < len; i++) {
+          diff |= a[i] ^ b[i];
+      }
+      return diff == 0 ? 1 : 0;
+  }
+solution_explanation: |
+  The function XORs each pair of bytes. If they are equal, XOR produces 0. Any
+  difference produces a non-zero value, which is ORed into the accumulator. Since
+  OR never clears bits, a single mismatch permanently sets the accumulator to
+  non-zero. The loop always runs for the full length, so execution time does not
+  depend on where mismatches occur.

@@ -1,0 +1,53 @@
+id: dma_dma_transfer_size
+topic_id: dma
+title: "Calculate DMA Transfer Size and Alignment"
+difficulty: advanced
+description: |
+  Implement two functions for DMA transfer planning:
+
+  1. calc_transfer_count: Given a total byte count and a transfer width
+     (1=byte, 2=halfword, 4=word), return the number of DMA transfers needed.
+     If the byte count is not evenly divisible by the width, round up.
+
+  2. check_alignment: Given an address and a transfer width (1, 2, or 4),
+     return 1 if the address is properly aligned for that width, 0 otherwise.
+     An address is aligned to width N if (address % N) == 0.
+
+  Parameters:
+  - calc_transfer_count(uint32_t byte_count, uint8_t width)
+  - check_alignment(uint32_t address, uint8_t width)
+function_signature: "uint32_t calc_transfer_count(uint32_t byte_count, uint8_t width); uint8_t check_alignment(uint32_t address, uint8_t width)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t calc_transfer_count(uint32_t byte_count, uint8_t width) {
+      // TODO: implement
+  }
+
+  uint8_t check_alignment(uint32_t address, uint8_t width) {
+      // TODO: implement
+  }
+test_harness: "dma_transfer_size_tests/test_main.c"
+expected_output: "dma_transfer_size_tests/expected_output.txt"
+hints:
+  - "Round-up division: (a + b - 1) / b."
+  - "Check alignment with modulo: address % width == 0."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t calc_transfer_count(uint32_t byte_count, uint8_t width) {
+      if (width == 0) return 0;
+      return (byte_count + width - 1) / width;
+  }
+
+  uint8_t check_alignment(uint32_t address, uint8_t width) {
+      if (width == 0) return 0;
+      return (address % width) == 0 ? 1 : 0;
+  }
+solution_explanation: |
+  calc_transfer_count uses ceiling division: (byte_count + width - 1) / width
+  to round up when bytes don't divide evenly. check_alignment uses modulo to
+  verify the address is a multiple of the transfer width. These are essential
+  checks before configuring a DMA transfer to avoid bus faults from unaligned access.

@@ -63,6 +63,26 @@ ACHIEVEMENTS: dict[str, Achievement] = {
         "bit_wizard", "Bit Wizard",
         "Complete all bit manipulation challenges", "%",
     ),
+    "bug_hunter": Achievement(
+        "bug_hunter", "Bug Hunter",
+        "Find 10 bugs in Bug Hunt mode", "$",
+    ),
+    "review_streak": Achievement(
+        "review_streak", "Memory Palace",
+        "Complete 5 spaced repetition reviews", "=",
+    ),
+    "register_master": Achievement(
+        "register_master", "Register Master",
+        "Complete 10 register simulator exercises", "|",
+    ),
+    "100_questions": Achievement(
+        "100_questions", "Knowledge Seeker",
+        "Answer 100 quiz questions", ":",
+    ),
+    "25_challenges": Achievement(
+        "25_challenges", "Code Master",
+        "Pass 25 coding challenges", ";",
+    ),
 }
 
 # Level definitions

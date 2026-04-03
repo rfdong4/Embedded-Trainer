@@ -36,3 +36,27 @@ hints:
   - "To find the lowest set bit, iterate from bit 0 to 7 and check each with (mask & (1 << i))."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t set_task_ready(uint8_t ready_mask, uint8_t task_id) {
+      if (task_id > 7) return ready_mask;
+      return ready_mask | (1 << task_id);
+  }
+
+  uint8_t clear_task_ready(uint8_t ready_mask, uint8_t task_id) {
+      if (task_id > 7) return ready_mask;
+      return ready_mask & ~(1 << task_id);
+  }
+
+  int8_t get_highest_ready(uint8_t ready_mask) {
+      for (int8_t i = 0; i < 8; i++) {
+          if (ready_mask & (1 << i)) return i;
+      }
+      return -1;
+  }
+solution_explanation: |
+  set_task_ready and clear_task_ready use standard bit set/clear operations with
+  bounds checking for task_id > 7. get_highest_ready scans from bit 0 (highest
+  priority) upward and returns the first set bit position, or -1 if the mask
+  is empty.

@@ -1,0 +1,67 @@
+id: dma_dma_channel_config
+topic_id: dma
+title: "Configure DMA Channel Registers"
+difficulty: intermediate
+description: |
+  Implement a function that configures a DMA channel control register value
+  based on the given parameters.
+
+  The control register layout (32-bit):
+  - Bit 0: Channel enable (EN)
+  - Bit 1: Transfer complete interrupt enable (TCIE)
+  - Bit 2: Half-transfer interrupt enable (HTIE)
+  - Bit 3: Transfer error interrupt enable (TEIE)
+  - Bit 4: Transfer direction (0 = peripheral-to-memory, 1 = memory-to-peripheral)
+  - Bit 5: Circular mode enable (CIRC)
+  - Bit 6: Peripheral increment enable (PINC)
+  - Bit 7: Memory increment enable (MINC)
+  - Bits 9:8: Peripheral data size (00=8-bit, 01=16-bit, 10=32-bit)
+  - Bits 11:10: Memory data size (00=8-bit, 01=16-bit, 10=32-bit)
+  - Bits 13:12: Priority level (00=low, 01=medium, 10=high, 11=very high)
+
+  Parameters: enable, tc_ie, ht_ie, te_ie, dir, circ, pinc, minc (all uint8_t 0/1),
+  psize, msize (0/1/2), priority (0-3).
+  Return the 32-bit control register value.
+function_signature: "uint32_t dma_config_channel(uint8_t enable, uint8_t tc_ie, uint8_t ht_ie, uint8_t te_ie, uint8_t dir, uint8_t circ, uint8_t pinc, uint8_t minc, uint8_t psize, uint8_t msize, uint8_t priority)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t dma_config_channel(uint8_t enable, uint8_t tc_ie, uint8_t ht_ie,
+                               uint8_t te_ie, uint8_t dir, uint8_t circ,
+                               uint8_t pinc, uint8_t minc, uint8_t psize,
+                               uint8_t msize, uint8_t priority) {
+      // TODO: implement
+  }
+test_harness: "dma_channel_config_tests/test_main.c"
+expected_output: "dma_channel_config_tests/expected_output.txt"
+hints:
+  - "OR together each field shifted to its correct bit position."
+  - "psize goes to bits 9:8, so shift left by 8."
+  - "priority goes to bits 13:12, so shift left by 12."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t dma_config_channel(uint8_t enable, uint8_t tc_ie, uint8_t ht_ie,
+                               uint8_t te_ie, uint8_t dir, uint8_t circ,
+                               uint8_t pinc, uint8_t minc, uint8_t psize,
+                               uint8_t msize, uint8_t priority) {
+      uint32_t reg = 0;
+      reg |= ((uint32_t)enable << 0);
+      reg |= ((uint32_t)tc_ie << 1);
+      reg |= ((uint32_t)ht_ie << 2);
+      reg |= ((uint32_t)te_ie << 3);
+      reg |= ((uint32_t)dir << 4);
+      reg |= ((uint32_t)circ << 5);
+      reg |= ((uint32_t)pinc << 6);
+      reg |= ((uint32_t)minc << 7);
+      reg |= ((uint32_t)psize << 8);
+      reg |= ((uint32_t)msize << 10);
+      reg |= ((uint32_t)priority << 12);
+      return reg;
+  }
+solution_explanation: |
+  Each parameter is shifted to its correct bit position in the control register
+  and ORed together. This is a common pattern in embedded programming where
+  peripheral registers pack multiple configuration fields into a single register.

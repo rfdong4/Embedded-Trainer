@@ -1,0 +1,138 @@
+topic_id: embedded_rust
+topic_name: "Embedded Rust"
+questions:
+  - id: embedded_rust_q01
+    type: mcq
+    difficulty: beginner
+    text: "What does the #[no_std] attribute indicate in a Rust embedded project?"
+    options:
+      - "A) The program does not use any standard library functions"
+      - "B) The program does not link against the standard library (std), using only core and optionally alloc"
+      - "C) The program cannot use any Rust traits"
+      - "D) The program must be compiled without optimizations"
+    correct: "B"
+    explanation: "The #[no_std] attribute tells the Rust compiler not to link the standard library (std), which requires an OS. Instead, the program uses the core library (always available) and optionally alloc for heap allocation."
+    tags: [rust, no_std, basics]
+    xp: 10
+
+  - id: embedded_rust_q02
+    type: mcq
+    difficulty: intermediate
+    text: "In Rust's ownership model, what happens when a value is moved to a new variable?"
+    options:
+      - "A) The value is copied and both variables are valid"
+      - "B) The original variable becomes invalid and cannot be used"
+      - "C) A reference count is incremented"
+      - "D) The compiler generates a deep clone automatically"
+    correct: "B"
+    explanation: "When a value is moved in Rust, ownership transfers to the new variable. The original variable is invalidated and any attempt to use it results in a compile-time error. This prevents use-after-free bugs."
+    tags: [rust, ownership, move_semantics]
+    xp: 10
+
+  - id: embedded_rust_q03
+    type: mcq
+    difficulty: intermediate
+    text: "What is a PAC (Peripheral Access Crate) in the Rust embedded ecosystem?"
+    options:
+      - "A) A high-level driver library for sensors"
+      - "B) A low-level crate auto-generated from SVD files that provides type-safe register access"
+      - "C) A package manager for embedded targets"
+      - "D) A compiler plugin for cross-compilation"
+    correct: "B"
+    explanation: "A PAC is auto-generated from SVD (System View Description) files using tools like svd2rust. It provides type-safe, zero-cost abstractions over raw register access, preventing invalid register operations at compile time."
+    tags: [rust, pac, svd, registers]
+    xp: 10
+
+  - id: embedded_rust_q04
+    type: true_false
+    difficulty: beginner
+    text: "In Rust, the unsafe keyword disables all of the compiler's safety checks within the block."
+    options: ["True", "False"]
+    correct: "False"
+    explanation: "The unsafe keyword only unlocks a small set of additional capabilities: dereferencing raw pointers, calling unsafe functions, accessing mutable statics, implementing unsafe traits, and accessing union fields. All other safety checks (ownership, borrowing, type checking) remain active."
+    tags: [rust, unsafe, safety]
+    xp: 10
+
+  - id: embedded_rust_q05
+    type: mcq
+    difficulty: intermediate
+    text: "What does the embedded-hal crate provide?"
+    options:
+      - "A) A specific HAL implementation for STM32"
+      - "B) A set of traits that define common embedded peripheral interfaces (GPIO, SPI, I2C, etc.)"
+      - "C) A real-time operating system written in Rust"
+      - "D) Memory allocation routines for embedded systems"
+    correct: "B"
+    explanation: "embedded-hal defines a set of traits (interfaces) for common embedded peripherals like GPIO, SPI, I2C, UART, and timers. Device-specific HAL crates implement these traits, enabling portable driver code."
+    tags: [rust, embedded_hal, traits, portability]
+    xp: 10
+
+  - id: embedded_rust_q06
+    type: mcq
+    difficulty: intermediate
+    text: "How does Rust handle critical sections in embedded systems (e.g., cortex-m crate)?"
+    options:
+      - "A) Using POSIX mutexes"
+      - "B) By disabling interrupts within a closure-based API that guarantees re-enabling on exit"
+      - "C) Using hardware semaphores only"
+      - "D) Critical sections are not supported in no_std Rust"
+    correct: "B"
+    explanation: "The cortex-m crate provides interrupt::free(|cs| { ... }) which disables interrupts, runs the closure, and re-enables interrupts on exit. The CriticalSection token passed to the closure proves interrupts are disabled."
+    tags: [rust, critical_section, cortex_m, interrupts]
+    xp: 10
+
+  - id: embedded_rust_q07
+    type: mcq
+    difficulty: advanced
+    text: "What does the cortex-m-rt crate provide for embedded Rust applications?"
+    options:
+      - "A) A real-time scheduler"
+      - "B) A minimal runtime with startup code, vector table, and memory initialization"
+      - "C) A debugger interface"
+      - "D) A USB stack"
+    correct: "B"
+    explanation: "cortex-m-rt provides the minimal startup runtime: the reset handler, vector table, .bss zeroing, .data initialization from flash, and the #[entry] macro for defining the main function."
+    tags: [rust, cortex_m_rt, startup, runtime]
+    xp: 10
+
+  - id: embedded_rust_q08
+    type: mcq
+    difficulty: advanced
+    text: "What is RTIC (Real-Time Interrupt-driven Concurrency) in Rust?"
+    options:
+      - "A) A traditional RTOS with preemptive multitasking"
+      - "B) A framework that uses hardware interrupt priorities for compile-time verified concurrency"
+      - "C) A software timer library"
+      - "D) A testing framework for embedded systems"
+    correct: "B"
+    explanation: "RTIC is a concurrency framework that maps tasks to hardware interrupt priorities. It uses compile-time analysis to prove that shared resources are accessed safely, eliminating the need for runtime mutexes or locks in many cases."
+    tags: [rust, rtic, concurrency, real_time]
+    xp: 10
+
+  - id: embedded_rust_q09
+    type: mcq
+    difficulty: intermediate
+    text: "What is Rust's borrowing rule regarding mutable and immutable references?"
+    options:
+      - "A) You can have unlimited mutable and immutable references simultaneously"
+      - "B) You can have either multiple immutable references OR exactly one mutable reference, but not both"
+      - "C) You can only have one reference of any kind at a time"
+      - "D) Mutable references are not allowed in no_std code"
+    correct: "B"
+    explanation: "Rust's borrowing rules allow either multiple immutable references (&T) or exactly one mutable reference (&mut T) at any time, but never both simultaneously. This prevents data races at compile time."
+    tags: [rust, borrowing, references, safety]
+    xp: 10
+
+  - id: embedded_rust_q10
+    type: mcq
+    difficulty: advanced
+    text: "Compared to C, what is a key advantage of Rust for embedded systems development?"
+    options:
+      - "A) Rust compiles faster than C"
+      - "B) Rust has more mature embedded tooling than C"
+      - "C) Rust prevents undefined behavior like buffer overflows and use-after-free at compile time without runtime cost"
+      - "D) Rust uses less flash memory than equivalent C code"
+    correct: "C"
+    explanation: "Rust's ownership system, borrow checker, and type system prevent entire classes of bugs (buffer overflows, use-after-free, data races) at compile time with zero runtime overhead. C relies on programmer discipline and runtime checks for these issues."
+    tags: [rust, c_comparison, safety, zero_cost]
+    xp: 10

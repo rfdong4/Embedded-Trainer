@@ -27,3 +27,17 @@ hints:
   - "To set a pin as input, AND the register with ~(1 << pin)."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t configure_pin(uint32_t dir_reg, uint8_t pin, uint8_t mode) {
+      if (mode) {
+          return dir_reg | ((uint32_t)1 << pin);
+      } else {
+          return dir_reg & ~((uint32_t)1 << pin);
+      }
+  }
+solution_explanation: |
+  The function uses bitwise OR to set a bit (output mode) or bitwise AND with
+  an inverted mask to clear a bit (input mode). The cast to uint32_t ensures
+  correct behavior when shifting to bit positions above 15.

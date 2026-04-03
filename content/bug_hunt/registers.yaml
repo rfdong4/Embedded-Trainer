@@ -1,0 +1,51 @@
+topic_id: registers
+challenges:
+  - id: bug_read_modify_write_volatile
+    title: "Register Read-Modify-Write Race"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      #define RCC_AHB1ENR (*(volatile uint32_t*)0x40023830)
+
+      void enable_gpioa_clock(void) {
+          uint32_t temp = RCC_AHB1ENR;
+          temp |= (1 << 0);
+          RCC_AHB1ENR = temp;
+      }
+      // Called from main and ISR context
+    correct_answer: "B"
+    options:
+      - "A) temp doesn't need to be uint32_t"
+      - "B) Storing to local variable creates a window where ISR can change RCC_AHB1ENR — use direct |= or disable interrupts"
+      - "C) Bit 0 is wrong for GPIOA"
+      - "D) Missing delay after clock enable"
+    explanation: "The local variable 'temp' captures RCC_AHB1ENR at one point. If an ISR modifies RCC_AHB1ENR between the read and write, the ISR's changes are lost. Either use direct volatile |= (which is still not fully atomic) or disable interrupts around the operation."
+    xp: 15
+    tags: [read_modify_write, volatile, race_condition]
+
+  - id: bug_wrong_register_offset
+    title: "Wrong Register Offset"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      // STM32 GPIO register offsets:
+      // MODER = +0x00, OTYPER = +0x04, OSPEEDR = +0x08
+      // PUPDR = +0x0C, IDR = +0x10, ODR = +0x14
+
+      #define GPIOA_BASE 0x40020000
+      #define GPIOA_ODR  (*(volatile uint32_t*)(GPIOA_BASE + 0x10))
+
+      void set_pin(uint8_t pin) {
+          GPIOA_ODR |= (1 << pin);
+      }
+    correct_answer: "A"
+    options:
+      - "A) ODR offset is 0x14, not 0x10 — 0x10 is IDR (input data register)"
+      - "B) pin should be uint32_t"
+      - "C) Should use = instead of |="
+      - "D) GPIOA_BASE is wrong"
+    explanation: "The offset 0x10 corresponds to IDR (Input Data Register), which is read-only. Writing to it has no effect. The ODR (Output Data Register) is at offset 0x14."
+    xp: 10
+    tags: [register_offset, idr, odr]

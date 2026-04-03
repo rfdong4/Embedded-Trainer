@@ -21,6 +21,9 @@ class HomeScreen(Screen):
         ("1", "quiz_mode", "Quiz Mode"),
         ("2", "coding_mode", "Coding Mode"),
         ("3", "learn_mode", "Learn Mode"),
+        ("4", "bug_hunt_mode", "Bug Hunt"),
+        ("5", "register_sim", "Register Sim"),
+        ("6", "review_mode", "Review"),
         ("p", "profile", "Profile"),
     ]
 
@@ -60,6 +63,28 @@ class HomeScreen(Screen):
                 variant="warning",
                 classes="mode-button",
             )
+
+        with Horizontal(id="mode-buttons-2"):
+            yield Button(
+                "Bug Hunt\n[4] Find the bug",
+                id="btn-bug-hunt",
+                variant="error",
+                classes="mode-button",
+            )
+            yield Button(
+                "Register Sim\n[5] Visualize bits",
+                id="btn-reg-sim",
+                variant="primary",
+                classes="mode-button",
+            )
+            yield Button(
+                "Review\n[6] Spaced repetition",
+                id="btn-review",
+                variant="success",
+                classes="mode-button",
+            )
+
+        with Horizontal(id="mode-buttons-3"):
             yield Button(
                 "Profile\n[P] Stats & Achievements",
                 id="btn-profile",
@@ -76,6 +101,12 @@ class HomeScreen(Screen):
             self.action_coding_mode()
         elif event.button.id == "btn-learn":
             self.action_learn_mode()
+        elif event.button.id == "btn-bug-hunt":
+            self.action_bug_hunt_mode()
+        elif event.button.id == "btn-reg-sim":
+            self.action_register_sim()
+        elif event.button.id == "btn-review":
+            self.action_review_mode()
         elif event.button.id == "btn-profile":
             self.action_profile()
 
@@ -93,6 +124,18 @@ class HomeScreen(Screen):
     def action_learn_mode(self):
         from embedded_trainer.screens.topic_select import TopicSelectScreen
         self.app.push_screen(TopicSelectScreen(mode="learn"))
+
+    def action_bug_hunt_mode(self):
+        from embedded_trainer.screens.topic_select import TopicSelectScreen
+        self.app.push_screen(TopicSelectScreen(mode="bug_hunt"))
+
+    def action_register_sim(self):
+        from embedded_trainer.screens.register_sim import RegisterSimSelectScreen
+        self.app.push_screen(RegisterSimSelectScreen())
+
+    def action_review_mode(self):
+        from embedded_trainer.screens.review import ReviewScreen
+        self.app.push_screen(ReviewScreen())
 
     def action_profile(self):
         from embedded_trainer.screens.profile import ProfileScreen

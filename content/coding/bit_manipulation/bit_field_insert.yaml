@@ -29,3 +29,17 @@ hints:
   - "Clear the field in reg with reg &= ~(mask << start_bit), then insert with reg |= ((value & mask) << start_bit)."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t bit_field_insert(uint32_t reg, uint32_t value, uint8_t start_bit, uint8_t width) {
+      uint32_t mask = ((1UL << width) - 1);
+      reg &= ~(mask << start_bit);
+      reg |= (value & mask) << start_bit;
+      return reg;
+  }
+solution_explanation: |
+  The function first creates a mask of width consecutive 1-bits using
+  ((1UL << width) - 1). It clears the target field in the register by ANDing with
+  the inverted shifted mask. Then it inserts the new value by masking it to width
+  bits, shifting it to the start position, and ORing it into the register.

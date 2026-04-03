@@ -24,3 +24,18 @@ hints:
   - "Brian Kernighan's trick: val &= (val - 1) clears the lowest set bit each iteration."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t count_set_bits(uint32_t val) {
+      uint8_t count = 0;
+      while (val) {
+          count++;
+          val &= (val - 1);
+      }
+      return count;
+  }
+solution_explanation: |
+  This uses Brian Kernighan's bit-counting trick. The expression val &= (val - 1)
+  clears the lowest set bit in each iteration, so the loop runs exactly once per
+  set bit. This is more efficient than checking all 32 bit positions individually.

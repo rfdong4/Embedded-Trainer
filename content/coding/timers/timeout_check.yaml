@@ -23,3 +23,13 @@ hints:
   - "Simply compare (now - start) >= timeout and return 1 or 0."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t timeout_elapsed(uint32_t start, uint32_t now, uint32_t timeout) {
+      return (now - start) >= timeout ? 1 : 0;
+  }
+solution_explanation: |
+  Unsigned subtraction (now - start) naturally handles counter wraparound in C because
+  unsigned arithmetic wraps modulo 2^32. The elapsed time is simply compared against the
+  timeout threshold, returning 1 if the timeout has passed and 0 otherwise.

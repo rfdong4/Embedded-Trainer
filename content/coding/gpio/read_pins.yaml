@@ -27,3 +27,20 @@ hints:
   - "If pin is set, OR the result with (1 << index) where index is the loop counter."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t read_pins(uint32_t port_value, uint8_t *pins, uint8_t count) {
+      uint8_t result = 0;
+      for (uint8_t i = 0; i < count; i++) {
+          if (port_value & ((uint32_t)1 << pins[i])) {
+              result |= (1 << i);
+          }
+      }
+      return result;
+  }
+solution_explanation: |
+  The function iterates through the pins array and checks whether each
+  specified pin is set in the port value. If a pin is high, the corresponding
+  bit index in the result is set, packing the selected pin states into a
+  contiguous bitmask.

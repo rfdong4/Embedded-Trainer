@@ -52,3 +52,20 @@ class CodingChallenge:
     xp_value: int
     hints: list[str] = field(default_factory=list)
     time_limit_seconds: int = 5
+    solution: str = ""
+    solution_explanation: str = ""
+
+
+@dataclass
+class BugHuntChallenge:
+    id: str
+    topic_id: str
+    title: str
+    difficulty: Literal["beginner", "intermediate", "advanced"]
+    buggy_code: str
+    bug_description: str
+    correct_answer: str
+    options: list[str]
+    explanation: str
+    xp_value: int
+    tags: list[str] = field(default_factory=list)

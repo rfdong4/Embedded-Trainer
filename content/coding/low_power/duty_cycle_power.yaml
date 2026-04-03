@@ -1,0 +1,53 @@
+id: low_power_duty_cycle_power
+topic_id: low_power
+title: "Calculate Average Power from Duty Cycle"
+difficulty: advanced
+description: |
+  Implement a function that calculates the average current consumption
+  of a duty-cycled embedded system.
+
+  The formula is:
+    I_avg = (t_active * I_active + t_sleep * I_sleep) / (t_active + t_sleep)
+
+  All times are in milliseconds. Currents are in microamps.
+  Return the result in microamps (rounded down to integer).
+
+  Parameters:
+  - active_time_ms (uint32_t): time spent active per cycle in milliseconds
+  - sleep_time_ms (uint32_t): time spent sleeping per cycle in milliseconds
+  - active_current_ua (uint32_t): current draw during active phase in microamps
+  - sleep_current_ua (uint32_t): current draw during sleep phase in microamps
+
+  If total time is 0, return 0.
+function_signature: "uint32_t calc_avg_current(uint32_t active_time_ms, uint32_t sleep_time_ms, uint32_t active_current_ua, uint32_t sleep_current_ua)"
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t calc_avg_current(uint32_t active_time_ms, uint32_t sleep_time_ms,
+                             uint32_t active_current_ua, uint32_t sleep_current_ua) {
+      // TODO: implement
+  }
+test_harness: "duty_cycle_power_tests/test_main.c"
+expected_output: "duty_cycle_power_tests/expected_output.txt"
+hints:
+  - "Use 64-bit arithmetic to avoid overflow: (uint64_t)time * current."
+  - "Integer division naturally truncates (rounds down)."
+  - "Check for total time == 0 to avoid division by zero."
+xp: 35
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t calc_avg_current(uint32_t active_time_ms, uint32_t sleep_time_ms,
+                             uint32_t active_current_ua, uint32_t sleep_current_ua) {
+      uint32_t total_time = active_time_ms + sleep_time_ms;
+      if (total_time == 0) return 0;
+      uint64_t active_charge = (uint64_t)active_time_ms * active_current_ua;
+      uint64_t sleep_charge = (uint64_t)sleep_time_ms * sleep_current_ua;
+      return (uint32_t)((active_charge + sleep_charge) / total_time);
+  }
+solution_explanation: |
+  The function computes the weighted average current using 64-bit arithmetic
+  to prevent overflow when multiplying milliseconds by microamps. The result
+  is the average current the system draws over one full duty cycle, which is
+  the key metric for estimating battery life in duty-cycled systems.

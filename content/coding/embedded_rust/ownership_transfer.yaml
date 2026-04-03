@@ -1,0 +1,95 @@
+id: embedded_rust_ownership_transfer
+topic_id: embedded_rust
+title: "Ownership Transfer Simulation"
+difficulty: intermediate
+description: |
+  Simulate Rust's ownership model in C. A resource can only have one owner
+  at a time. When ownership is transferred (moved), the previous owner
+  becomes invalid.
+
+  Implement an ownership system using a Resource struct:
+
+  typedef struct {
+      int value;
+      int valid;   // 1 = owned/valid, 0 = moved/invalid
+  } Resource;
+
+  Functions:
+  - resource_create: Initialize a Resource with a value and valid=1
+  - resource_move: Transfer ownership from src to dst. After the move,
+    src->valid becomes 0 and dst gets src's value with valid=1.
+    Returns 1 on success, 0 if src is already invalid.
+  - resource_read: Return the value if valid, or -1 if invalid (moved).
+
+  This simulates how Rust prevents use-after-move at compile time.
+function_signature: |
+  void resource_create(Resource *r, int value);
+  int resource_move(Resource *src, Resource *dst);
+  int resource_read(const Resource *r);
+skeleton_code: |
+  #include <stdint.h>
+
+  /* Simulates Rust's ownership/move semantics:
+   * - Each value has exactly one owner
+   * - When ownership is transferred (moved), the source becomes invalid
+   * - Rust enforces this at compile time; here we check at runtime */
+
+  typedef struct {
+      int value;
+      int valid;
+  } Resource;
+
+  void resource_create(Resource *r, int value) {
+      // TODO: initialize resource with value and mark as valid
+  }
+
+  int resource_move(Resource *src, Resource *dst) {
+      // TODO: move ownership from src to dst
+      // Return 0 if src is already invalid
+  }
+
+  int resource_read(const Resource *r) {
+      // TODO: return value if valid, -1 if invalid (moved)
+  }
+test_harness: "ownership_transfer_tests/test_main.c"
+expected_output: "ownership_transfer_tests/expected_output.txt"
+hints:
+  - "After a move, src->valid must be set to 0"
+  - "resource_read should check the valid flag before returning the value"
+xp: 40
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  /* Simulates Rust's ownership/move semantics:
+   * - Each value has exactly one owner
+   * - When ownership is transferred (moved), the source becomes invalid
+   * - Rust enforces this at compile time; here we check at runtime */
+
+  typedef struct {
+      int value;
+      int valid;
+  } Resource;
+
+  void resource_create(Resource *r, int value) {
+      r->value = value;
+      r->valid = 1;
+  }
+
+  int resource_move(Resource *src, Resource *dst) {
+      if (!src->valid) return 0;
+      dst->value = src->value;
+      dst->valid = 1;
+      src->valid = 0;
+      return 1;
+  }
+
+  int resource_read(const Resource *r) {
+      if (!r->valid) return -1;
+      return r->value;
+  }
+solution_explanation: |
+  This simulates Rust's move semantics. In Rust, after 'let b = a;', the variable
+  'a' is no longer usable. The compiler tracks ownership and prevents use-after-move
+  at compile time. In this C simulation, we use a 'valid' flag to track ownership
+  at runtime, returning an error when reading a moved resource.

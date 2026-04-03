@@ -1,0 +1,53 @@
+id: embedded_security_boot_chain_verify
+topic_id: embedded_security
+title: "Verify a Boot Chain"
+difficulty: advanced
+description: |
+  Implement a function that verifies a boot chain by checking signature flags
+  for each stage.
+
+  A boot chain consists of N stages. Each stage has a uint8_t flags field:
+  - Bit 0: SIGNATURE_VALID (1 = signature verified, 0 = invalid)
+  - Bit 1: VERSION_OK (1 = version >= minimum required, 0 = rollback detected)
+
+  A stage passes verification only if BOTH bits 0 and 1 are set (flags & 0x03 == 0x03).
+
+  The function must verify all stages in order. Return the 0-based index of the
+  first failing stage, or -1 if all stages pass.
+
+  Parameters:
+  - stages: array of uint8_t flags, one per boot stage
+  - num_stages: number of stages in the chain
+
+  Return -1 if all stages pass, or the index of the first failing stage.
+function_signature: "int verify_boot_chain(const uint8_t *stages, uint32_t num_stages)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int verify_boot_chain(const uint8_t *stages, uint32_t num_stages) {
+      // TODO: implement
+  }
+test_harness: "boot_chain_verify_tests/test_main.c"
+expected_output: "boot_chain_verify_tests/expected_output.txt"
+hints:
+  - "Check bits 0 and 1 of each stage's flags using (flags & 0x03) == 0x03."
+  - "Return the index of the first stage that fails this check."
+xp: 45
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int verify_boot_chain(const uint8_t *stages, uint32_t num_stages) {
+      for (uint32_t i = 0; i < num_stages; i++) {
+          if ((stages[i] & 0x03) != 0x03) {
+              return (int)i;
+          }
+      }
+      return -1;
+  }
+solution_explanation: |
+  The function iterates through each boot stage and checks that both bit 0
+  (SIGNATURE_VALID) and bit 1 (VERSION_OK) are set by masking with 0x03 and
+  comparing. The first stage that fails returns its index immediately, breaking
+  the chain of trust. If all stages pass, -1 is returned indicating a valid
+  boot chain.

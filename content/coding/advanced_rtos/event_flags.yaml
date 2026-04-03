@@ -1,0 +1,59 @@
+id: advanced_rtos_event_flags
+topic_id: advanced_rtos
+title: "Event Flag Group"
+difficulty: intermediate
+description: |
+  Implement an event flag group — a bitmask used for task synchronization.
+
+  Implement three functions:
+  - `event_set`: Set specified flag bits in the group
+  - `event_clear`: Clear specified flag bits
+  - `event_wait`: Check if condition is met. If mode=0, return 1 when ANY
+    of the requested flags are set. If mode=1, return 1 only when ALL
+    requested flags are set. Return 0 otherwise.
+function_signature: "void event_set(uint32_t *flags, uint32_t mask); void event_clear(uint32_t *flags, uint32_t mask); uint8_t event_wait(uint32_t flags, uint32_t mask, uint8_t mode)"
+skeleton_code: |
+  #include <stdint.h>
+
+  void event_set(uint32_t *flags, uint32_t mask) {
+      // TODO: set the bits in mask
+  }
+
+  void event_clear(uint32_t *flags, uint32_t mask) {
+      // TODO: clear the bits in mask
+  }
+
+  uint8_t event_wait(uint32_t flags, uint32_t mask, uint8_t mode) {
+      // TODO: mode 0 = wait ANY, mode 1 = wait ALL
+  }
+test_harness: "event_flags_tests/test_main.c"
+expected_output: "event_flags_tests/expected_output.txt"
+hints:
+  - "event_set uses OR: *flags |= mask"
+  - "For wait ALL, check (flags & mask) == mask"
+  - "For wait ANY, check (flags & mask) != 0"
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  void event_set(uint32_t *flags, uint32_t mask) {
+      *flags |= mask;
+  }
+
+  void event_clear(uint32_t *flags, uint32_t mask) {
+      *flags &= ~mask;
+  }
+
+  uint8_t event_wait(uint32_t flags, uint32_t mask, uint8_t mode) {
+      if (mode == 1) {
+          return ((flags & mask) == mask) ? 1 : 0;
+      } else {
+          return ((flags & mask) != 0) ? 1 : 0;
+      }
+  }
+solution_explanation: |
+  Event flags use simple bitwise operations. Set uses OR to turn on bits,
+  clear uses AND with complement to turn off bits. The wait function checks
+  whether the requested bits are present: ALL mode requires every bit in
+  the mask to be set, ANY mode requires at least one bit to be set.

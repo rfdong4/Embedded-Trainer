@@ -23,3 +23,18 @@ hints:
   - "Loop num_tasks times to check all tasks, starting from (current + 1)."
 xp: 35
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t next_task(uint8_t current, uint8_t *active, uint8_t num_tasks) {
+      for (uint8_t i = 1; i <= num_tasks; i++) {
+          uint8_t candidate = (current + i) % num_tasks;
+          if (active[candidate]) return candidate;
+      }
+      return current;
+  }
+solution_explanation: |
+  The function searches forward from (current + 1), wrapping around using modulo.
+  It checks up to num_tasks candidates and returns the first one with an active
+  flag of 1. If no active task is found after checking all positions, it returns
+  the current task ID.

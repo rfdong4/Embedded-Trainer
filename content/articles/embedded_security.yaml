@@ -1,0 +1,136 @@
+topic_id: embedded_security
+articles:
+  - id: secure_boot_concepts
+    title: "Secure Boot: Chain of Trust"
+    estimated_minutes: 6
+    content: |
+      # Secure Boot: Chain of Trust
+
+      Secure boot is the foundation of embedded device security. It ensures that
+      only authenticated, unmodified firmware runs on the device by establishing a
+      **chain of trust** from hardware to application.
+
+      ## How Secure Boot Works
+
+      The boot process is divided into stages, each verifying the next:
+
+      1. **Boot ROM (Root of Trust)**: Immutable code burned into silicon. It holds
+         the root public key or its hash and verifies the first-stage bootloader.
+      2. **First-Stage Bootloader**: Verified by the Boot ROM. It verifies the
+         second-stage bootloader or main firmware.
+      3. **Main Firmware / Application**: Verified by the bootloader before execution.
+
+      Each stage checks a **digital signature** (e.g., ECDSA, RSA) of the next
+      stage using a public key. The private key is kept offline at the manufacturer.
+
+      ## Signature Verification Flow
+
+          +-----------+     verifies     +------------+     verifies     +----------+
+          | Boot ROM  | --------------> | Bootloader  | --------------> | Firmware |
+          | (immutable)|                 | (signed)    |                 | (signed) |
+          +-----------+                  +------------+                  +----------+
+               |
+          Root public key
+          (OTP fuses)
+
+      ## Key Storage
+
+      The root public key (or its SHA-256 hash) is stored in **One-Time Programmable
+      (OTP) fuses** inside the chip. These fuses are burned during manufacturing and
+      cannot be modified afterward, preventing an attacker from replacing the key.
+
+          // Pseudocode: secure boot verification
+          uint8_t* firmware = (uint8_t*)FIRMWARE_ADDR;
+          uint32_t fw_size = get_firmware_size();
+          uint8_t* signature = (uint8_t*)SIGNATURE_ADDR;
+
+          // Hash the firmware image
+          uint8_t hash[32];
+          sha256(firmware, fw_size, hash);
+
+          // Verify signature using the root public key from OTP
+          if (ecdsa_verify(root_pubkey, hash, signature)) {
+              jump_to_firmware(FIRMWARE_ADDR);
+          } else {
+              enter_recovery_mode();
+          }
+
+      ## Rollback Protection
+
+      An attacker might try to flash an older, vulnerable firmware version. Secure
+      boot systems prevent this with a **monotonic counter** stored in OTP fuses.
+      Each firmware update increments the counter, and the bootloader refuses to
+      boot firmware with a version number lower than the current counter value.
+
+      ## Common Pitfalls
+
+      - **No rollback protection**: Allows downgrade attacks
+      - **Debug ports left open**: JTAG/SWD can bypass secure boot entirely
+      - **Key stored in flash**: Can be extracted with flash dump tools
+      - **No fault injection countermeasures**: Voltage glitches can skip verification
+
+  - id: trustzone_overview
+    title: "ARM TrustZone for Embedded Systems"
+    estimated_minutes: 5
+    content: |
+      # ARM TrustZone for Embedded Systems
+
+      TrustZone is ARM's hardware security technology that creates two isolated
+      execution environments on a single processor: the **Secure world** and the
+      **Non-Secure world**.
+
+      ## TrustZone on Cortex-M (TrustZone-M)
+
+      Available on ARMv8-M processors (Cortex-M23, M33, M55), TrustZone-M provides:
+
+      - **Memory partitioning**: The SAU (Secure Attribution Unit) and IDAU
+        (Implementation-Defined Attribution Unit) classify every address as
+        Secure, Non-Secure, or Non-Secure Callable.
+      - **Secure/Non-Secure transitions**: Non-Secure code can only call Secure
+        functions through designated **entry points** (NSC regions with SG instruction).
+      - **Separate stack pointers**: Each world has its own MSP and PSP.
+      - **Banked registers**: Some system registers are banked between worlds.
+
+      ## Memory Map
+
+          0x00000000 +------------------+
+                     |  Secure Code     |  (Boot ROM, secure services)
+          0x10000000 +------------------+
+                     |  NSC (Veneer)    |  (Non-Secure Callable entry points)
+          0x10001000 +------------------+
+                     |  Non-Secure Code |  (Main application, RTOS)
+          0x20000000 +------------------+
+                     |  Secure Data     |  (Keys, credentials)
+          0x30000000 +------------------+
+                     |  Non-Secure Data |  (Application data)
+                     +------------------+
+
+      ## Calling Secure Functions from Non-Secure World
+
+      Secure functions exposed to the Non-Secure world are called **Secure Gateway
+      (SG) veneers**:
+
+          // Secure side: define an NSC function
+          __attribute__((cmse_nonsecure_entry))
+          uint32_t secure_encrypt(uint32_t *data, uint32_t len) {
+              // Access secure key material
+              aes_encrypt(secure_key, data, len);
+              return 0;
+          }
+
+          // Non-Secure side: call it like a normal function
+          extern uint32_t secure_encrypt(uint32_t *data, uint32_t len);
+          secure_encrypt(my_buffer, 16);
+
+      ## Use Cases
+
+      - **Secure key storage**: Cryptographic keys remain in the Secure world
+      - **Secure boot**: Boot ROM runs in Secure world, validates Non-Secure firmware
+      - **Trusted peripherals**: Crypto accelerators assigned to Secure world only
+      - **Secure firmware update**: Update logic runs in Secure world to prevent tampering
+
+      ## TrustZone vs. MPU
+
+      The MPU provides privilege-level isolation (privileged vs. unprivileged) but
+      runs in the same security domain. TrustZone provides a hardware-enforced
+      security boundary that even privileged Non-Secure code cannot cross.

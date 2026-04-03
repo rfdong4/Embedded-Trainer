@@ -22,3 +22,17 @@ hints:
   - "XOR is associative and commutative, so order does not matter."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t i2c_pec(uint8_t *data, uint8_t len) {
+      uint8_t pec = 0;
+      for (uint8_t i = 0; i < len; i++) {
+          pec ^= data[i];
+      }
+      return pec;
+  }
+solution_explanation: |
+  The PEC is computed by XORing all bytes in the data array together, starting
+  from an initial value of 0. This simple checksum can detect any single-bit
+  error in the transmitted data.

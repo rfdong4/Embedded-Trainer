@@ -1,0 +1,46 @@
+id: riscv_privilege_check
+topic_id: riscv
+title: "Privilege Level Access Check"
+difficulty: intermediate
+description: |
+  Implement a function that checks whether an operation is allowed at the
+  current RISC-V privilege level.
+
+  RISC-V defines three privilege levels:
+  - 0 (User), 1 (Supervisor), 3 (Machine)
+
+  A CSR address encodes the minimum required privilege level in bits [9:8].
+  An operation is allowed if the current privilege level >= the required level.
+
+  Parameters:
+  - current_priv: current privilege level (0, 1, or 3)
+  - csr_addr: 12-bit CSR address
+
+  Return 1 if access is allowed, 0 if denied.
+function_signature: "int privilege_check(uint8_t current_priv, uint16_t csr_addr)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int privilege_check(uint8_t current_priv, uint16_t csr_addr) {
+      // TODO: extract required privilege from csr_addr bits [9:8]
+      // Return 1 if current_priv >= required, 0 otherwise
+  }
+test_harness: "privilege_check_tests/test_main.c"
+expected_output: "privilege_check_tests/expected_output.txt"
+hints:
+  - "Extract bits [9:8] with: (csr_addr >> 8) & 0x3"
+  - "Compare current privilege level against the extracted level"
+xp: 40
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int privilege_check(uint8_t current_priv, uint16_t csr_addr) {
+      uint8_t required_priv = (csr_addr >> 8) & 0x3;
+      return current_priv >= required_priv;
+  }
+solution_explanation: |
+  In RISC-V, CSR addresses encode the minimum privilege level in bits [9:8].
+  For example, machine-level CSRs like mstatus (0x300) have bits [9:8] = 0b11 = 3,
+  meaning only M-mode (level 3) can access them. The function extracts this field
+  and compares it against the current privilege level.

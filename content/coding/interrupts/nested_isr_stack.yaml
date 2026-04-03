@@ -60,3 +60,45 @@ hints:
   - "Push condition: priority < isr_get_active_priority() AND depth < ISR_MAX_DEPTH."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define ISR_MAX_DEPTH 8
+
+  static uint8_t isr_prio_stack[ISR_MAX_DEPTH];
+  static int isr_depth;
+
+  void isr_stack_init(void) {
+      isr_depth = 0;
+  }
+
+  int isr_push(uint8_t priority) {
+      if (isr_depth >= ISR_MAX_DEPTH) return 0;
+      uint8_t active = isr_get_active_priority();
+      if (priority < active) {
+          isr_prio_stack[isr_depth] = priority;
+          isr_depth++;
+          return 1;
+      }
+      return 0;
+  }
+
+  int isr_pop(void) {
+      if (isr_depth == 0) return -1;
+      isr_depth--;
+      return isr_prio_stack[isr_depth];
+  }
+
+  uint8_t isr_get_active_priority(void) {
+      if (isr_depth == 0) return 255;
+      return isr_prio_stack[isr_depth - 1];
+  }
+
+  int isr_get_depth(void) {
+      return isr_depth;
+  }
+solution_explanation: |
+  The priority stack uses 255 as the idle priority. isr_push only succeeds when
+  the new priority is strictly less than the current active priority and the
+  stack is not full. isr_pop returns the popped priority and decrements depth,
+  or -1 if empty. This simulates NVIC-style nested interrupt preemption.

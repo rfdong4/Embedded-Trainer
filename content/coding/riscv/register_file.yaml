@@ -1,0 +1,55 @@
+id: riscv_register_file
+topic_id: riscv
+title: "RISC-V Register File"
+difficulty: intermediate
+description: |
+  Implement a RISC-V register file simulator with 32 registers (x0-x31).
+
+  Key constraint: Register x0 is hardwired to zero. Writing to x0 must be
+  silently ignored, and reading x0 must always return 0.
+
+  Implement two functions:
+
+  - reg_read: Return the value of register 'reg' (0-31)
+  - reg_write: Write 'value' to register 'reg' (0-31), ignoring writes to x0
+
+  Parameters:
+  - regs: pointer to an array of 32 uint32_t values (the register file)
+  - reg: register number (0-31)
+  - value: value to write (for reg_write)
+function_signature: |
+  uint32_t reg_read(const uint32_t *regs, uint8_t reg);
+  void reg_write(uint32_t *regs, uint8_t reg, uint32_t value);
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t reg_read(const uint32_t *regs, uint8_t reg) {
+      // TODO: return 0 for x0, otherwise return regs[reg]
+  }
+
+  void reg_write(uint32_t *regs, uint8_t reg, uint32_t value) {
+      // TODO: ignore writes to x0, otherwise set regs[reg] = value
+  }
+test_harness: "register_file_tests/test_main.c"
+expected_output: "register_file_tests/expected_output.txt"
+hints:
+  - "x0 must always read as 0 regardless of what is stored in regs[0]"
+  - "Writes to register 0 should be silently discarded"
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t reg_read(const uint32_t *regs, uint8_t reg) {
+      if (reg == 0) return 0;
+      return regs[reg];
+  }
+
+  void reg_write(uint32_t *regs, uint8_t reg, uint32_t value) {
+      if (reg == 0) return;
+      regs[reg] = value;
+  }
+solution_explanation: |
+  The RISC-V ISA hardwires x0 to zero. This simplifies instruction encoding --
+  for example, a NOP is encoded as ADDI x0, x0, 0. The register file enforces
+  this by special-casing register 0 in both read and write operations.

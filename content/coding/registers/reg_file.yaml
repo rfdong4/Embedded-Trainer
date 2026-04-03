@@ -32,3 +32,21 @@ hints:
   - "Just assign reg_file[reg] = value for write, return reg_file[reg] for read."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  static uint32_t reg_file[8] = {0};
+
+  void reg_write(uint8_t reg, uint32_t value) {
+      if (reg < 8) reg_file[reg] = value;
+  }
+
+  uint32_t reg_read(uint8_t reg) {
+      if (reg < 8) return reg_file[reg];
+      return 0;
+  }
+solution_explanation: |
+  Both functions perform bounds checking to ensure the register index is within
+  0-7. reg_write stores the value into the static array, and reg_read returns
+  the stored value. Out-of-range accesses are safely handled by doing nothing
+  (write) or returning 0 (read).

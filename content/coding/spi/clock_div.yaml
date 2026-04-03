@@ -25,3 +25,18 @@ hints:
   - "Powers of 2: 1, 2, 4, 8, 16, 32, 64, 128. Stop at 128 maximum."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t spi_clock_div(uint32_t sys_clock, uint32_t max_spi_clock) {
+      uint8_t div = 1;
+      while (div < 128 && sys_clock / div > max_spi_clock) {
+          div *= 2;
+      }
+      return div;
+  }
+solution_explanation: |
+  The function starts with divider 1 and doubles it until sys_clock/divider is
+  at or below max_spi_clock. It stops at 128 as the maximum allowed divider.
+  This finds the smallest power-of-2 divider that keeps the SPI clock within
+  the specified limit.

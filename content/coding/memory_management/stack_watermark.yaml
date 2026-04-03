@@ -38,3 +38,30 @@ hints:
   - "In stack_check_usage, count from index 0 while buf[i] == 0xDEADBEEF, then return size minus that count."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define STACK_PAINT_PATTERN 0xDEADBEEF
+
+  void stack_paint(uint32_t* buf, uint32_t size) {
+      for (uint32_t i = 0; i < size; i++) {
+          buf[i] = STACK_PAINT_PATTERN;
+      }
+  }
+
+  uint32_t stack_check_usage(const uint32_t* buf, uint32_t size) {
+      uint32_t untouched = 0;
+      for (uint32_t i = 0; i < size; i++) {
+          if (buf[i] == STACK_PAINT_PATTERN) {
+              untouched++;
+          } else {
+              break;
+          }
+      }
+      return size - untouched;
+  }
+solution_explanation: |
+  stack_paint fills every element with 0xDEADBEEF as a known marker. stack_check_usage
+  counts consecutive untouched (still painted) words from the start of the buffer. Since
+  the stack grows downward from the end, overwritten entries appear at the end first. The
+  usage is the total size minus the number of untouched words at the beginning.

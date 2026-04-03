@@ -1,0 +1,70 @@
+id: riscv_csr_read_write
+topic_id: riscv
+title: "CSR Read/Modify/Write Operations"
+difficulty: beginner
+description: |
+  Simulate RISC-V CSR (Control and Status Register) read/modify/write operations.
+
+  Implement three functions that operate on a simulated CSR register struct:
+
+  - csr_read: Return the current value of the CSR
+  - csr_set_bits: Set (OR) the specified bits in the CSR and return the old value
+  - csr_clear_bits: Clear (AND NOT) the specified bits in the CSR and return the old value
+
+  These simulate the CSRRW, CSRRS, and CSRRC RISC-V instructions.
+
+  Parameters:
+  - csr: pointer to a uint32_t representing the CSR
+  - bits: bitmask of bits to set or clear (for set/clear functions)
+
+  Return the previous CSR value (before modification).
+function_signature: |
+  uint32_t csr_read(const uint32_t *csr);
+  uint32_t csr_set_bits(uint32_t *csr, uint32_t bits);
+  uint32_t csr_clear_bits(uint32_t *csr, uint32_t bits);
+skeleton_code: |
+  #include <stdint.h>
+
+  uint32_t csr_read(const uint32_t *csr) {
+      // TODO: return the current CSR value
+  }
+
+  uint32_t csr_set_bits(uint32_t *csr, uint32_t bits) {
+      // TODO: save old value, OR in the bits, return old value
+  }
+
+  uint32_t csr_clear_bits(uint32_t *csr, uint32_t bits) {
+      // TODO: save old value, clear the bits, return old value
+  }
+test_harness: "csr_read_write_tests/test_main.c"
+expected_output: "csr_read_write_tests/expected_output.txt"
+hints:
+  - "csr_set_bits should do: *csr |= bits"
+  - "csr_clear_bits should do: *csr &= ~bits"
+  - "Always save the old value before modifying"
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t csr_read(const uint32_t *csr) {
+      return *csr;
+  }
+
+  uint32_t csr_set_bits(uint32_t *csr, uint32_t bits) {
+      uint32_t old = *csr;
+      *csr |= bits;
+      return old;
+  }
+
+  uint32_t csr_clear_bits(uint32_t *csr, uint32_t bits) {
+      uint32_t old = *csr;
+      *csr &= ~bits;
+      return old;
+  }
+solution_explanation: |
+  These functions simulate the three CSR instructions in RISC-V:
+  - CSRRS (CSR Read and Set): reads the CSR, then sets bits specified by the mask
+  - CSRRC (CSR Read and Clear): reads the CSR, then clears bits specified by the mask
+  - CSRRW (CSR Read and Write): reads the CSR value
+  Each returns the original value before modification, matching RISC-V behavior.

@@ -27,3 +27,14 @@ hints:
   - "The clear_mask specifies which bits to zero out; set_mask specifies which bits to turn on."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t reg_rmw(uint32_t reg_val, uint32_t clear_mask, uint32_t set_mask) {
+      return (reg_val & ~clear_mask) | set_mask;
+  }
+solution_explanation: |
+  The read-modify-write pattern first clears the bits specified by clear_mask
+  using AND with the inverted mask, then sets the bits specified by set_mask
+  using OR. This modifies only the targeted fields while preserving all other
+  bits in the register.

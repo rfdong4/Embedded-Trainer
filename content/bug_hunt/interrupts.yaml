@@ -1,0 +1,115 @@
+topic_id: interrupts
+challenges:
+  - id: bug_volatile_missing
+    title: "Missing volatile Qualifier"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      uint8_t flag = 0;
+
+      void ISR_Handler(void) {
+          flag = 1;
+      }
+
+      void wait_for_flag(void) {
+          while (!flag) {
+              // spin
+          }
+      }
+    correct_answer: "B"
+    options:
+      - "A) The while loop needs a timeout"
+      - "B) flag must be declared volatile"
+      - "C) ISR_Handler should return int"
+      - "D) flag should be uint16_t for alignment"
+    explanation: "Without volatile, the compiler may cache 'flag' in a register and never re-read it from memory. The while loop becomes infinite because the compiler doesn't know the ISR modifies flag. Declare as: volatile uint8_t flag = 0;"
+    xp: 15
+    tags: [volatile, isr, optimization]
+
+  - id: bug_no_critical_section
+    title: "Race Condition on Shared Counter"
+    difficulty: advanced
+    buggy_code: |
+      #include <stdint.h>
+
+      volatile uint32_t tick_count = 0;
+
+      void SysTick_Handler(void) {
+          tick_count++;
+      }
+
+      uint32_t get_elapsed(uint32_t start) {
+          return tick_count - start;
+      }
+
+      void delay_ms(uint32_t ms) {
+          uint32_t start = tick_count;
+          while (get_elapsed(start) < ms);
+      }
+    correct_answer: "C"
+    options:
+      - "A) tick_count should be int32_t"
+      - "B) get_elapsed has wrong subtraction order"
+      - "C) Reading tick_count non-atomically — on 8/16-bit MCUs, a 32-bit read can be torn by an interrupt"
+      - "D) delay_ms should use a for loop"
+    explanation: "On 8-bit or 16-bit MCUs, reading a 32-bit variable is not atomic. The SysTick interrupt can fire between reading the upper and lower halves, giving a corrupted value. Use a critical section (disable interrupts) around the read."
+    xp: 20
+    tags: [race_condition, atomic, critical_section]
+
+  - id: bug_isr_too_long
+    title: "Blocking Call in ISR"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+      #include <string.h>
+
+      #define UART_TX_READY (*(volatile uint8_t*)0x40011000 & 0x80)
+
+      void uart_send_string(const char *str) {
+          while (*str) {
+              while (!UART_TX_READY);  // Wait for TX ready
+              *(volatile uint8_t*)0x40011004 = *str++;
+          }
+      }
+
+      void EXTI0_IRQHandler(void) {
+          uart_send_string("Button pressed!\n");
+          // Clear interrupt flag...
+      }
+    correct_answer: "A"
+    options:
+      - "A) Blocking UART send inside ISR — ISRs should be short and non-blocking"
+      - "B) The UART address is wrong"
+      - "C) str should be declared volatile"
+      - "D) Missing null terminator check"
+    explanation: "The ISR blocks while waiting for UART TX ready, which can take a very long time relative to ISR expectations. This blocks all lower-priority interrupts. Instead, set a flag and handle the UART transmission in the main loop."
+    xp: 15
+    tags: [isr, blocking, uart]
+
+  - id: bug_missing_clear_flag
+    title: "Interrupt Flag Not Cleared"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      #define EXTI_PR  (*(volatile uint32_t*)0x40010414)
+      #define GPIOA_IDR (*(volatile uint32_t*)0x40020010)
+
+      volatile uint32_t button_count = 0;
+
+      void EXTI0_IRQHandler(void) {
+          if (GPIOA_IDR & 0x01) {
+              button_count++;
+          }
+          // Handler returns without clearing pending flag
+      }
+    correct_answer: "D"
+    options:
+      - "A) Should check bit 1 instead of bit 0"
+      - "B) button_count doesn't need volatile"
+      - "C) The if condition is inverted"
+      - "D) The interrupt pending flag is never cleared — ISR will fire repeatedly"
+    explanation: "If the interrupt pending bit is not cleared before returning from the ISR, the interrupt controller will immediately re-trigger the ISR, causing an infinite loop. Add: EXTI_PR = (1 << 0); to clear the pending flag."
+    xp: 10
+    tags: [interrupt_flag, pending, clear]

@@ -38,3 +38,17 @@ hints:
   - "Pack the result: ((uint32_t)ch1_compare << 16) | ch2_compare."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t calc_dead_time_pwm(uint16_t period, uint16_t duty_permille, uint16_t dead_ticks) {
+      uint32_t on_ticks = ((uint32_t)period * duty_permille) / 1000;
+      uint16_t ch1_compare = (uint16_t)(on_ticks - dead_ticks);
+      uint16_t ch2_compare = (uint16_t)(on_ticks + dead_ticks);
+      return ((uint32_t)ch1_compare << 16) | ch2_compare;
+  }
+solution_explanation: |
+  Compute the nominal on-time in ticks from the permille duty cycle, using uint32_t to
+  avoid overflow. CH1 turns off dead_ticks early (on_ticks - dead_ticks) and CH2 turns on
+  dead_ticks late (on_ticks + dead_ticks), creating a gap of 2*dead_ticks to prevent
+  shoot-through. The results are packed into a uint32_t with CH1 in the upper 16 bits.

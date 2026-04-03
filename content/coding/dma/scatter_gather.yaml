@@ -1,0 +1,75 @@
+id: dma_scatter_gather
+topic_id: dma
+title: "Implement Scatter-Gather List Builder"
+difficulty: intermediate
+description: |
+  Implement a function that builds a linked list of DMA descriptors for
+  scatter-gather transfers.
+
+  Given an array of dma_descriptor_t and a count, link them together by
+  setting each descriptor's 'next' field to point to the next descriptor
+  in the array. The last descriptor's 'next' should be 0 (end of chain).
+
+  The function should also set the 'valid' field of each descriptor to 1.
+
+  Parameters:
+  - descriptors: pointer to array of dma_descriptor_t
+  - count: number of descriptors in the array
+
+  Return the number of descriptors linked (should equal count).
+
+  The dma_descriptor_t struct has: src_addr, dst_addr, transfer_count,
+  control, next (all uint32_t), and valid (uint8_t).
+function_signature: "uint32_t build_sg_list(dma_descriptor_t *descriptors, uint32_t count)"
+skeleton_code: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t src_addr;
+      uint32_t dst_addr;
+      uint32_t transfer_count;
+      uint32_t control;
+      uint32_t next;
+      uint8_t valid;
+  } dma_descriptor_t;
+
+  uint32_t build_sg_list(dma_descriptor_t *descriptors, uint32_t count) {
+      // TODO: implement
+  }
+test_harness: "scatter_gather_tests/test_main.c"
+expected_output: "scatter_gather_tests/expected_output.txt"
+hints:
+  - "Iterate through the array and set each descriptor's next to the address of the following one."
+  - "Use (uint32_t)(uintptr_t)&descriptors[i+1] to get the address as a uint32_t."
+  - "The last descriptor should have next = 0."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  typedef struct {
+      uint32_t src_addr;
+      uint32_t dst_addr;
+      uint32_t transfer_count;
+      uint32_t control;
+      uint32_t next;
+      uint8_t valid;
+  } dma_descriptor_t;
+
+  uint32_t build_sg_list(dma_descriptor_t *descriptors, uint32_t count) {
+      if (count == 0) return 0;
+      for (uint32_t i = 0; i < count; i++) {
+          descriptors[i].valid = 1;
+          if (i < count - 1) {
+              descriptors[i].next = (uint32_t)(uintptr_t)&descriptors[i + 1];
+          } else {
+              descriptors[i].next = 0;
+          }
+      }
+      return count;
+  }
+solution_explanation: |
+  The function iterates through each descriptor, marks it as valid, and sets
+  its next pointer to the address of the following descriptor. The last
+  descriptor gets next = 0 to terminate the chain. This mirrors how real
+  scatter-gather DMA controllers traverse linked lists of descriptors.

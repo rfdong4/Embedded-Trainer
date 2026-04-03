@@ -1,0 +1,121 @@
+id: embedded_rust_type_state
+topic_id: embedded_rust
+title: "Typestate Pattern for GPIO Pin"
+difficulty: intermediate
+description: |
+  Simulate Rust's typestate pattern for a GPIO pin in C. In Rust, the type
+  system encodes hardware state so that invalid operations are compile-time
+  errors (e.g., you cannot set_high on an input pin).
+
+  Implement a pin state machine using a GpioPin struct:
+
+  typedef struct {
+      uint8_t pin_number;
+      uint8_t state;   // 0=unconfigured, 1=input, 2=output
+  } GpioPin;
+
+  Functions:
+  - pin_init: Create an unconfigured pin (state=0)
+  - pin_configure_input: Transition from unconfigured (0) to input (1).
+    Returns 1 on success, 0 if not unconfigured.
+  - pin_configure_output: Transition from unconfigured (0) to output (2).
+    Returns 1 on success, 0 if not unconfigured.
+  - pin_read: Read the pin (returns pin_number as dummy value).
+    Only valid in input state (1). Returns -1 if wrong state.
+  - pin_write: Write to the pin (no-op, returns 1).
+    Only valid in output state (2). Returns 0 if wrong state.
+
+  In Rust, these invalid transitions would be prevented at compile time via
+  the type system rather than runtime checks.
+function_signature: |
+  void pin_init(GpioPin *pin, uint8_t pin_number);
+  int pin_configure_input(GpioPin *pin);
+  int pin_configure_output(GpioPin *pin);
+  int pin_read(const GpioPin *pin);
+  int pin_write(GpioPin *pin, uint8_t value);
+skeleton_code: |
+  #include <stdint.h>
+
+  /* Simulates Rust's typestate pattern:
+   * - In Rust, Pin<Unconfigured>, Pin<Input>, Pin<Output> are different types
+   * - Calling set_high() on Pin<Input> is a compile-time error
+   * - Here we use runtime state checks to simulate the same safety */
+
+  typedef struct {
+      uint8_t pin_number;
+      uint8_t state;   /* 0=unconfigured, 1=input, 2=output */
+  } GpioPin;
+
+  void pin_init(GpioPin *pin, uint8_t pin_number) {
+      // TODO: initialize pin as unconfigured
+  }
+
+  int pin_configure_input(GpioPin *pin) {
+      // TODO: transition to input state if unconfigured
+  }
+
+  int pin_configure_output(GpioPin *pin) {
+      // TODO: transition to output state if unconfigured
+  }
+
+  int pin_read(const GpioPin *pin) {
+      // TODO: return value only if in input state
+  }
+
+  int pin_write(GpioPin *pin, uint8_t value) {
+      // TODO: write only if in output state
+  }
+test_harness: "type_state_tests/test_main.c"
+expected_output: "type_state_tests/expected_output.txt"
+hints:
+  - "Check the current state before allowing transitions"
+  - "Only unconfigured pins (state 0) can be configured"
+  - "Read only works in input state (1), write only in output state (2)"
+xp: 40
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  /* Simulates Rust's typestate pattern:
+   * - In Rust, Pin<Unconfigured>, Pin<Input>, Pin<Output> are different types
+   * - Calling set_high() on Pin<Input> is a compile-time error
+   * - Here we use runtime state checks to simulate the same safety */
+
+  typedef struct {
+      uint8_t pin_number;
+      uint8_t state;   /* 0=unconfigured, 1=input, 2=output */
+  } GpioPin;
+
+  void pin_init(GpioPin *pin, uint8_t pin_number) {
+      pin->pin_number = pin_number;
+      pin->state = 0;
+  }
+
+  int pin_configure_input(GpioPin *pin) {
+      if (pin->state != 0) return 0;
+      pin->state = 1;
+      return 1;
+  }
+
+  int pin_configure_output(GpioPin *pin) {
+      if (pin->state != 0) return 0;
+      pin->state = 2;
+      return 1;
+  }
+
+  int pin_read(const GpioPin *pin) {
+      if (pin->state != 1) return -1;
+      return (int)pin->pin_number;
+  }
+
+  int pin_write(GpioPin *pin, uint8_t value) {
+      if (pin->state != 2) return 0;
+      (void)value;
+      return 1;
+  }
+solution_explanation: |
+  This simulates the typestate pattern used in Rust embedded HALs. In Rust,
+  Pin<Unconfigured>, Pin<Input>, and Pin<Output> are different types, so
+  calling set_high() on an input pin is a compile-time error. The into_input()
+  method consumes the unconfigured pin and returns an input pin, making the
+  state transition explicit and verified by the compiler.

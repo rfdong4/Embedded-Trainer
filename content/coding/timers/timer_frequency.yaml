@@ -28,3 +28,13 @@ hints:
   - "The division is straightforward: sys_clk / (prescaler * reload)."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint32_t timer_overflow_freq(uint32_t sys_clk, uint16_t prescaler, uint16_t reload) {
+      return sys_clk / ((uint32_t)prescaler * reload);
+  }
+solution_explanation: |
+  The output frequency is the system clock divided by the product of prescaler and reload.
+  The prescaler is cast to uint32_t before multiplying with reload to ensure the intermediate
+  product does not overflow a 16-bit type. Integer division truncates toward zero as required.

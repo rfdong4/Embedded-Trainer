@@ -1,0 +1,48 @@
+id: wireless_rssi_average
+topic_id: wireless
+title: "Moving Average RSSI"
+difficulty: beginner
+description: |
+  Implement a function that calculates the moving average of RSSI
+  (Received Signal Strength Indicator) samples.
+
+  RSSI values are represented as signed 8-bit integers (int8_t), typically
+  ranging from -128 to 0 dBm. Given an array of RSSI samples and the number
+  of samples, compute the arithmetic mean.
+
+  Use integer division (truncation toward zero).
+
+  Parameters:
+  - samples: array of int8_t RSSI values
+  - count: number of samples (always >= 1)
+
+  Return the average RSSI as an int8_t.
+function_signature: "int8_t rssi_average(const int8_t *samples, uint32_t count)"
+skeleton_code: |
+  #include <stdint.h>
+
+  int8_t rssi_average(const int8_t *samples, uint32_t count) {
+      // TODO: implement
+  }
+test_harness: "rssi_average_tests/test_main.c"
+expected_output: "rssi_average_tests/expected_output.txt"
+hints:
+  - "Sum all samples into a wider integer type (int32_t) to avoid overflow."
+  - "Divide the sum by count to get the average."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  int8_t rssi_average(const int8_t *samples, uint32_t count) {
+      int32_t sum = 0;
+      for (uint32_t i = 0; i < count; i++) {
+          sum += samples[i];
+      }
+      return (int8_t)(sum / (int32_t)count);
+  }
+solution_explanation: |
+  The function accumulates all RSSI samples into a 32-bit signed integer to
+  prevent overflow (since int8_t can only hold -128 to 127). It then divides
+  by the count using integer division. The result is cast back to int8_t since
+  the average of int8_t values will always fit in int8_t range.

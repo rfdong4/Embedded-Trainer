@@ -22,3 +22,18 @@ hints:
   - "Use (val >> i) & 1 to extract bit i, then place it at position (7 - i) in the result."
 xp: 30
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t bit_reverse(uint8_t val) {
+      uint8_t result = 0;
+      for (int i = 0; i < 8; i++) {
+          result |= ((val >> i) & 1) << (7 - i);
+      }
+      return result;
+  }
+solution_explanation: |
+  The function iterates through all 8 bit positions. For each position i, it
+  extracts the bit using (val >> i) & 1, then places it at the mirrored position
+  (7 - i) in the result. This effectively reverses the bit order so that the MSB
+  becomes the LSB and vice versa.

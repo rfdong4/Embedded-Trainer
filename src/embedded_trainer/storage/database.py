@@ -67,6 +67,37 @@ class Database:
                 coding_completed INTEGER DEFAULT 0,
                 PRIMARY KEY (user_id, topic_id)
             );
+
+            CREATE TABLE IF NOT EXISTS question_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER REFERENCES users(id),
+                question_id TEXT NOT NULL,
+                topic_id TEXT NOT NULL,
+                correct BOOLEAN NOT NULL,
+                answered_at TEXT DEFAULT (datetime('now'))
+            );
+
+            CREATE TABLE IF NOT EXISTS spaced_repetition (
+                user_id INTEGER REFERENCES users(id),
+                question_id TEXT NOT NULL,
+                topic_id TEXT NOT NULL,
+                ease_factor REAL DEFAULT 2.5,
+                interval_days INTEGER DEFAULT 1,
+                repetitions INTEGER DEFAULT 0,
+                next_review TEXT NOT NULL,
+                last_reviewed TEXT,
+                PRIMARY KEY (user_id, question_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS bug_hunt_results (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER REFERENCES users(id),
+                challenge_id TEXT NOT NULL,
+                topic_id TEXT NOT NULL,
+                correct BOOLEAN NOT NULL,
+                xp_earned INTEGER DEFAULT 0,
+                answered_at TEXT DEFAULT (datetime('now'))
+            );
         """)
         self.conn.commit()
 
@@ -236,6 +267,94 @@ class Database:
         return UserProgress(
             profile=user_profile, topics=topics, achievements=achievements
         )
+
+    # --- Question history (for adaptive quizzes) ---
+
+    def save_question_result(
+        self, user_id: int, question_id: str, topic_id: str, correct: bool,
+    ):
+        self.conn.execute(
+            """INSERT INTO question_history (user_id, question_id, topic_id, correct)
+               VALUES (?, ?, ?, ?)""",
+            (user_id, question_id, topic_id, correct),
+        )
+        self.conn.commit()
+
+    def get_question_history(
+        self, user_id: int, topic_id: str,
+    ) -> dict[str, list[bool]]:
+        """Return {question_id: [correct, correct, ...]} for a topic."""
+        rows = self.conn.execute(
+            """SELECT question_id, correct FROM question_history
+               WHERE user_id = ? AND topic_id = ?
+               ORDER BY answered_at""",
+            (user_id, topic_id),
+        ).fetchall()
+        history: dict[str, list[bool]] = {}
+        for r in rows:
+            history.setdefault(r["question_id"], []).append(bool(r["correct"]))
+        return history
+
+    # --- Spaced repetition ---
+
+    def get_sr_state(self, user_id: int, question_id: str) -> dict | None:
+        row = self.conn.execute(
+            """SELECT * FROM spaced_repetition
+               WHERE user_id = ? AND question_id = ?""",
+            (user_id, question_id),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def upsert_sr_state(
+        self, user_id: int, question_id: str, topic_id: str,
+        ease_factor: float, interval_days: int, repetitions: int,
+        next_review: str,
+    ):
+        self.conn.execute(
+            """INSERT INTO spaced_repetition
+               (user_id, question_id, topic_id, ease_factor, interval_days,
+                repetitions, next_review, last_reviewed)
+               VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+               ON CONFLICT(user_id, question_id) DO UPDATE SET
+               ease_factor = ?, interval_days = ?, repetitions = ?,
+               next_review = ?, last_reviewed = datetime('now')""",
+            (user_id, question_id, topic_id, ease_factor, interval_days,
+             repetitions, next_review,
+             ease_factor, interval_days, repetitions, next_review),
+        )
+        self.conn.commit()
+
+    def get_due_reviews(self, user_id: int) -> list[dict]:
+        """Return all questions due for review (next_review <= today)."""
+        today = date.today().isoformat()
+        rows = self.conn.execute(
+            """SELECT question_id, topic_id, ease_factor, interval_days, repetitions
+               FROM spaced_repetition
+               WHERE user_id = ? AND next_review <= ?""",
+            (user_id, today),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    # --- Bug hunt ---
+
+    def save_bug_hunt_result(
+        self, user_id: int, challenge_id: str, topic_id: str,
+        correct: bool, xp_earned: int,
+    ):
+        self.conn.execute(
+            """INSERT INTO bug_hunt_results
+               (user_id, challenge_id, topic_id, correct, xp_earned)
+               VALUES (?, ?, ?, ?, ?)""",
+            (user_id, challenge_id, topic_id, correct, xp_earned),
+        )
+        self.conn.commit()
+
+    def get_completed_bug_hunts(self, user_id: int) -> set[str]:
+        rows = self.conn.execute(
+            "SELECT DISTINCT challenge_id FROM bug_hunt_results WHERE user_id = ? AND correct = 1",
+            (user_id,),
+        ).fetchall()
+        return {r["challenge_id"] for r in rows}
 
     def close(self):
         self.conn.close()

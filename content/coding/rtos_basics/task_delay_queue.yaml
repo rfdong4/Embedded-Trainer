@@ -38,3 +38,41 @@ hints:
   - "In tick_update, loop over all 8 tasks: if active, decrement; if it reaches 0, set the bit in the result mask and mark inactive."
 xp: 50
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  static uint16_t delay_ticks[8];
+  static uint8_t  delay_active[8];
+
+  void delay_queue_init(void) {
+      for (int i = 0; i < 8; i++) {
+          delay_ticks[i] = 0;
+          delay_active[i] = 0;
+      }
+  }
+
+  void delay_task(uint8_t task_id, uint16_t ticks) {
+      if (task_id >= 8 || ticks == 0) return;
+      delay_ticks[task_id] = ticks;
+      delay_active[task_id] = 1;
+  }
+
+  uint8_t delay_tick_update(void) {
+      uint8_t expired_mask = 0;
+      for (int i = 0; i < 8; i++) {
+          if (delay_active[i]) {
+              delay_ticks[i]--;
+              if (delay_ticks[i] == 0) {
+                  expired_mask |= (1 << i);
+                  delay_active[i] = 0;
+              }
+          }
+      }
+      return expired_mask;
+  }
+solution_explanation: |
+  delay_task stores the tick count and marks the task active. delay_tick_update
+  decrements each active task's counter by 1; when a counter reaches 0, the
+  corresponding bit is set in the returned expired mask and the task is marked
+  inactive. This allows multiple tasks to expire independently at different
+  tick counts.

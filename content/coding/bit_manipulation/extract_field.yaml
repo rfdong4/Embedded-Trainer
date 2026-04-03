@@ -23,3 +23,14 @@ hints:
   - "Create a mask of 'width' ones using ((1 << width) - 1) and AND it with the shifted value."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t extract_field(uint8_t reg, uint8_t start_bit, uint8_t width) {
+      return (reg >> start_bit) & ((1 << width) - 1);
+  }
+solution_explanation: |
+  The function first right-shifts the register by start_bit to align the desired
+  field with bit 0. It then creates a mask of width consecutive 1-bits using
+  ((1 << width) - 1) and ANDs the shifted value with this mask to extract only
+  the bits belonging to the field.

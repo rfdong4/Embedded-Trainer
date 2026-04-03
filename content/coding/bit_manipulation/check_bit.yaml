@@ -21,3 +21,13 @@ hints:
   - "Return (reg >> bit_pos) & 1 to get a clean 0 or 1 result."
 xp: 25
 time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  uint8_t check_bit(uint8_t reg, uint8_t bit_pos) {
+      return (reg >> bit_pos) & 1;
+  }
+solution_explanation: |
+  The function shifts the register value right by bit_pos positions, moving the
+  target bit into the least significant bit position. It then masks with 1 using
+  bitwise AND to isolate that single bit, returning either 0 or 1.

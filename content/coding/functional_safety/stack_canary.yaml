@@ -1,0 +1,54 @@
+id: functional_safety_stack_canary
+topic_id: functional_safety
+title: "Stack Canary Check"
+difficulty: intermediate
+description: |
+  Implement stack canary functions for detecting stack corruption.
+
+  A stack canary is a known sentinel value placed at the boundary of the
+  stack. Before returning from a function, the canary is checked — if it
+  has been overwritten, stack corruption has occurred.
+
+  Implement two functions:
+  - `stack_canary_init`: Place the canary value at a given memory location
+  - `stack_canary_check`: Verify the canary is intact, return 1 if valid, 0 if corrupted
+
+  Use the canary value 0xDEADBEEF.
+function_signature: "void stack_canary_init(uint32_t *location); uint8_t stack_canary_check(const uint32_t *location)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define CANARY_VALUE 0xDEADBEEF
+
+  void stack_canary_init(uint32_t *location) {
+      // TODO: Place canary value at location
+  }
+
+  uint8_t stack_canary_check(const uint32_t *location) {
+      // TODO: Return 1 if canary is intact, 0 if corrupted
+  }
+test_harness: "stack_canary_tests/test_main.c"
+expected_output: "stack_canary_tests/expected_output.txt"
+hints:
+  - "stack_canary_init simply writes the CANARY_VALUE to the given memory location."
+  - "stack_canary_check compares the value at the location to CANARY_VALUE."
+xp: 25
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define CANARY_VALUE 0xDEADBEEF
+
+  void stack_canary_init(uint32_t *location) {
+      *location = CANARY_VALUE;
+  }
+
+  uint8_t stack_canary_check(const uint32_t *location) {
+      return (*location == CANARY_VALUE) ? 1 : 0;
+  }
+solution_explanation: |
+  The init function writes the sentinel value 0xDEADBEEF to the given
+  memory location. The check function compares the current value at that
+  location against the expected canary. If a buffer overflow or stack
+  corruption has overwritten the canary, the check returns 0, signaling
+  that the stack has been corrupted.

@@ -1,0 +1,79 @@
+topic_id: uart
+challenges:
+  - id: bug_baud_rate_calc
+    title: "Baud Rate Calculation Error"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      #define UART_BRR (*(volatile uint32_t*)0x40011008)
+
+      void uart_set_baud(uint32_t pclk, uint32_t baud) {
+          UART_BRR = pclk / baud;
+      }
+      // pclk=8000000, baud=9600 -> BRR=833
+      // Actual baud = 8000000/833 = 9604 (close enough)
+      // But pclk=72000000, baud=115200 -> BRR=625
+      // Integer division truncates — should round
+    correct_answer: "C"
+    options:
+      - "A) BRR address is wrong"
+      - "B) Should multiply baud by 16"
+      - "C) Integer division truncates — use (pclk + baud/2) / baud for proper rounding"
+      - "D) pclk and baud should be uint16_t"
+    explanation: "Integer division truncates, which can cause significant baud rate error at higher speeds. The fix is to round: BRR = (pclk + baud/2) / baud. Some UARTs also divide pclk by an oversampling factor (typically 16)."
+    xp: 15
+    tags: [baud_rate, integer_division, rounding]
+
+  - id: bug_uart_no_stop
+    title: "Missing Stop Bit Configuration"
+    difficulty: beginner
+    buggy_code: |
+      #include <stdint.h>
+
+      typedef struct {
+          volatile uint32_t CR1;
+          volatile uint32_t CR2;
+          volatile uint32_t BRR;
+      } UART_TypeDef;
+
+      void uart_init(UART_TypeDef *uart) {
+          uart->CR1 = 0;
+          uart->CR1 |= (1 << 13);  // Enable UART
+          uart->CR1 |= (1 << 3);   // Enable TX
+          uart->CR1 |= (1 << 2);   // Enable RX
+          uart->BRR = 833;         // 9600 baud @ 8MHz
+          // CR2 left at default (0x0000)
+      }
+    correct_answer: "D"
+    options:
+      - "A) TX and RX bits are swapped"
+      - "B) BRR value is wrong"
+      - "C) Should disable UART before configuring"
+      - "D) This is actually correct — CR2=0 means 1 stop bit by default, which is standard"
+    explanation: "Trick question! The default CR2 value of 0 typically means 1 stop bit, which is the most common UART configuration (8N1). The code is correct. Always check the reference manual for default register values."
+    xp: 15
+    tags: [stop_bit, configuration, defaults]
+
+  - id: bug_uart_tx_overrun
+    title: "TX Buffer Overrun"
+    difficulty: intermediate
+    buggy_code: |
+      #include <stdint.h>
+
+      #define UART_DR  (*(volatile uint32_t*)0x40011004)
+
+      void uart_send_bytes(const uint8_t *data, uint32_t len) {
+          for (uint32_t i = 0; i < len; i++) {
+              UART_DR = data[i];
+          }
+      }
+    correct_answer: "A"
+    options:
+      - "A) Not waiting for TX empty flag — data is written faster than it's transmitted"
+      - "B) Should send MSB first"
+      - "C) data pointer is not volatile"
+      - "D) Loop should count down"
+    explanation: "Writing to the data register without checking if the transmit buffer is empty causes data loss — each write overwrites the previous byte before it's been shifted out. Must wait for TXE (transmit empty) flag before each write."
+    xp: 15
+    tags: [tx_overrun, busy_wait, txe_flag]

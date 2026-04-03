@@ -1,0 +1,82 @@
+id: advanced_rtos_timer_wheel
+topic_id: advanced_rtos
+title: "Software Timer Wheel"
+difficulty: advanced
+description: |
+  Implement a simplified timer wheel for scheduling callbacks.
+
+  The timer wheel has a fixed number of slots. Each timer is placed in
+  a slot based on its expiry tick modulo the wheel size.
+
+  Implement:
+  - `timer_wheel_init`: Initialize the wheel (clear all slots)
+  - `timer_add`: Add a timer to expire at a given tick. Store the timer_id
+    in the slot at (tick % WHEEL_SIZE). Return 1 on success, 0 if slot full.
+  - `timer_tick`: Process the current tick. Return the timer_id in the
+    current slot (or -1 if empty), and clear the slot.
+
+  Each slot holds at most one timer (simplified).
+function_signature: "void timer_wheel_init(TimerWheel *tw); uint8_t timer_add(TimerWheel *tw, uint32_t tick, int8_t timer_id); int8_t timer_tick(TimerWheel *tw, uint32_t current_tick)"
+skeleton_code: |
+  #include <stdint.h>
+
+  #define WHEEL_SIZE 8
+
+  typedef struct {
+      int8_t slots[WHEEL_SIZE];  /* timer_id or -1 if empty */
+  } TimerWheel;
+
+  void timer_wheel_init(TimerWheel *tw) {
+      // TODO: set all slots to -1
+  }
+
+  uint8_t timer_add(TimerWheel *tw, uint32_t tick, int8_t timer_id) {
+      // TODO: place timer in slot (tick % WHEEL_SIZE)
+  }
+
+  int8_t timer_tick(TimerWheel *tw, uint32_t current_tick) {
+      // TODO: check and clear slot at (current_tick % WHEEL_SIZE)
+  }
+test_harness: "timer_wheel_tests/test_main.c"
+expected_output: "timer_wheel_tests/expected_output.txt"
+hints:
+  - "Use tick % WHEEL_SIZE to determine the slot index."
+  - "timer_add should check if the slot is already occupied (not -1)."
+  - "timer_tick should save the timer_id, clear the slot to -1, then return the saved id."
+xp: 30
+time_limit: 5
+solution: |
+  #include <stdint.h>
+
+  #define WHEEL_SIZE 8
+
+  typedef struct {
+      int8_t slots[WHEEL_SIZE];
+  } TimerWheel;
+
+  void timer_wheel_init(TimerWheel *tw) {
+      for (int i = 0; i < WHEEL_SIZE; i++) {
+          tw->slots[i] = -1;
+      }
+  }
+
+  uint8_t timer_add(TimerWheel *tw, uint32_t tick, int8_t timer_id) {
+      uint32_t slot = tick % WHEEL_SIZE;
+      if (tw->slots[slot] != -1) {
+          return 0;
+      }
+      tw->slots[slot] = timer_id;
+      return 1;
+  }
+
+  int8_t timer_tick(TimerWheel *tw, uint32_t current_tick) {
+      uint32_t slot = current_tick % WHEEL_SIZE;
+      int8_t id = tw->slots[slot];
+      tw->slots[slot] = -1;
+      return id;
+  }
+solution_explanation: |
+  The timer wheel maps expiry ticks to slots using modulo. This gives O(1)
+  insertion and expiry checking. The simplified version allows one timer per
+  slot. Real implementations use linked lists per slot to handle collisions
+  and support many more timers than slots.
