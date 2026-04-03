@@ -62,16 +62,18 @@ class CodingSelectScreen(Screen):
         if not list_view.children:
             for ch in self._challenges:
                 check = "✓ " if ch.id in completed else "  "
+                diff = ch.difficulty.upper()
                 list_view.append(
-                    ListItem(Label(f"{check}{ch.title}  [{ch.difficulty}] +{ch.xp_value} XP"))
+                    ListItem(Label(f"{check}({diff})  {ch.title}  +{ch.xp_value} XP"))
                 )
         else:
             # Update existing labels in-place (no clear/re-mount needed)
             for i, ch in enumerate(self._challenges):
                 if i < len(list_view.children):
                     check = "✓ " if ch.id in completed else "  "
+                    diff = ch.difficulty.upper()
                     label = list_view.children[i].query_one(Label)
-                    label.update(f"{check}{ch.title}  [{ch.difficulty}] +{ch.xp_value} XP")
+                    label.update(f"{check}({diff})  {ch.title}  +{ch.xp_value} XP")
 
     def on_list_view_selected(self, event: ListView.Selected):
         idx = list(self.query_one("#challenge-list", ListView).children).index(event.item)
