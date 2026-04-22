@@ -24,6 +24,7 @@ class HomeScreen(Screen):
         ("4", "bug_hunt_mode", "Bug Hunt"),
         ("5", "register_sim", "Register Sim"),
         ("6", "review_mode", "Review"),
+        ("7", "interview_mode", "Interview"),
         ("p", "profile", "Profile"),
     ]
 
@@ -86,6 +87,12 @@ class HomeScreen(Screen):
 
         with Horizontal(id="mode-buttons-3"):
             yield Button(
+                "Interview Sim\n[7] Mock interviews",
+                id="btn-interview",
+                variant="warning",
+                classes="mode-button",
+            )
+            yield Button(
                 "Profile\n[P] Stats & Achievements",
                 id="btn-profile",
                 variant="default",
@@ -107,6 +114,8 @@ class HomeScreen(Screen):
             self.action_register_sim()
         elif event.button.id == "btn-review":
             self.action_review_mode()
+        elif event.button.id == "btn-interview":
+            self.action_interview_mode()
         elif event.button.id == "btn-profile":
             self.action_profile()
 
@@ -136,6 +145,10 @@ class HomeScreen(Screen):
     def action_review_mode(self):
         from embedded_trainer.screens.review import ReviewScreen
         self.app.push_screen(ReviewScreen())
+
+    def action_interview_mode(self):
+        from embedded_trainer.screens.interview import InterviewConfigScreen
+        self.app.push_screen(InterviewConfigScreen())
 
     def action_profile(self):
         from embedded_trainer.screens.profile import ProfileScreen

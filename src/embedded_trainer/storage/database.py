@@ -98,6 +98,25 @@ class Database:
                 xp_earned INTEGER DEFAULT 0,
                 answered_at TEXT DEFAULT (datetime('now'))
             );
+
+            CREATE TABLE IF NOT EXISTS interview_results (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER REFERENCES users(id),
+                level TEXT NOT NULL,
+                topic_focus TEXT NOT NULL,
+                duration_seconds_used REAL,
+                duration_seconds_total INTEGER,
+                conceptual_correct INTEGER,
+                conceptual_total INTEGER,
+                coding_passed INTEGER,
+                coding_total INTEGER,
+                overall_score REAL,
+                readiness_score REAL,
+                grade TEXT,
+                xp_earned INTEGER,
+                ran_out_of_time BOOLEAN DEFAULT 0,
+                completed_at TEXT DEFAULT (datetime('now'))
+            );
         """)
         self.conn.commit()
 
@@ -355,6 +374,56 @@ class Database:
             (user_id,),
         ).fetchall()
         return {r["challenge_id"] for r in rows}
+
+    # --- Interview simulation ---
+
+    def save_interview_result(
+        self, user_id: int, level: str, topic_focus: str,
+        duration_seconds_used: float, duration_seconds_total: int,
+        conceptual_correct: int, conceptual_total: int,
+        coding_passed: int, coding_total: int,
+        overall_score: float, readiness_score: float,
+        grade: str, xp_earned: int, ran_out_of_time: bool,
+    ) -> int:
+        cursor = self.conn.execute(
+            """INSERT INTO interview_results
+               (user_id, level, topic_focus, duration_seconds_used,
+                duration_seconds_total, conceptual_correct, conceptual_total,
+                coding_passed, coding_total, overall_score, readiness_score,
+                grade, xp_earned, ran_out_of_time)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (user_id, level, topic_focus, duration_seconds_used,
+             duration_seconds_total, conceptual_correct, conceptual_total,
+             coding_passed, coding_total, overall_score, readiness_score,
+             grade, xp_earned, ran_out_of_time),
+        )
+        self.conn.commit()
+        return cursor.lastrowid
+
+    def get_interview_history(self, user_id: int, limit: int = 20) -> list[dict]:
+        rows = self.conn.execute(
+            """SELECT * FROM interview_results
+               WHERE user_id = ?
+               ORDER BY completed_at DESC
+               LIMIT ?""",
+            (user_id, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def get_best_interview_score(self, user_id: int, level: str) -> float | None:
+        row = self.conn.execute(
+            """SELECT MAX(readiness_score) as best FROM interview_results
+               WHERE user_id = ? AND level = ?""",
+            (user_id, level),
+        ).fetchone()
+        return row["best"] if row and row["best"] is not None else None
+
+    def get_total_interviews_taken(self, user_id: int) -> int:
+        row = self.conn.execute(
+            "SELECT COUNT(*) as n FROM interview_results WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        return row["n"] if row else 0
 
     def close(self):
         self.conn.close()

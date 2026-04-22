@@ -83,6 +83,22 @@ ACHIEVEMENTS: dict[str, Achievement] = {
         "25_challenges", "Code Master",
         "Pass 25 coding challenges", ";",
     ),
+    "first_interview": Achievement(
+        "first_interview", "Suited Up",
+        "Complete your first mock interview", "I",
+    ),
+    "interview_pass": Achievement(
+        "interview_pass", "Interview Passed",
+        "Score 70%+ on a mock interview", "P",
+    ),
+    "interview_ace": Achievement(
+        "interview_ace", "Interview Ace",
+        "Score 90%+ on a mock interview", "A",
+    ),
+    "senior_ready": Achievement(
+        "senior_ready", "Senior Ready",
+        "Pass a senior-level interview with 70%+", "S",
+    ),
 }
 
 # Level definitions

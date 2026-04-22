@@ -1,0 +1,175 @@
+/* Interview simulation styling */
+
+.section-title {
+    text-style: bold;
+    color: $primary;
+    margin: 1 2;
+}
+
+.interview-subtitle {
+    color: $text-muted;
+    margin: 0 2 1 2;
+}
+
+#interview-config {
+    padding: 1 2;
+}
+
+.config-label {
+    text-style: bold;
+    margin: 1 0 0 0;
+}
+
+#level-buttons {
+    height: auto;
+    margin: 0 0 1 0;
+}
+
+.level-btn {
+    margin: 0 1 0 0;
+    min-width: 28;
+}
+
+.level-btn.selected {
+    border: thick $accent;
+    text-style: bold;
+}
+
+#topic-focus-list {
+    height: 10;
+    border: solid $primary-darken-1;
+    margin: 0 0 1 0;
+}
+
+#pb-display {
+    color: $warning;
+    margin: 0 0 1 0;
+}
+
+#start-row {
+    height: auto;
+    margin-top: 1;
+}
+
+/* --- Session screen --- */
+
+#interview-header-bar {
+    height: 3;
+    border-bottom: solid $primary-darken-2;
+    padding: 0 2;
+}
+
+#interview-header-bar Label {
+    width: 1fr;
+    content-align: center middle;
+}
+
+#interview-level-label {
+    text-style: bold;
+    color: $primary;
+}
+
+#interview-timer {
+    text-style: bold;
+    color: $success;
+}
+
+#interview-timer.timer-warning {
+    color: $error;
+    text-style: bold reverse;
+}
+
+#interview-progress {
+    color: $text-muted;
+    text-align: right;
+}
+
+#interview-content {
+    padding: 1 2;
+}
+
+.coding-title {
+    text-style: bold;
+    color: $warning;
+    margin: 0 0 1 0;
+}
+
+#coding-editor {
+    height: 20;
+    margin: 1 0;
+}
+
+#coding-actions {
+    height: auto;
+    margin: 1 0;
+}
+
+#coding-actions Button {
+    margin-right: 1;
+}
+
+#coding-feedback {
+    margin-top: 1;
+    padding: 0 1;
+}
+
+/* --- Results screen --- */
+
+#results-header {
+    height: auto;
+    padding: 1 2;
+    border-bottom: solid $primary-darken-2;
+}
+
+#grade-display {
+    text-align: center;
+    text-style: bold;
+    width: 1fr;
+    padding: 1;
+}
+
+.grade-a {
+    color: $success;
+    text-style: bold;
+}
+.grade-b {
+    color: $primary;
+    text-style: bold;
+}
+.grade-c {
+    color: $warning;
+    text-style: bold;
+}
+.grade-d {
+    color: $warning;
+}
+.grade-f {
+    color: $error;
+    text-style: bold;
+}
+
+.verdict-text {
+    text-align: center;
+    color: $text-muted;
+    width: 1fr;
+    margin: 0 2;
+}
+
+.results-section-title {
+    text-style: bold;
+    color: $accent;
+    margin: 1 0 0 0;
+}
+
+#results-content {
+    padding: 1 2;
+}
+
+#results-actions {
+    height: auto;
+    margin: 2 0;
+}
+
+#results-actions Button {
+    margin-right: 1;
+}
